@@ -1,0 +1,43 @@
+// (Colors are in hexadecimal argb format)
+// Space
+ff ff ff ff
+
+// Colors randomly chosen for empires
+
+ff ff 00 00
+ff ff 33 00
+ff ff 66 00
+ff ff 99 00
+ff ff cc 00
+ff ff ff 00
+ff cc ff 00
+ff 99 ff 00
+ff 66 ff 00
+ff 33 ff 00
+ff 00 ff 00
+ff 00 ff 33
+ff 00 ff 66
+ff 00 ff 99
+ff 00 ff cc
+ff 00 ff ff
+ff 00 cc ff
+ff 00 99 ff
+ff 00 66 ff
+ff 00 33 ff
+ff 00 00 ff
+ff 33 00 ff
+ff 66 00 ff
+ff 99 00 ff
+ff cc 00 ff
+ff ff 00 ff
+ff ff 00 cc
+ff ff 00 99
+ff ff 00 66
+ff ff 00 33
+ff ff 00 00
+ff 00 00 00
+ff 33 33 33
+ff 66 66 66
+ff 99 99 99
+ff cc cc cc
+ff ff ff ff
