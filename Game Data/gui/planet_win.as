@@ -12,7 +12,7 @@ import void triggerContextMenu(Object@) from "context_menu";
 
 /* {{{ Constants */
 const int MIN_WIDTH = 730;
-const int MIN_HEIGHT = 442;
+const int MIN_HEIGHT = 468;
 
 const float unitsPerAU = 1000.f;
 const float econUpdateLength = 1.f;
@@ -22,14 +22,14 @@ const float queueCheckDelay = 1.f;
 
 const string@ strFood = "Food", strOre = "Ore", strDamage = "Damage";
 const string@ strLabor = "Labr", strWorkers = "Workers", strMood = "Mood";
-const string@ strMetals = "Metals", strElects = "Electronics", strAdvParts = "AdvParts";
+const string@ strMetals = "Metals", strElects = "Electronics", strAdvParts = "AdvParts", strFuel = "Fuel", strAmmo = "Ammo";
 string@ strUnique = "Unique";
 
 const string@ strDisableCivilActs = "disable_civil_acts", strFastConsumption = "fast_consumption", strNoFood = "no_food";
 const string@ actShortWorkWeek = "work_low", actForcedLabor = "work_forced", actTaxBreak = "tax_break";
 const string@ strLowLuxuries = "low_luxuries_consumption", strHighLuxuries = "high_luxuries_consumption";
 const string@ strIndifferent = "forever_indifferent";
-const string@ strAdvGen = "AdvG", strElcGen = "ElcG", strMtlGen = "MineM", strFoodGen = "FudGe";
+const string@ strAdvGen = "AdvG", strElcGen = "ElcG", strMtlGen = "MineM", strFoodGen = "FudGe", strFuelG = "FuelG", strAmmoG = "AmmoG";
 string@ strElectronics = "Electronics";
 const string@ strLuxsGen = "LuxG", strGudsGen = "GudsG", strTrade = "Trade", strTradeMode = "TradeMode";
 const double million = 1000000.0;
@@ -37,8 +37,11 @@ const double million = 1000000.0;
 const string[] shipTooltipHints = {"Armor", "Shield", "Thrust", "Fuel", "ShipBay"};
 uint shipTooltipHintCount = 5;
 
-string@[] resNames = { "#advparts", "#electronics", "#metals", "#food", "#goods", "#luxuries" };
-uint[] resColors = { 0xffc2e4ff, 0xfff6ff00, 0xffeaeaea, 0xff197b30, 0xff987433, 0xffffb9b9 };
+string@[] resNames =   { "#advparts",    "#electronics", "#metals",      "#food",
+                         "#goods",       "#luxuries",    "#fuel",        "#ammo"      };
+uint[] resColors =     {  0xffc2e4ff,     0xfff6ff00,     0xffeaeaea,     0xff197b30,
+                          0xff987433,     0xffffb9b9,     0xffff8000,     0xffaaaaaa  };
+						  
 /* }}} */
 /* {{{ Planet Window Handle */
 class PlanetWindowHandle {
@@ -244,7 +247,7 @@ class PlanetWindow : ScriptedGuiHandler {
 	float econUpdateTick;
 
 	void init(GuiElement@ ele) {
-		economyValues.resize(7*6);
+		economyValues.resize(7*8);
 		syncTimer = 0.f;
 		queueCheckTime = 0.f;
 		buildingStructures = 0;
@@ -313,9 +316,9 @@ class PlanetWindow : ScriptedGuiHandler {
 		resources.add(gui_sprite("planet_topbar_resources", 5), localize("#PLTT_Mood"), 0, 1);
 
 		// Tabs
-		@queueTab = TabButton(recti(), localize("#PL_MANAGE_QUEUE"), topPanel);
+		@queueTab   = TabButton(recti(), localize("#PL_MANAGE_QUEUE"), topPanel);
 		@structsTab = TabButton(recti(), localize("#PL_STRUCTURES"), topPanel);
-		@econTab = TabButton(recti(), localize("#PL_Economy"), topPanel);
+		@econTab    = TabButton(recti(), localize("#PL_Economy"), topPanel);
 
 		queueTab.setPressed(true);
 
@@ -475,13 +478,13 @@ class PlanetWindow : ScriptedGuiHandler {
 		txt.setTextAlignment(EA_Right, EA_Top);
 
 		// Create economy data fields
-		for (uint i = 0; i < 6; ++i) {
+		for (uint i = 0; i < 8; ++i) {
 			GuiStaticText@ text = GuiStaticText(recti(pos2di(12, 128+(20*i)), dim2di(60, 20)), null, false, false, false, econPanel);
 			text.setText(localize(resNames[i]));
 			text.setColor(Color(resColors[i]));
 			@economyValues[(i*7)] = text;
 
-			if (i < 4) {
+			if (i < 4 || i > 5) {
 				@text = GuiStaticText(recti(pos2di(130, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
 				text.setTextAlignment(EA_Right, EA_Top);
 				@economyValues[(i*7)+1] = text;
@@ -1221,6 +1224,16 @@ class PlanetWindow : ScriptedGuiHandler {
 	}
 
 	EventReturn onKeyEvent(GuiElement@ ele, const KeyEvent& evt) {
+		if (evt.pressed) {
+			if (evt.key == 221) {
+				nextPlanet();
+				return ER_Absorb;
+			}
+			if (evt.key == 219) {
+				prevPlanet();
+				return ER_Absorb;
+			}
+		}
 		return ER_Pass;
 	}
 
@@ -1410,6 +1423,8 @@ class PlanetWindow : ScriptedGuiHandler {
 	float elcAvg;
 	float mtlAvg;
 	float tradeAvg;
+	float fulAvg;
+	float amoAvg;
 
 	float advExpAvg;
 	float elcExpAvg;
@@ -1417,12 +1432,17 @@ class PlanetWindow : ScriptedGuiHandler {
 	float fudExpAvg;
 	float luxExpAvg;
 	float gudExpAvg;
+	float fulExpAvg;
+	float amoExpAvg;
 
 	void resetRates() {
 		advAvg = -1.f;
 		elcAvg = -1.f;
 		mtlAvg = -1.f;
 		tradeAvg = -1.f;
+		fulAvg = -1.f;
+		amoAvg = -1.f;
+		
 		
 		advExpAvg = -1.f;
 		elcExpAvg = -1.f;
@@ -1430,6 +1450,8 @@ class PlanetWindow : ScriptedGuiHandler {
 		fudExpAvg = -1.f;
 		luxExpAvg = -1.f;
 		gudExpAvg = -1.f;
+		fulExpAvg = -1.f;
+		amoExpAvg = -1.f;
 	}
 
 	void updateRate(GuiStaticText@ ele, float val) {
@@ -1574,17 +1596,22 @@ class PlanetWindow : ScriptedGuiHandler {
 		float advTrans = 0.f, elcTrans = 0.f, mtlTrans = 0.f, fudTrans = 0.f;
 		float mtlCons = 0.f, elcCons = 0.f, foodCons = 0.f;
 		float gotGuds = 0.f, gotLuxs = 0.f;
+		float fulGen = 0.f, amoGen = 0.f, fulTrans = 0.f, amoTrans = 0.f;
 
-		obj.getStateVals(strAdvGen, advGen, temp, temp, advTrans);
-		obj.getStateVals(strElcGen, elcGen, temp, temp, elcTrans);
-		obj.getStateVals(strMtlGen, mtlGen, temp, temp, mtlTrans);
+		obj.getStateVals( strAdvGen, advGen,  temp, temp, advTrans);
+		obj.getStateVals( strElcGen, elcGen,  temp, temp, elcTrans);
+		obj.getStateVals( strMtlGen, mtlGen,  temp, temp, mtlTrans);
 		obj.getStateVals(strFoodGen, foodGen, temp, temp, fudTrans);
 		obj.getStateVals(strLuxsGen, luxsGen, temp, temp, gotLuxs);
 		obj.getStateVals(strGudsGen, gudsGen, temp, temp, gotGuds);
+		obj.getStateVals(  strFuelG, fulGen,  temp, temp, fulTrans);
+		obj.getStateVals(  strAmmoG, amoGen,  temp, temp, amoTrans);	
 
 		advAvg = movingAvg(advGen, advAvg);
 		mtlAvg = movingAvg(mtlGen, mtlAvg);
 		elcAvg = movingAvg(elcGen, elcAvg);
+		fulAvg = movingAvg(fulGen, fulAvg);
+		amoAvg = movingAvg(amoGen, amoAvg);
 
 		advExpAvg = movingAvg(advTrans, advExpAvg);
 		mtlExpAvg = movingAvg(mtlTrans, mtlExpAvg);
@@ -1592,6 +1619,8 @@ class PlanetWindow : ScriptedGuiHandler {
 		fudExpAvg = movingAvg(fudTrans, fudExpAvg);
 		gudExpAvg = movingAvg(gotGuds, gudExpAvg);
 		luxExpAvg = movingAvg(gotLuxs, luxExpAvg);
+		fulExpAvg = movingAvg(fulTrans, fulExpAvg);
+		amoExpAvg = movingAvg(amoTrans, amoExpAvg);
 
 		foodCons = float(population * (0.06 / million));
 		mtlCons = advGen + elcGen * 2.f;
@@ -1618,19 +1647,18 @@ class PlanetWindow : ScriptedGuiHandler {
 			}
 
 			float val = 0.f, max = 0.f, cargo = 0.f, temp = 0.f;
-			if (obj.getStateVals(strAdvParts, val, max, temp, cargo))
-				updateStorage(0, val+cargo, max);
-			if (obj.getStateVals(strElectronics, val, max, temp, cargo))
-				updateStorage(1, val+cargo, max);
-			if (obj.getStateVals(strMetals, val, max, temp, cargo))
-				updateStorage(2, val+cargo, max);
-			if (obj.getStateVals(strFood, val, max, temp, cargo))
-				updateStorage(3, val+cargo, max);
+			if (obj.getStateVals(   strAdvParts, val, max, temp, cargo))		updateStorage(0, val+cargo, max);
+			if (obj.getStateVals(strElectronics, val, max, temp, cargo))		updateStorage(1, val+cargo, max);
+			if (obj.getStateVals(     strMetals, val, max, temp, cargo))		updateStorage(2, val+cargo, max);
+			if (obj.getStateVals(       strFood, val, max, temp, cargo))		updateStorage(3, val+cargo, max);
+			
+			if (obj.getStateVals(       strFuel, val, max, temp, cargo))		updateStorage(6, val+cargo, max);
+			if (obj.getStateVals(       strAmmo, val, max, temp, cargo))		updateStorage(7, val+cargo, max);		
 
-			updateRate(0, advAvg+advGen, 0, -advExpAvg);
-			updateRate(1, elcAvg+elcGen, -elcCons, -elcExpAvg);
-			updateRate(2, mtlAvg+mtlGen, -mtlCons, -mtlExpAvg);
-			updateRate(3, foodGen, -foodCons, -fudExpAvg);
+			updateRate(0, advAvg+advGen, 0,         -advExpAvg);
+			updateRate(1, elcAvg+elcGen, -elcCons,  -elcExpAvg);
+			updateRate(2, mtlAvg+mtlGen, -mtlCons,  -mtlExpAvg);
+			updateRate(3, foodGen,       -foodCons, -fudExpAvg);
 
 			if (hasMood) {
 				updateRate(4, gudsGen, -gudsCons, gudExpAvg);
@@ -1640,6 +1668,9 @@ class PlanetWindow : ScriptedGuiHandler {
 				updateRate(4, 0, 0, 0);
 				updateRate(5, 0, 0, 0);
 			}
+			
+			updateRate(6, fulAvg+fulGen, 0,         -fulExpAvg);
+			updateRate(7, amoAvg+amoGen, 0,         -amoExpAvg);
 		}
 	}
 	/* }}} */
