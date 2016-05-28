@@ -25,8 +25,8 @@ const double c_e = 2.71828183;
 import float processOre(Object@ obj, float Rate) from "Economy";
 import float makeElectronics(Object@ obj, float Rate) from "Economy";
 import float makeAdvParts(Object@ obj, float Rate) from "Economy";
-import float makeFuel(Object@ obj, float Rate) from "Economy";
-import float makeAmmo(Object@ obj, float Rate) from "Economy";
+//import float makeFuel(Object@ obj, float Rate) from "Economy";
+//import float makeAmmo(Object@ obj, float Rate) from "Economy";
 
 //EMPIRE ACTS:
 //============
@@ -289,12 +289,16 @@ void tick(Planet@ pl, float time) {
 		mtlRate.val = processOre(obj, modifyEcoRate(mtlRate.max * tickEco, EM_Metals, ecoRate, ecoType)) / time;
 		
 	State@ fuelRate = obj.getState(strFuelGen);
+		/*
 	if(@fuelRate != null && fuelRate.max > 0)
 		fuelRate.val = makeFuel(obj, fuelRate.max) / time;
+		*/
 		
 	State@ ammoRate = obj.getState(strAmmoGen);
+		/*
 	if(@ammoRate != null && ammoRate.max > 0)
 		ammoRate.val = makeAmmo(obj, ammoRate.max * tickEco) / time;
+		*/
 		
 	float consumeFactor = time;
 	if(hasCivilActs && emp.getSetting(actTaxBreak) == 1)
