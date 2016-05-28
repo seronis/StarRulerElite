@@ -3,6 +3,7 @@ const string@ strMtl = "Metals", strMine = "MineM", strMtlGen = "MtlG";
 const string@ strElc = "Electronics", strElcGen = "ElcG";
 const string@ strAdv = "AdvParts", strAdvGen = "AdvG", strFoodGen = "FudGe";
 const string@ strFood = "Food", strGoods = "Guds", strLuxuries = "Luxs";
+const string@ strFuel = "Fuel", strFuelGen = "FuelG", strAmmo = "Ammo", strAmmoGen = "AmmoG";
 const string@ strLabor = "Labr", strWorkers = "Workers", strTrade = "Trade", strMood = "Mood", strTradeMode = "TradeMode";
 const string@ actShortWorkWeek = "work_low", actForcedLabor = "work_forced", actTaxBreak = "tax_break", strEthics = "ethics", strEcoMode = "eco_mode";
 const string@ actStockPile = "act_stockpile";
@@ -24,6 +25,8 @@ const double c_e = 2.71828183;
 import float processOre(Object@ obj, float Rate) from "Economy";
 import float makeElectronics(Object@ obj, float Rate) from "Economy";
 import float makeAdvParts(Object@ obj, float Rate) from "Economy";
+import float makeFuel(Object@ obj, float Rate) from "Economy";
+import float makeAmmo(Object@ obj, float Rate) from "Economy";
 
 //EMPIRE ACTS:
 //============
@@ -107,6 +110,10 @@ void popEcoInit(Event@ evt) {
 	evt.obj.getState(strElcGen);
 	evt.obj.getState(strAdv);
 	evt.obj.getState(strAdvGen);
+	evt.obj.getState(strFuel);
+	evt.obj.getState(strFuelGen);
+	evt.obj.getState(strAmmo);
+	evt.obj.getState(strAmmoGen);
 }
 
 float modifyEcoRate(float rate, ecoMode type, ecoMode rateMode, ecoMode typeMode) {
@@ -280,7 +287,15 @@ void tick(Planet@ pl, float time) {
 	State@ mtlRate = obj.getState(strMine);
 	if(@mtlRate != null && mtlRate.max > 0)
 		mtlRate.val = processOre(obj, modifyEcoRate(mtlRate.max * tickEco, EM_Metals, ecoRate, ecoType)) / time;
-	
+		
+	State@ fuelRate = obj.getState(strFuelGen);
+	if(@fuelRate != null && fuelRate.max > 0)
+		fuelRate.val = makeFuel(obj, fuelRate.max) / time;
+		
+	State@ ammoRate = obj.getState(strAmmoGen);
+	if(@ammoRate != null && ammoRate.max > 0)
+		ammoRate.val = makeAmmo(obj, ammoRate.max * tickEco) / time;
+		
 	float consumeFactor = time;
 	if(hasCivilActs && emp.getSetting(actTaxBreak) == 1)
 		consumeFactor *= 1.5f;
@@ -402,69 +417,99 @@ void tick(Planet@ pl, float time) {
 			State@ sp_Advs = obj.getState(strAdv);
 			float advWeight = getResourceWeight(sp_Advs, cargoSpaceLeft, tradeTarget);
 			
-			float totalWeight = abs(foodWeight) + abs(mtlWeight) + abs(elecWeight) + abs(advWeight);
+			State@ sp_Fuel = obj.getState(strFuel);
+			float fuelWeight = getResourceWeight(sp_Fuel, sp_Fuel.getTotalFreeSpace(obj), tradeTarget);
+			
+			State@ sp_Ammo = obj.getState(strAmmo);
+			float ammoWeight = getResourceWeight(sp_Ammo, sp_Ammo.getTotalFreeSpace(obj), tradeTarget);
+			
+			float totalWeight = abs(foodWeight) + abs(mtlWeight) + abs(elecWeight) + abs(advWeight) + abs(fuelWeight) + abs(ammoWeight);
 			
 			if(totalWeight > 0) {
-				advRate.inCargo = tradeResource(emp, obj, sp_Advs, strAdv, tickTrade * advWeight/totalWeight, tradeEff, advMode);
-				elcRate.inCargo = tradeResource(emp, obj, sp_Elecs, strElc, tickTrade * elecWeight/totalWeight, tradeEff, elcMode);
-				mtlRate.inCargo = tradeResource(emp, obj, sp_Metals, strMtl, tickTrade * mtlWeight/totalWeight, tradeEff, mtlMode);
-				foodRate.inCargo = tradeResource(emp, obj, sp_Food, strFood, tickTrade * foodWeight/totalWeight, 1.f, fudMode);
-				tickTrade -= abs(advRate.inCargo) + abs(elcRate.inCargo) + abs(mtlRate.inCargo) + abs(foodRate.inCargo);
+				advRate.inCargo  = tradeResource(emp, obj, sp_Advs,   strAdv,  tickTrade *  advWeight/totalWeight, tradeEff, advMode);
+				elcRate.inCargo  = tradeResource(emp, obj, sp_Elecs,  strElc,  tickTrade * elecWeight/totalWeight, tradeEff, elcMode);
+				mtlRate.inCargo  = tradeResource(emp, obj, sp_Metals, strMtl,  tickTrade *  mtlWeight/totalWeight, tradeEff, mtlMode);
+				foodRate.inCargo = tradeResource(emp, obj, sp_Food,   strFood, tickTrade * foodWeight/totalWeight, 1.f,      fudMode);
+				fuelRate.inCargo = tradeResource(emp, obj, sp_Fuel,   strFuel, tickTrade * fuelWeight/totalWeight, tradeEff, fudMode);
+				ammoRate.inCargo = tradeResource(emp, obj, sp_Ammo,   strAmmo, tickTrade * ammoWeight/totalWeight, tradeEff, mtlMode);
+				tickTrade -= abs(advRate.inCargo)  + abs(elcRate.inCargo)  + abs(mtlRate.inCargo)
+				           + abs(foodRate.inCargo) + abs(fuelRate.inCargo) + abs(ammoRate.inCargo);
 			}
 			else {
-				advRate.inCargo = 0;
-				elcRate.inCargo = 0;
-				mtlRate.inCargo = 0;
+				advRate.inCargo  = 0;
+				elcRate.inCargo  = 0;
+				mtlRate.inCargo  = 0;
 				foodRate.inCargo = 0;
+				fuelRate.inCargo = 0;
+				ammoRate.inCargo = 0;
 			}
 			
-			if(tickTrade > 0) {
-				float traded = 0.f;
+			float traded = 0.f;
 
+			if (tickTrade > 0) {
+				traded = tradeResource(emp, obj, sp_Food, strFood, tickTrade * sign(foodWeight), 1.f,      fudMode);
+				foodRate.inCargo += traded;
+				tickTrade -= abs(traded);
+			}
+
+			if(tickTrade > 0) {
 				traded = tradeResource(emp, obj, sp_Advs, strAdv, tickTrade * sign(advWeight), tradeEff, advMode);
 				advRate.inCargo += traded;
 				tickTrade -= abs(traded);
+			}
 
-				if (tickTrade > 0) {
-					traded = tradeResource(emp, obj, sp_Elecs, strElc, tickTrade * sign(elecWeight), tradeEff, elcMode);
-					elcRate.inCargo += traded;
-					tickTrade -= abs(traded);
+			if (tickTrade > 0) {
+				traded = tradeResource(emp, obj, sp_Elecs, strElc, tickTrade * sign(elecWeight), tradeEff, elcMode);
+				elcRate.inCargo += traded;
+				tickTrade -= abs(traded);
+			}
 
-					if (tickTrade > 0) {
-						traded = tradeResource(emp, obj, sp_Metals, strMtl, tickTrade * sign(mtlWeight), tradeEff, mtlMode);
-						mtlRate.inCargo += traded;
-						tickTrade -= abs(traded);
+			if (tickTrade > 0) {
+				traded = tradeResource(emp, obj, sp_Metals, strMtl, tickTrade * sign(mtlWeight), tradeEff, mtlMode);
+				mtlRate.inCargo += traded;
+				tickTrade -= abs(traded);
+			}
 
-						if (tickTrade > 0) {
-							traded = tradeResource(emp, obj, sp_Food, strFood, tickTrade * sign(foodWeight), 1.f, fudMode);
-							foodRate.inCargo += traded;
-							tickTrade -= abs(traded);
-						}
-					}
-				}
+			if (tickTrade > 0) {
+				traded = tradeResource(emp, obj, sp_Fuel, strFuel, tickTrade * sign(fuelWeight), tradeEff, fudMode);
+				fuelRate.inCargo += traded;
+				tickTrade -= abs(traded);
+			}
+
+			if(tickTrade > 0) {
+				traded = tradeResource(emp, obj, sp_Ammo, strAmmo, tickTrade * sign(ammoWeight), tradeEff, mtlMode);
+				ammoRate.inCargo += traded;
+				tickTrade -= abs(traded);
 			}
 			tradeRate.required = ((tradeRate.val * time) - tickTrade) / time;
 
-			advRate.inCargo /= time;
-			elcRate.inCargo /= time;
-			mtlRate.inCargo /= time;
+			advRate.inCargo  /= time;
+			elcRate.inCargo  /= time;
+			mtlRate.inCargo  /= time;
 			foodRate.inCargo /= time;
+			fuelRate.inCargo /= time;
+			ammoRate.inCargo /= time;
 		}
 		else {
-			tradeRate.required = 0;
-			advRate.inCargo = 0;
-			elcRate.inCargo = 0;
-			mtlRate.inCargo = 0;
+			advRate.inCargo  = 0;
+			elcRate.inCargo  = 0;
+			mtlRate.inCargo  = 0;
 			foodRate.inCargo = 0;
+			fuelRate.inCargo = 0;
+			ammoRate.inCargo = 0;
+
+			tradeRate.required = 0;
 		}
 	}
 	else {
-		advRate.inCargo = 0;
-		elcRate.inCargo = 0;
-		mtlRate.inCargo = 0;
-		foodRate.inCargo = 0;
+		advRate.inCargo   = 0;
+		elcRate.inCargo   = 0;
+		mtlRate.inCargo   = 0;
+		foodRate.inCargo  = 0;
 		goodsRate.inCargo = 0;
-		luxsRate.inCargo = 0;
+		luxsRate.inCargo  = 0;
+		fuelRate.inCargo  = 0;
+		ammoRate.inCargo  = 0;
 
 		State@ tradeRate = obj.getState(strTrade);
 		tradeRate.required = 0;
