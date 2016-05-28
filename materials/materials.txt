@@ -1,2 +1,5 @@
 
 #include "~/materials/materials.txt"
+
+Material: elite_globalbank_ticker
+ Texture: Images/GUI/elite_ticker.png
