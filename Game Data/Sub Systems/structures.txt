@@ -9,7 +9,7 @@ System: SciLab
 	Mass: 500 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	
 	Tags: Structure
-	Tied To: Science 1
+	Tied To: Science 0
 
 	Costs: Metals[200 * Size * pow(COST_INC_CRV, Level)], Electronics[200 * Size * pow(COST_INC_CRV, Level)], AdvParts[200 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size]
 	Complexity: 10
@@ -197,12 +197,15 @@ System: City
 	Complexity: 2
 	
 	vHousing: Size * 2000000 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
-	vLaborPool: Size * 0.3 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vLaborPool: Size * 1.0 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vFoodReq: vHousing * 0.00000006
 	
 	Provides: Housing with
 		Amount[vHousing]
 	
 	Provides: LaborPool with Amount[vLaborPool]
+	
+	Provides: FoodStorage with Amount[vFoodReq * 30]
 	
 	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 1.25 * Size]
 
@@ -227,7 +230,8 @@ System: Bunker
 	Complexity: 2
 	
 	vHousing: Size * 600000 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
-	vLaborPool: Size * 0.05 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vLaborPool: Size * 0.3 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vFoodReq: vHousing * 0.00000006
 	vSoakDamage: Size * 25 * pow(LEVEL_GAIN_CURVE, Level)
 	
 	Provides: SoakDamage with
@@ -235,6 +239,8 @@ System: Bunker
 	
 	Provides: Housing with
 		Amount[vHousing]
+	
+	Provides: FoodStorage with Amount[vFoodReq * 300]
 	
 	Provides: LaborPool with Amount[vLaborPool]
 	
@@ -248,47 +254,53 @@ System: Capital
 	Description: #SS_CAPITAL_DESC
 
 	Available: true
-	Level: 1
+	Level: max(1, ceil((Techs.Sociology.Level+Techs.Economics.Level)/2))
 	Size: Scale
 	Durability: 2000 * Size
 	Mass: 400 * Size
 	
 	Tags: Structure, Unique, Capitol, Unique:Capitol
 	
-	Costs: Labr[BLDG_LABR_MULT * 100 * Size]
+	Costs: Metals[200 * Size * pow(COST_INC_CRV, Level)], Electronics[100 * Size * pow(COST_INC_CRV, Level)], AdvParts[50 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 25 * Size]
 	Complexity: 1
 	
-	vHousing: Size * 600000
+	vCapSupport: Size * 10 * pow(LEVEL_GAIN_CURVE, Level)
+	vStorage: Size * 250 * Level
+	
+	vTrade: Size * 3 * pow(LEVEL_GAIN_CURVE, Level) * TRADE_RATE_MULT
+	
+	vHousing: Size * 600000 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vLaborPool: Size * 0.3 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vFoodReq: vHousing * 0.00000006
 	
 	Provides: Housing with
 		Amount[vHousing]
+
+	Provides: Trade with
+		Rate[vTrade]
 	
-	Provides: FoodStorage with Amount[500]
+	Provides: FoodStorage with Amount[500 + vFoodReq * 60]
 
 	Provides: MetalStorage with
-		Amount[Size * 250]
+		Amount[vStorage * 0.5]
 
 	Provides: ElecStorage with
-		Amount[Size * 100]
+		Amount[vStorage * 0.3]
 
 	Provides: AdvPartsStorage with
-		Amount[Size * 50]
-
-	Provides: MakeFood with
-		Rate[Size * 0.1]
+		Amount[vStorage * 0.2]
 	
 	Provides: Repair with Rate[Durability / 120]
 	
-	Provides: LaborPool with Amount[Size * 0.1]
+	Provides: LaborPool with Amount[vLaborPool]
 	
 	Provides: PopEconomy
 	
 	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 1.25 * Size]
+	
+	Provides: CapitalSupport with Metals[vCapSupport * 0.5], Electronics[vCapSupport * 0.3], AdvParts[vCapSupport * 0.2], Food[vFoodReq]
 
-	Provides: Trade with
-		Rate[Size * 3]
-
-	Hints: Housing[vHousing], TradeRate[Size * 3]
+	Hints: Housing[vHousing], TradeRate[vTrade], MtlGen[vCapSupport * 0.5], ElecGen[vCapSupport * 0.3], AdvGen[vCapSupport * 0.2], FoodGen[vFoodReq]
 
 
 System: GalacticCapital
@@ -296,44 +308,54 @@ System: GalacticCapital
 	Description: #SS_GLXCAPITAL_DESC
 
 	Available: true
-	Level: 1
+	Level: max(1, ceil((Techs.Sociology.Level+Techs.Economics.Level)/2))
 	Size: Scale
 	Durability: 20000 * Size
 	Mass: 400 * Size
 	
-	Tags: Structure, Unique, NoManualBuild, Capitol, Unique:Capitol
+	Tags: Structure, Unique, Capitol, Unique:Capitol
 	
-	Costs: Labr[BLDG_LABR_MULT * 400 * Size]
+	Costs: Metals[200 * Size * pow(COST_INC_CRV, Level)], Electronics[100 * Size * pow(COST_INC_CRV, Level)], AdvParts[50 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 50 * Size]
 	Complexity: 1
 	
-	vHousing: Size * 2400000
+	vCapSupport: Size * 10 * pow(LEVEL_GAIN_CURVE, Level)
+	vStorage: Size * 500 * Level
+	
+	vTrade: Size * 6 * pow(LEVEL_GAIN_CURVE, Level) * TRADE_RATE_MULT
+	
+	vHousing: Size * 1200000 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vLaborPool: Size * 0.6 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
+	vFoodReq: vHousing * 0.00000006
 	
 	Provides: Housing with
 		Amount[vHousing]
+
+	Provides: Trade with
+		Rate[vTrade]
 	
-	Provides: FoodStorage with Amount[2000]
+	Provides: FoodStorage with Amount[1000 + vFoodReq * 300]
 
 	Provides: MetalStorage with
-		Amount[Size * 2500]
+		Amount[vStorage * 0.5]
 
 	Provides: ElecStorage with
-		Amount[Size * 1000]
+		Amount[vStorage * 0.3]
 
 	Provides: AdvPartsStorage with
-		Amount[Size * 500]
+		Amount[vStorage * 0.2]
 	
 	Provides: Repair with Rate[Durability / 12]
 	
-	Provides: LaborPool with Amount[Size * 1]
+	Provides: LaborPool with Amount[vLaborPool]
 	
 	Provides: PopEconomy
 	
 	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 2.5 * Size]
 	
 	//Free (but slow) generation of key resources
-	Provides: CapitalSupport with Metals[Size * 50], Electronics[Size * 25], AdvParts[Size * 10], Food[Size * 1]
+	Provides: CapitalSupport with Metals[vCapSupport * 0.5], Electronics[vCapSupport * 0.3], AdvParts[vCapSupport * 0.2], Food[vFoodReq]
 
-	Hints: Housing[vHousing], MtlGen[Size * 50], ElecGen[Size * 25], AdvGen[Size * 10], FoodGen[Size * 1]
+	Hints: Housing[vHousing], MtlGen[vCapSupport * 0.5], ElecGen[vCapSupport * 0.3], AdvGen[vCapSupport * 0.2], FoodGen[vFoodReq]
 
 
 System: Farm
@@ -499,23 +521,20 @@ System: SpacePort
 		Amount[vShipBay]
 
 	Provides: MakeBioFuel with
-		Rate[Size * 2 * pow(LEVEL_GAIN_CURVE, econLevel)],
+		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, econLevel)],
 		FoodCostPer[0.2*decay(econLevel,5)]
 	
 	Provides: FuelStorage with
-		Amount[Size * 50 * pow(LEVEL_GAIN_CURVE, cargoLevel)]
+		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, cargoLevel)]
 	
 	Provides: MetalStorage with
-		Amount[vEcoStore / 4]
+		Amount[vEcoStore * 0.5]
 	
 	Provides: ElecStorage with
-		Amount[vEcoStore / 4]
+		Amount[vEcoStore * 0.3]
 	
 	Provides: AdvPartsStorage with
-		Amount[vEcoStore / 4]
-	
-	Provides: FoodStorage with
-		Amount[vEcoStore / 4]
+		Amount[vEcoStore * 0.2]
 	
 	Provides: NeedWorkers with
 		Workers[vWorkers]
@@ -562,18 +581,18 @@ System: ShipYard
 		Amount[vShipBay]
 
 	Provides: MakeBioFuel with
-		Rate[Size * 2 * pow(LEVEL_GAIN_CURVE, Level)],
+		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
 		FoodCostPer[0.2*decay(Level,5)]
 	
 	Provides: FuelStorage with
-		Amount[Size*50 * pow(LEVEL_GAIN_CURVE, Level)]
+		Amount[Size*100 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Provides: MakeAmmo with
-		Rate[Size * 2 * pow(LEVEL_GAIN_CURVE, Level)],
+		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
 		MetalCostPer[0.2*decay(Level,5)]
 	
 	Provides: AmmoStorage with
-		Amount[Size * 50 * pow(LEVEL_GAIN_CURVE, Level)]
+		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, Level)]
 	
 	Requires:
 		To Run:
@@ -664,7 +683,7 @@ System: CargoBlock
 	Complexity: 0.2
 	
 	vWorkers: Size * 100000
-	vCargoStore: Size * 750 * pow(LEVEL_GAIN_CURVE, Level)
+	vCargoStore: Size * 1000 * pow(LEVEL_GAIN_CURVE, Level)
 
 	Provides: Cargo with
 		Amount[vCargoStore / 2]
