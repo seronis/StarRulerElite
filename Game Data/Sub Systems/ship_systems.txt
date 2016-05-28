@@ -1,0 +1,1342 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+//Average density is 50 per size unit
+
+
+System: LightHull
+	Name: #SS_LIGHTHULL_NAME
+	Description: #SS_LIGHTHULL_DESC
+	Appearance: LightHull
+	Explosion: ship_explode centered lasting 0.5
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 3, ShipSystems 3
+	
+	Equips To: Hull
+	PreDamageOrder: -2
+	
+	Available: (Techs.ShipConstruction.Level > 2) && (Techs.ShipSystems.Level > 2)
+	Level: weight(Techs.ShipConstruction.Level, 0.7, Techs.ShipSystems.Level, 0.3)
+	
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size * (16 / 15)
+
+	Durability: Size * HEALTH_MULT * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 10
+	
+	Costs: Metals[poly(Size, 250, 37.5, 10 * sizePenalty)], Electronics[poly(Size, 100, 7.5, 2.5 * sizePenalty)], AdvParts[poly(Size,50,3,1 * sizePenalty)], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.3], DmgAlter[Scale]
+	
+	Hints: Local/DamageReduction[-1 * Scale], Local/HullSoak[30], Local/HullHP[Durability]
+
+
+System: MediumHull
+	Name: #SS_MEDHULL_NAME
+	Description: #SS_MEDHULL_DESC
+	Appearance: MediumHull
+	Explosion: ship_explode centered lasting 1.0
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 1
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: Techs.ShipConstruction.Level > 0
+	Level: Techs.ShipConstruction.Level
+	
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size
+	Durability: Size * HEALTH_MULT * 20 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 20
+
+	Costs: Metals[poly(Size, 350, 50, 16 * sizePenalty)], Electronics[poly(Size, 125, 10, 3.3 * sizePenalty)], AdvParts[poly(Size,60,4,1.33 * sizePenalty)], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.5], DmgAlter[0]
+	
+	Hints: Local/HullSoak[50], Local/HullHP[Durability]
+
+System: HeavyHull
+	Name: #SS_HVYHULL_NAME
+	Description: #SS_HVYHULL_DESC
+	Appearance: HeavyHull
+	Explosion: ship_explode centered lasting 1.5
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 3, Armor 3
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: (Techs.ShipConstruction.Level > 2) && (Techs.Armor.Level > 2)
+	Level: floor(weight(Techs.ShipConstruction.Level, 0.7, Techs.Armor.Level, 0.3))
+	
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size * (14 / 15)
+	Durability: Size * HEALTH_MULT * 50 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 40
+
+	Costs: Metals[poly(Size, 500, 100, 33 * sizePenalty)], Electronics[poly(Size, 175, 10, 3.3 * sizePenalty)], AdvParts[poly(Size,85,5,1.67 * sizePenalty)], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.7], DmgAlter[-1 * Scale]
+	
+	Hints: Local/DamageReduction[Scale], Local/HullSoak[70], Local/HullHP[Durability]
+
+
+System: StationHull
+	Name: #SS_STATIONHULL_NAME
+	Description: #SS_STATIONHULL_DESC
+	Appearance: HeavyHull
+	Explosion: ship_explode centered lasting 2.1
+	
+	Tags: IgnoresScale, Hull, Station, Restrict:Engine, Restrict:Jump Drive, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 1
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: (Techs.ShipConstruction.Level > 0)
+	
+	Level: Techs.ShipConstruction.Level
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 400) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size * (17 / 15)
+	Durability: Size * HEALTH_MULT * 50 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 40
+
+	Costs: Metals[poly(Size, 1500, 80, 26 * sizePenalty)], Electronics[poly(Size, 500, 8, 2.6 * sizePenalty)], AdvParts[poly(Size,270,3.2,1.067 * sizePenalty)], Labr[10 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.8], DmgAlter[-1 * Scale]
+	
+	Hints: Local/DamageReduction[Scale], Local/HullSoak[80], Local/HullHP[Durability]
+
+
+System: FighterHull
+	Name: #SS_FIGHTERHULL_NAME
+	Description: #SS_FIGHTERHULL_DESC
+	Appearance: StealthHull
+	Explosion: ship_explode lasting 0.25
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo, Restrict:Flak
+	Tied To: ShipConstruction 1
+
+	//Equips To: Hull //Since we can't do special damage logic with this hull, treat it as a normal sub system for damage purposes
+	PreDamageOrder: -20
+
+	Available: Techs.ShipConstruction.Level > 0
+	Level: Techs.ShipConstruction.Level
+	
+	vMaxSize: pow(LEVEL_GAIN_CURVE, max(Level - 1, 0))
+	Size: min(Object.Size,vMaxSize * 15)
+
+	vOneSpace: Object.Size * (1 / 15)
+	Durability: Size * HEALTH_MULT * 2 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 7
+
+	Costs: Metals[280 + 50 * Size], Electronics[100 + 10 * Size], AdvParts[48 + 4 * Size], Labr[4 * Size]
+	Complexity: 1
+	
+	Tick Rate: 1
+	
+	vDodgeChange: 0.3 + (0.65 * decay(pow(LEVEL_GAIN_CURVE,Level)-1,50))
+	
+	Provides: MoveDodge with HitMod[vDodgeChange]
+	Provides: DestructsShip
+	
+	Hints: Local/DodgeChance[100 * (1 - vDodgeChange)], Local/HullSoak[25], Local/HullHP[Durability], Local/MaxScale[vMaxSize]
+
+
+System: StealthHull
+	Name: #SS_STEALHHULL_NAME
+	Description: #SS_STEALHHULL_DESC
+	Appearance: StealthHull
+	Explosion: ship_explode lasting 1
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: Stealth 4, ShipConstruction 4
+
+	Equips To: Hull
+	PreDamageOrder: -6
+	
+	Available: (Techs.Stealth.Level > 3) && (Techs.ShipConstruction.Level > 3)
+	
+	Level: floor(weight(Techs.ShipConstruction.Level - 3, 0.4, Techs.Stealth.Level - 3, 0.6))
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size
+	Durability: Size * HEALTH_MULT * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 20
+	
+	Costs: Metals[poly(Size, 200, 40, 13.3 * sizePenalty)], Electronics[poly(Size, 50, 10, 3.33 * sizePenalty)], AdvParts[poly(Size,200,40,13.33 * sizePenalty)], Labr[5 * Size]
+	Complexity: 1
+	
+	Tick Rate: 1
+	
+	vDodgeChange: 0.05 + (0.85 * decay(pow(LEVEL_GAIN_CURVE,Level)-1,45))
+	
+	Provides: Chameleon with HitMod[vDodgeChange]
+
+	Provides: HullSoak with ReceivePct[0.0], DmgAlter[0]
+	
+	Hints: Local/MissChance[100 * (1 - vDodgeChange)], Local/HullSoak[0], Local/HullHP[Durability]
+
+
+System: RingworldGen
+	Name: #SS_RINGWORLD_NAME
+	Description: #SS_RINGWORLD_DESC
+	Appearance: QuantumComputerCore
+
+	Tags: IgnoresScale, Hull
+	Tied To: MegaConstruction 22, Gravitics 16, WarpPhysics 16
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: (Techs.MegaConstruction.Level > 21) && (Techs.Gravitics.Level > 15) && (Techs.WarpPhysics.Level > 15)
+	Mass: 20000000
+
+	Costs: Metals[20 * pow(10,9)], Electronics[6 * pow(10,9)], AdvParts[2 * pow(10,9)]
+
+	Provides: RingworldGen
+
+
+System: Thruster
+	Name: #SS_THRUSTER_NAME
+	Description: #SS_THRUSTER_DESC
+	Appearance: ThrusterRocket
+	Explosion: armor_explode lasting 0.4
+	
+	Tags: Engine
+	Tied To: Engines 1
+
+	Available: Techs.Engines.Level > 0
+	Level: Techs.Engines.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[200 * progress(Size, 0.05, Level)], Electronics[15 * progress(Size, 0.05, Level)], AdvParts[100 * progress(Size, 0.05, Level)], Labr[5 * Size]
+	Complexity: 0.5
+	
+	vThrust: Size * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vEfficieny: 0.00009 * (1 + 1 * decay(pow(LEVEL_GAIN_CURVE,Level),35))
+	
+	Provides: FuelStorage with
+		Amount[Size * 10]
+	
+	Provides: FuelThrust with
+		Amount[vThrust],
+		Efficiency[vEfficieny]
+
+	Requires:
+		To Run: Control[5 * Size]
+	
+	Hints: Thrust[vThrust], FuelUse[vEfficieny * vThrust * -1], Fuel[Size * 10]
+
+
+System: IonThruster
+	Name: #SS_IONTHRUSTER_NAME
+	Description: #SS_IONTHRUSTER_DESC
+	Appearance: ThrusterIon
+	Explosion: armor_explode lasting 0.4
+	
+	Tags: Engine
+	Tied To: Engines 5, EnergyPhysics 5
+
+	Available: (Techs.Engines.Level > 4) && (Techs.EnergyPhysics.Level > 4)
+	Level: floor(weight(Techs.Engines.Level, 0.7, Techs.EnergyPhysics.Level, 0.3))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[200 * progress(Size, 0.05, Level)], Electronics[15 * progress(Size, 0.05, Level)], AdvParts[100 * progress(Size, 0.05, Level)], Labr[5 * Size]
+	Complexity: 0.5
+	
+	vThrust: Size * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vEfficieny: 0.000036 * (0.5 + 0.5 * decay(pow(LEVEL_GAIN_CURVE,Level),35))
+	vPowCost: 5 * decay(pow(LEVEL_GAIN_CURVE,Level),35) * Size
+	
+	Provides: FuelStorage with
+		Amount[Size * 10]
+	
+	Provides: IonThrust with
+		Amount[vThrust],
+		Efficiency[vEfficieny], //Scales with size because effective thrust is inversely scaled to psuedo-account for mass
+		PowCost[vPowCost]
+
+	Requires:
+		To Run: Control[5 * Size]
+	
+	Hints: Thrust[vThrust], Power[vPowCost * -1], FuelUse[vEfficieny * vThrust * -1], Fuel[Size * 10]
+
+
+System: PowerGen
+	Name: #SS_POWERGEN_NAME
+	Description: #SS_POWERGEN_DESC
+	Appearance: NuclearReactor
+	Explosion: subsys_powerexplode lasting 1.25
+	
+	Tags: Support, Power
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[200 * Size], Electronics[10 * Size], Labr[5 * Size]
+	Complexity: 0.7
+	
+	vGen: Size * 25 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vCost: 0.01 * decay(Size, 30)
+
+	Provides: Power with
+		Rate[vGen],
+		Cost[vCost] //Larger power generators tend to be more efficient
+
+	Provides: Capacitance with
+		Amount[vGen * 5] //Hold 2.5 seconds of power output
+
+	Requires:
+		To Run: Control[2 * Size]
+	
+	//Multiply by 1.8 to approximate charge rate at 20% of max charge
+	Hints: Power[1.8 * vGen], FuelUse[vCost * vGen * -1.8], Charge[vGen * 5]
+
+
+System: FusionGen
+	Name: #SS_FUSIONGEN_NAME
+	Description: #SS_FUSIONGEN_DESC
+	Appearance: FusionGenerator
+	Explosion: antimatter_boom2 centered lasting 1.0
+	
+	Tags: Support, Power
+	Tied To: EnergyPhysics 5
+
+	Available: Techs.EnergyPhysics.Level > 4
+	Level: Techs.EnergyPhysics.Level - 4
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 40 * Size
+
+	Costs: Metals[200 * Size], Electronics[100 * Size], AdvParts[100 * Size], Labr[5 * Size]
+	Complexity: 0.7
+	
+	vGen: Size * 50 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vCost: 0.004 * decay(Size, 30)
+
+	Provides: Power with
+		Rate[vGen],
+		Cost[vCost] //Larger power generators tend to be more efficient
+
+	Provides: Capacitance with
+		Amount[vGen * 5]
+		
+	Provides: ExplodesShip
+	
+	Triggerable: Detonation: ShipExplosion with Damage[Size * 100 * GAME_DAMAGE_MULT], Accuracy[0.75], Range[sqrt(Size) * 6]
+
+	Requires:
+		To Run: Control[5 * Size]
+	
+	//Multiply by 1.8 to approximate charge rate at 20% of max charge
+	Hints: Power[1.8 * vGen], FuelUse[-1.8 * vGen * vCost], Local/SelfDestruct[Size * 100 * GAME_DAMAGE_MULT], Local/NovaRange[sqrt(Size) * 6], Charge[vGen * 5]
+
+
+System: AntiMatterGen
+	Name: #SS_AMGEN_NAME
+	Description: #SS_AMGEN_DESC
+	Appearance: AntimatterGenerator
+	Explosion: antimatter_boom_heavy centered lasting 1.0
+	
+	Tags: Support, Power
+	Tied To: EnergyPhysics 7, Science 4
+
+	Available: (Techs.EnergyPhysics.Level > 6) && (Techs.Science.Level > 3)
+	Level: ceil((Techs.EnergyPhysics.Level - 6) / 2)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+
+	Costs: Metals[200 * Size], Electronics[200 * Size], AdvParts[200 * Size], Labr[5 * Size]
+	Complexity: 2.4
+	
+	vGen: Size * 100 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vCost: 0.001 * decay(Size, 30)
+
+	Provides: Power with
+		Rate[vGen],
+		Cost[vCost] //Larger power generators tend to be more efficient
+
+	Provides: Capacitance with
+		Amount[vGen * 5]
+		
+	Provides: PowerOrBoom
+	
+	Triggerable: Detonation: ShipExplosion with Damage[Size * 500 * GAME_DAMAGE_MULT], Accuracy[0.75], Range[sqrt(Size) * 6]
+
+	Requires:
+		To Run: Control[15 * Size]
+	
+	//Multiply by 1.8 to approximate charge rate at 20% of max charge
+	Hints: Power[1.8 * vGen], FuelUse[-1.8 * vGen * vCost], Local/SelfDestruct[Size * 500 * GAME_DAMAGE_MULT], Local/NovaRange[sqrt(Size) * 6], Charge[vGen * 5]
+
+
+System: BackupPower
+	Name: #SS_BACKUPPOWER_NAME
+	Description: #SS_BACKUPPOWER_DESC
+	Appearance: NuclearReactor
+	Explosion: subsys_powerexplode lasting 0.35
+	
+	Tags: Link
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[100 * Size], Electronics[50 * Size], AdvParts[5 * Size], Labr[5 * Size]
+	Complexity: 0.4
+	
+	Alters: subSysAlterations::reducePowerNeeds[Size * 40 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))]
+
+	Requires:
+		To Run: Control[2 * Size]
+		
+	Hints: Local/BackupPower[Size * 40 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level), 50))]
+
+
+System: SolarPowerGen
+	Name: #SS_SOLARPANELS_NAME
+	Description: #SS_SOLARPANELS_DESC
+	Appearance: SolarPanel
+	Explosion: electrical_spark lasting 0.5
+	
+	Tags: Support
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 40 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[50 * Size], Electronics[30 * Size], Labr[5 * Size]
+	Complexity: 0.5
+	
+	vGenFactor: 50
+	vEfficiency: 1 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+	vCharge: Size * 100 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 40))
+
+	Provides: SolarPower with
+		Efficiency[vEfficiency],
+		SurfaceArea[Size * vGenFactor]
+		
+	Provides: Capacitance with
+		Amount[vCharge]
+
+	Requires: External
+	
+	Hints: Power[vEfficiency * vGenFactor * Size * 0.1], Charge[vCharge]
+
+
+System: Capacitor
+	Name: #SS_CAPACITOR_NAME
+	Description: #SS_CAPACITOR_DESC
+	Appearance: Capacitor
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Support, Storage:Power
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[150 * Size], Labr[2 * Size]
+	Complexity: 0.4
+	
+	Tick Rate: 1
+	
+	vCharge: Size * 500 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 40))
+	
+	Provides: Capacitance with
+		Amount[vCharge]
+	
+	Hints: Charge[vCharge]
+
+System: QuantumBattery
+	Name: #SS_ZPM_NAME
+	Description: #SS_ZPM_DESC
+	Appearance: Capacitor
+	Explosion: electrical_spark lasting 2
+	
+	Tags: Support, Storage:Power
+	Tied To: EnergyPhysics 18, WarpPhysics 16
+
+	Available: ((Techs.EnergyPhysics.Level >= 18) && (Techs.WarpPhysics.Level >= 16)) || Traits.remnants
+	Level: max(floor(weight(Techs.WarpPhysics.Level - 15, 0.5, Techs.EnergyPhysics.Level - 17, 0.5)), 1)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 60 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 40 * Size
+	
+	Costs: Metals[50 * Size], Electronics[60 * Size], AdvParts[80 * Size], Labr[2 * Size]
+	
+	Tick Rate: 1
+	vCharge: Size * 80000 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 40))
+	
+	Provides: Capacitance with
+		Amount[vCharge]
+
+	Requires:
+		To Run:
+			Control[20 * Size]
+	
+	Hints: Charge[vCharge]
+
+System: RamScoop
+	Name: #SS_RAMSCOOP_NAME
+	Description: #SS_RAMSCOOP_DESC
+	Appearance: BussardRamscoop
+	Explosion: armor_explode lasting 0.25
+	
+	Tags: Support
+	Tied To: ParticlePhysics 1
+
+	Available: Techs.ParticlePhysics.Level > 0
+	Level: Techs.ParticlePhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[150 * Size], Electronics[10 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 0.75
+	
+	Tick Rate: 2
+	
+	vFuelRate: Size * 0.01 * (8 - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 25)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 125)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 625)))
+	vFuelStore: Size * 10 * (8 - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 25)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 125)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 625)))
+	
+	Provides: FuelStorage with
+		Amount[vFuelStore]
+	
+	Provides: CollectFuel with
+		Rate[vFuelRate]
+	
+	Hints: FuelUse[vFuelRate], Fuel[vFuelStore]
+
+System: BussardRamjet
+	Name: #SS_RAMJET_NAME
+	Description: #SS_RAMJET_DESC
+	Appearance: BussardRamjet
+	Explosion: armor_explode lasting 0.25
+	
+	Tags: Engine
+	Tied To: ParticlePhysics 1, Engines 1
+
+	Available: (Techs.ParticlePhysics.Level > 0) && (Techs.Engines.Level > 0)
+	Level: floor((Techs.ParticlePhysics.Level + Techs.Engines.Level) / 2)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[150 * Size], Electronics[10 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 0.75
+	
+	vThrust: Size * 280 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),12)) * GAME_THRUST_MULT
+	
+	Provides: Propulsion with
+		Amount[vThrust]
+	
+	Hints: Thrust[vThrust]
+
+
+System: FuelCell
+	Name: #SS_FUELCELL_NAME
+	Description: #SS_FUELCELL_DESC
+	Appearance: FuelCell
+	Explosion: fuel_cell_explode lasting 0.7
+	
+	Tags: Support, Storage, Storage:Fuel
+	Tied To: ShipSystems 1, EnergyPhysics 1
+
+	Available: (Techs.ShipSystems.Level > 0) && (Techs.EnergyPhysics.Level > 0)
+	Level: floor((Techs.ShipSystems.Level + Techs.EnergyPhysics.Level) / 1.5)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 35 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+	
+	Costs: Metals[150 * Size], Labr[5 * Size]
+	Complexity: 0.4
+	
+	Tick Rate: 1
+	
+	vFuelStore: Size * 200 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+	
+	Provides: FuelStorage with
+		Amount[vFuelStore]
+		
+	Hints: Fuel[vFuelStore]
+
+
+System: AmmoStorage
+	Name: #SS_AMMOCACHE_NAME
+	Description: #SS_AMMOCACHE_DESC
+	Appearance: Ammocache
+	Explosion: fuel_cell_explode lasting 1.2
+
+	Tags: Storage, Storage:Ammo
+	Tied To: ShipSystems 1, Cargo 1
+
+	Available: (Techs.ShipSystems.Level > 0) && (Techs.Cargo.Level > 0)
+	Level: ceil((Techs.ShipSystems.Level + Techs.Cargo.Level) / 1.5)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 60 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[200 * Size], Labr[2 * Size]
+	Complexity: 0.4
+	
+	Tick Rate: 1
+	
+	vAmmoStore: Size * 125 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+	
+	Provides: AmmoStorage with
+		Amount[vAmmoStore]
+		
+	Hints: Ammo[vAmmoStore]
+
+
+System: CargoBay
+	Name: #SS_CARGOBAY_NAME
+	Description: #SS_CARGOBAY_DESC
+	Appearance: Storage
+	Explosion: vent_gas lasting 1
+	
+	Tags: CargoBay, Storage, Storage:Cargo, Storage:Resources
+	Tied To: Cargo 1
+	
+	Available: Techs.Cargo.Level > 0
+	Level: floor(Techs.ShipSystems.Level/3) + Techs.Cargo.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 20 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[100 * Size], Labr[2 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	vCargoStore: Size * 60 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+	
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Hints: Cargo[vCargoStore]
+
+
+System: Refinery
+	Name: #SS_REFINERY_NAME
+	Description: #SS_REFINERY_DESC
+	Appearance: MetFab
+	Explosion: armor_explode lasting 0.5
+
+	Tags: Deposit:Metals
+	Tied To: Metallurgy 6
+	
+	Available: Techs.Metallurgy.Level > 5
+	Level: Techs.Metallurgy.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[80 * Size], Labr[10 * Size]
+	
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 4 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+	
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Provides: RefineMetal with
+		Rate[vRate], OreCostPer[1]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Requires:
+		To Run: Control[10 * Size]
+
+	Hints: Cargo[vCargoStore], Local/RefineRate[vRate]
+
+System: ElectsFab
+	Name: #SS_ELECTSFAB_NAME
+	Description: #SS_ELECTSFAB_DESC
+	Appearance: ElecFab
+	Explosion: armor_explode lasting 0.5
+	
+	Tags: Deposit:Electronics
+	Tied To: Metallurgy 8, Computers 6
+	
+	Available: (Techs.Metallurgy.Level >= 8) && (Techs.Computers.Level >= 6)
+	Level: floor(weight(Techs.Metallurgy.Level, 0.7, Techs.Computers.Level, 0.3))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[80 * Size], Electronics[60 * Size], Labr[15 * Size]
+	
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 2 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+	
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Provides: FabElects with
+		Rate[vRate], MtlCostPer[1]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Requires:
+		To Run: Control[5 * Size]
+
+	Hints: Cargo[vCargoStore], Local/ElectsFabRate[vRate]
+
+System: AdvAssembler
+	Name: #SS_ADVFAB_NAME
+	Description: #SS_ADVFAB_DESC
+	Appearance: AdvFab
+	Explosion: armor_explode lasting 0.5
+	
+	Tags: Deposit:AdvParts
+	Tied To: Metallurgy 10, Computers 8, Nanotech 6
+	
+	Available: (Techs.Metallurgy.Level >= 10) && (Techs.Computers.Level >= 8) && (Techs.Nanotech.Level >= 6)
+	Level: floor(weight(Techs.Metallurgy.Level, 0.5, Techs.Computers.Level, 0.2, Techs.Nanotech.Level, 0.3))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Electronics[60 * Size], AdvParts[60 * Size]
+	
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 1 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+	
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Provides: FabAdvParts with
+		Rate[vRate], MtlCostPer[1], ElcCostPer[1]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Hints: Cargo[vCargoStore], Local/AdvFabRate[vRate]
+
+System: Exporter
+	Name: #SS_EXPORTER_NAME
+	Description: #SS_EXPORTER_DESC
+
+	Appearance: MetFab
+	Explosion: armor_explode lasting 0.5
+	
+	Tied To: Economics 6
+	Tags: BankAccess
+	
+	Available: (Techs.Economics.Level > 5) && not(Traits.no_bank)
+	Level: Techs.Economics.Level - 5
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[80 * Size], Labr[10 * Size]
+	
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 2 * pow(LEVEL_GAIN_CURVE, Level) * TRADE_RATE_MULT
+	
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	// Resource per tick is randomized, so we need to multiply the
+	// rate by 3 to get that actual export rate for each resource.
+	Provides: BankExport with Amount[vRate * 3]
+
+	Requires:
+		To Run: Control[10 * Size]
+
+	Hints: Cargo[vCargoStore], Local/BankExport[vRate]
+
+
+
+System: ShipBay
+	Name: #SS_SHIPBAY_NAME
+	Description: #SS_SHIPBAY_DESC
+	Appearance: ShipBay
+	Explosion: armor_explode lasting 0.75
+	
+	Tags: ShipBay
+	Tied To: ShipConstruction 1
+	
+	Available: Techs.ShipConstruction.Level > 0
+	Level: floor(Techs.Cargo.Level/5) + Techs.ShipConstruction.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 5 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 5 * Size
+
+	Costs: Metals[20 * Size], Electronics[5 * Size], AdvParts[1 * Size], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	vShipBay: Size * (1 / 32) * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 12)) //A ship made of only ship bays can store a slightly smaller ship than itself at max tech
+	
+	Provides: ShipStorage with
+		Amount[vShipBay]
+
+	Hints: ShipBay[vShipBay] //Divide by space taken by a scale 1 ship
+
+System: ConstructionBay
+	Name: #SS_BUILDBAY_NAME
+	Description: #SS_BUILDBAY_DESC
+	Appearance: ConstructionBay
+	Explosion: armor_explode lasting 0.5
+	
+	Tags: BuildBay, BuildsShips, PostOrder:Fetch:Metals:0.3, PostOrder:Fetch:Electronics:0.3, PostOrder:Fetch:AdvParts:0.3, Storage:Resources
+	Tied To: ShipConstruction 1
+	
+	Available: Techs.ShipConstruction.Level > 0
+	Level: floor(Techs.Cargo.Level/5) + Techs.ShipConstruction.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 10 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 5 * Size
+
+	Costs: Metals[20 * Size], Electronics[5 * Size], AdvParts[1 * Size], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	vEcoStore: Size * 40 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+	
+	Provides: AdvPartsStorage with
+		Amount[vEcoStore * 0.2]
+	
+	Provides: ElecStorage with
+		Amount[vEcoStore * 0.3]
+	
+	Provides: MetalStorage with
+		Amount[vEcoStore * 0.5]
+
+	Provides: AutoLabor with
+		Rate[Size * 2 * pow(LEVEL_GAIN_CURVE, Level)], Store[Size * 10 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),45))]
+
+	Hints: EcoStore[vEcoStore]
+
+System: LifeSupport
+	Appearance: LifeSupport
+	
+	Name: #SS_LIFESUPPORT_NAME
+	Description: #SS_LIFESUPPORT_DESC
+	Explosion: vent_gas lasting 2
+	
+	Tags: Control
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 20 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[150 * Size], Electronics[200 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 1
+	
+	Tick Rate: 4
+	
+	vAirGen: 5 * Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	
+	Provides: MakeAir with Amount[vAirGen]
+	Provides: AirStorage with Amount[progress(50,10,Level) * Size]
+
+	Consumes:
+		To Run: Power[10 * Size]
+	
+	Hints: Air[vAirGen]
+
+
+System: CrewQuarters
+	Appearance: CrewQuarters
+	Name: #SS_CREWQUARTERS_NAME
+	Description: #SS_CREWQUARTERS_DESC
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Control
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 20 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 30 * Size
+
+	Costs: Metals[200 * Size], Electronics[20 * Size], Labr[5 * Size]
+	Complexity: 0.75
+	
+	Tick Rate: 4
+	
+	vCrewStore: ceil(25 * Size)
+	vCrewRegen: Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level), 50))
+	
+	Provides: CrewQuarters with Amount[vCrewStore], Regen[vCrewStore * 0.01]
+	
+	Provides: Repair with Rate[vCrewRegen]
+
+	Consumes:
+		To Run:
+			Power[2 * Size], Air[1 * Size]
+	
+	Hints: Crew[vCrewStore], Regen[vCrewRegen]
+
+
+System: Bridge
+	Name: #SS_BRIDGE_NAME
+	Description: #SS_BRIDGE_DESC
+	Appearance: Bridge	
+	Explosion: repair_weld_sparks lasting 0.5
+
+	Tags: Control
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale	
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 30 * Size
+	
+	Costs: Metals[100 * Size], Electronics[125 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 4
+	
+	Tick Rate: 4
+	
+	vCrewReq: ceil(10 * Size * (1 + decay(pow(LEVEL_GAIN_CURVE,Level),40)))
+	vControlGen: 100 * Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	
+	Provides: Control with
+		Amount[vControlGen]
+	
+	Requires:
+		To Run: Crew[vCrewReq]
+	
+	Consumes:
+		To Run: Power[2 * Size]
+	
+	Hints: Control[vControlGen]
+
+
+System: Computer
+	Name: #SS_COMPUTER_NAME
+	Description: #SS_COMPUTER_DESC
+	Appearance: CPU
+	Explosion: repair_weld_sparks lasting 0.5
+	
+	Tags: Control
+	Tied To: Computers 1
+
+	Available: (Techs.Computers.Level > 0) && not(Traits.no_computers)
+	Level: ceil(weight(Techs.ShipSystems.Level, 1 / 4, Techs.Computers.Level, 3 / 4))
+	Size: Scale	
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 75 * Size
+	
+	Costs: Metals[50 * Size], Electronics[400 * Size], AdvParts[30 * Size], Labr[5 * Size]
+	Complexity: 4
+	
+	Tick Rate: 4
+	
+	vControlGen: Size * 75 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	
+	Provides: Control with
+		Amount[vControlGen]
+	
+	Consumes:
+		To Run: Power[20 * Size]
+	
+	Hints: Control[vControlGen]
+
+
+System: QuantumComputer
+	Name: #SS_QUANTUMCOMP_NAME
+	Description: #SS_QUANTUMCOMP_DESC
+	Appearance: QuantumComputerCore
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Link
+	Tied To: Computers 5, Science 2
+
+	Available: (((Techs.Computers.Level >= 5) && (Techs.Science.Level > 1)) || Traits.remnants) && not(Traits.no_computers)
+	Level: ceil((Techs.Computers.Level - 4) / 2)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 15 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 75 * Size
+
+	Costs: Metals[50 * Size], Electronics[600 * Size], AdvParts[200 * Size], Labr[5 * Size]
+	Complexity: 10
+	
+	Tick Rate: 1
+
+	Alters: subSysAlterations::reduceControlReq[Size * 150 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))]
+
+	Consumes:
+		To Run: Power[10 * Size]
+		
+	Hints: Local/ReduceControl[Size * 150 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))]
+
+
+System: QuantumCompressor
+	Name: #SS_SPACESAVER_NAME
+	Description: #SS_SPACESAVER_DESC
+	Appearance: QuantumCompressor
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Link
+	Tied To: Cargo 3, WarpPhysics 3
+
+	Available: (Techs.Cargo.Level > 2) && (Techs.WarpPhysics.Level > 2)
+	Level: floor(weight(Techs.Cargo.Level - 2, 0.25, Techs.WarpPhysics.Level - 2, 0.75))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 15 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[50 * Size], Electronics[50 * Size], AdvParts[180 * Size], Labr[5 * Size]
+	Complexity: 10
+	
+	Tick Rate: 1
+
+	Alters: subSysAlterations::increaseCargoSpace[Size][2 / decay(pow(LEVEL_GAIN_CURVE,Level),30)]
+
+	Consumes:
+		To Run: Power[25 * Size]
+		
+	Hints: Local/IncreaseSpace[2 / decay(pow(LEVEL_GAIN_CURVE,Level),30)]
+
+
+System: RepairBay
+	Name: #SS_REPAIRBAY_NAME
+	Description: #SS_REPAIRBAY_DESC
+	Appearance: RepairBay
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Support
+
+	Tied To: Metallurgy 1
+	
+	Available: Techs.Metallurgy.Level > 0
+	Level: ceil(weight(Techs.ShipSystems.Level, 0.3, Techs.Metallurgy.Level, 0.7))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 75 * Size
+	
+	Costs: Metals[250 * Size], Electronics[50 * Size], AdvParts[50 * Size], Labr[5 * Size]
+	Complexity: 2.2
+	
+	Tick Rate: 1
+	
+	vRepair: Size * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	
+	Provides: Repair with
+		Rate[vRepair]
+
+	Requires:
+		To Run: Control[20 * Size]
+
+	Hints: Regen[vRepair]
+
+
+
+
+System: Colonizer
+	Name: #SS_COLONIZER_NAME
+	Description: #SS_COLONIZER_DESC
+	Appearance: ColonyModule	
+	Explosion: armor_explode lasting 0.25
+
+	Tags: Colonizer, Tool, Tool:Colonizer, Order:Colonize
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: max(Scale,15)
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[50 * Size], Electronics[12 * Size], AdvParts[12 * Size]
+	Complexity: 1.5
+	
+	Tick Rate: 4
+	
+	Provides: TakePlanet
+	Provides: MakeStructures with Amount[Size / 15]
+
+	Consumes:
+		To Run: Air[5 * Size * 0.99]
+	
+	Hints: Local/AddStructs[floor(Size / 15)], Colony Size[(floor(Size / 15)]
+
+
+System: RepairTool
+	Name: #SS_REPAIRTOOL_NAME
+	Description: #SS_REPAIRTOOL_DESC
+	Appearance: Repairtool
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Repairer, Support, Tool, Work:Repairer, Tool:Repairer, TimedReload
+	Tied To: Materials 1
+	
+	Available: Techs.Materials.Level > 0
+	Level: Techs.Materials.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[80 * Size], Electronics[30 * Size], AdvParts[50 * Size]
+	Complexity: 2.5
+	
+	Tick Rate: 10
+	
+	vRemoteRep: Size * 2.5 * pow(LEVEL_GAIN_CURVE, Level)
+	
+	Provides: RepairGun with RepairRate[vRemoteRep], Range[150 + pow(Object.Scale,.25)]
+
+	Requires:
+		To Run:
+			Control[20 * Size]
+	
+	Hints: RepOther[vRemoteRep]
+
+
+System: Salvager
+	Name: #SS_SALVAGER_NAME
+	Description: #SS_SALVAGER_DESC
+	Appearance: Salvager
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Salvager, Tool, Work:Salvager, Tool:Salvager, Deposit:Metals, TimedReload
+	Tied To: Materials 2
+	
+	Available: Techs.Materials.Level > 1
+	Level: Techs.Materials.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[50 * Size], Electronics[50 * Size], AdvParts[75 * Size]
+	Complexity: 2.5
+	
+	Tick Rate: 10
+	
+	Provides: Salvager with Rate[Size * 10 * pow(LEVEL_GAIN_CURVE, Level)], Factor[1 - (0.75 * decay(pow(LEVEL_GAIN_CURVE,Level), 12))], Delay[10], Duration[5]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Salvage[(Size * 10 * pow(LEVEL_GAIN_CURVE, Level) * 5)/10]
+
+
+System: Analyzer
+	Name: #SS_ANALYZER_NAME
+	Description: #SS_ANALYZER_DESC
+	Appearance: Analyzer
+	Explosion: electrical_spark lasting 0.5
+	
+	Tags: Anaylzer, Tool, Work:Analyzer, Tool:Analyzer, TimedReload
+	Tied To: Science 1, Sensors 0
+	
+	Available: (Techs.Science.Level > 0)
+	Level: ceil(weight(Techs.Science.Level,0.25, Techs.Sensors.Level, 0.75))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 60 * Size
+	
+	Costs: Metals[40 * Size], Electronics[75 * Size], AdvParts[100 * Size]
+	Complexity: 2.5
+	
+	Tick Rate: 10
+	
+	vSizeImpact: 0.5 + (0.5 * Object.Scale/Scale)
+	vTechImpact: if(Techs.Sensors.Level > 0, 1, 0.5)
+	vLevelImpact: 0.48 * (1 - decay(pow(LEVEL_GAIN_CURVE, Level),150))
+	
+	vAnalyzeChance: vTechImpact * ( 0.02 + vLevelImpact )^vSizeImpact
+	vPowCost: Size * 15 * decay(pow(LEVEL_GAIN_CURVE,Level),125)
+	
+	Provides: Analyzer with ScanQuality[vAnalyzeChance], PowCost[vPowCost], Delay[10], Duration[5], Range[35 + pow(Object.Size,0.3)]
+
+	Requires:
+		To Run:
+			Control[30 * Size]
+	
+	Hints: Local/AnalysisChance[100 * (1 - (1 - vAnalyzeChance)^5)], Power[-1 * vPowCost * 5 / 10]
+
+
+System: JumpDrive
+	Name: #SS_JUMPDRIVE_NAME
+	Description: #SS_JUMPDRIVE_DESC
+	Appearance: Jumpdrive
+	Explosion: antimatter_boom_heavy centered lasting 1.0
+	
+	Tags: Jump Drive, Tool:Jump Drive, TimedReload
+	Tied To: WarpPhysics 5
+	
+	Available: (Techs.WarpPhysics.Level > 4) || Traits.start_jumpdrives
+	realLevel: Techs.WarpPhysics.Level - 4
+	Level: if(Traits.start_jumpdrives, max(Techs.WarpPhysics.Level - 4, 3), Techs.WarpPhysics.Level - 4)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 300 * Size
+	
+	Costs: Metals[250 * Size], Electronics[250 * Size], AdvParts[250 * Size]
+	Complexity: 2.5
+	
+	vJumpRangeMin: 1000 * decay(Level, 250)
+	vJumpRange: progress(5000 + (Size * 50),1000 + (Size * 10), pow(LEVEL_GAIN_CURVE, Level)) * sqrt(Scale / Object.Scale)
+	vChargeTime: 8 * decay(pow(LEVEL_GAIN_CURVE, Level),250)
+	vPowCost: 100 * Size
+
+	Provides: DestructsShip
+	
+	Provides: JumpDrive with MinRange[vJumpRangeMin], MaxRange[vJumpRange],
+		ChargeupTime[vChargeTime], PowCost[vPowCost]
+
+	Requires:
+		To Run:
+			Control[50 * Size]
+	
+	Hints: Power[-1 * vPowCost], Local/ChargeTime[vChargeTime], Local/JumpMinDist[vJumpRangeMin / 1000], Local/JumpMaxDist[vJumpRange / 1000]
+
+System: MatterGen
+	Name: #SS_MATTERGEN_NAME
+	Description: #SS_MATTERGEN_DESC
+	Appearance: AntimatterGenerator
+	Explosion: electrical_spark lasting 0.5
+
+	Tags: Support
+	Tied To: ParticlePhysics 18, EnergyPhysics 16
+
+	Available: ((Techs.ParticlePhysics.Level >= 18) && (Techs.EnergyPhysics.Level >= 16)) || Traits.remnants
+	Level: max(floor(weight(Techs.ParticlePhysics.Level - 17, 0.8, Techs.EnergyPhysics.Level - 15, 0.2)), 1)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 40 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 60 * Size
+
+	Costs: Metals[200 * Size], Electronics[100 * Size], AdvParts[100 * Size]
+
+	vMatterRate: Size * (4 - (3 * decay(pow(LEVEL_GAIN_CURVE,Level), 30)))
+	vPowCost: Size * 40 * decay(pow(LEVEL_GAIN_CURVE,Level),125)
+
+	Provides: AmmoStorage with
+		Amount[Size * 10]
+
+	Provides: FuelStorage with
+		Amount[Size * 10]
+	
+	Provides: MatterGeneration with Rate[vMatterRate], PowCost[vPowCost]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Power[-1 * vPowCost], Local/MatterGen[vMatterRate]
+
+System: ExternalMount
+	Name: #SS_EXTERNALMOUNT_NAME
+	Description: #SS_EXTERNALMOUNT_DESC
+	Appearance: ExternalMount
+	Explosion: small_explosion lasting 0.5
+
+	Tags: NegatesSpace, IgnoresScale, Link
+	Tied To: ShipConstruction 4
+
+	Available: Techs.ShipConstruction.Level >= 4
+	Level: 1
+	Size: Object.Scale
+	Mass: 40 * Size
+
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 30 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+
+	Costs: Metals[Size * 275]
+	Alters: subSysAlterations::dummyAlter
+
+	PreDamageOrder: -8
+	Provides: DamageRedirection
