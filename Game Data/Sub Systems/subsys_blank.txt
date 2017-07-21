@@ -1,0 +1,8 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+
+
+

@@ -1,0 +1,142 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: Bridge
+	Name: #SS_BRIDGE_NAME
+	Description: #SS_BRIDGE_DESC
+	Appearance: Bridge	
+	Explosion: repair_weld_sparks lasting 0.5
+
+	Tags: Control
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale	
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 30 * Size
+	
+	Costs: Metals[100 * Size], Electronics[125 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 4
+	
+	Tick Rate: 4
+	
+	vCrewReq: ceil(10 * Size * (1 + decay(pow(LEVEL_GAIN_CURVE,Level),40)))
+	vControlGen: 100 * Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	
+	Provides: Control with
+		Amount[vControlGen]
+	
+	Requires:
+		To Run: Crew[vCrewReq]
+	
+	Consumes:
+		To Run: Power[2 * Size]
+	
+	Hints: Control[vControlGen]
+
+
+System: Computer
+	Name: #SS_COMPUTER_NAME
+	Description: #SS_COMPUTER_DESC
+	Appearance: CPU
+	Explosion: repair_weld_sparks lasting 0.5
+	
+	Tags: Control
+	Tied To: Computers 1
+
+	Available: (Techs.Computers.Level > 0) && not(Traits.no_computers)
+	Level: ceil(weight(Techs.ShipSystems.Level, 1 / 4, Techs.Computers.Level, 3 / 4))
+	Size: Scale	
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 75 * Size
+	
+	Costs: Metals[50 * Size], Electronics[400 * Size], AdvParts[30 * Size], Labr[5 * Size]
+	Complexity: 4
+	
+	Tick Rate: 4
+	
+	vControlGen: Size * 75 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	
+	Provides: Control with
+		Amount[vControlGen]
+	
+	Consumes:
+		To Run: Power[20 * Size]
+	
+	Hints: Control[vControlGen]
+
+
+System: CrewQuarters
+	Appearance: CrewQuarters
+	Name: #SS_CREWQUARTERS_NAME
+	Description: #SS_CREWQUARTERS_DESC
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Control
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 20 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 30 * Size
+
+	Costs: Metals[200 * Size], Electronics[20 * Size], Labr[5 * Size]
+	Complexity: 0.75
+	
+	Tick Rate: 4
+	
+	vCrewStore: ceil(25 * Size)
+	vCrewRegen: Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level), 50))
+	
+	Provides: CrewQuarters with Amount[vCrewStore], Regen[vCrewStore * 0.01]
+	
+	Provides: Repair with Rate[vCrewRegen]
+
+	Consumes:
+		To Run:
+			Power[2 * Size], Air[1 * Size]
+	
+	Hints: Crew[vCrewStore], Regen[vCrewRegen]
+
+
+
+System: LifeSupport
+	Appearance: LifeSupport
+	
+	Name: #SS_LIFESUPPORT_NAME
+	Description: #SS_LIFESUPPORT_DESC
+	Explosion: vent_gas lasting 2
+	
+	Tags: Control
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 20 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[150 * Size], Electronics[200 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 1
+	
+	Tick Rate: 4
+	
+	vAirGen: 5 * Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	
+	Provides: MakeAir with Amount[vAirGen]
+	Provides: AirStorage with Amount[progress(50,10,Level) * Size]
+
+	Consumes:
+		To Run: Power[10 * Size]
+	
+	Hints: Air[vAirGen]
+
+

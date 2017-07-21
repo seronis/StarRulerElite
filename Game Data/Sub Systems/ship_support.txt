@@ -1,0 +1,107 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: RamScoop
+	Name: #SS_RAMSCOOP_NAME
+	Description: #SS_RAMSCOOP_DESC
+	Appearance: BussardRamscoop
+	Explosion: armor_explode lasting 0.25
+	
+	Tags: Support
+	Tied To: ParticlePhysics 1
+
+	Available: Techs.ParticlePhysics.Level > 0
+	Level: Techs.ParticlePhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[150 * Size], Electronics[10 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 0.75
+	
+	Tick Rate: 2
+	
+	vFuelRate: Size * 0.01 * (8 - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 25)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 125)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 625)))
+	vFuelStore: Size * 10 * (8 - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 25)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 125)) - (2 * decay(pow(LEVEL_GAIN_CURVE, Level), 625)))
+	
+	Provides: FuelStorage with
+		Amount[vFuelStore]
+	
+	Provides: CollectFuel with
+		Rate[vFuelRate]
+	
+	Hints: FuelUse[vFuelRate], Fuel[vFuelStore]
+
+
+System: RepairBay
+	Name: #SS_REPAIRBAY_NAME
+	Description: #SS_REPAIRBAY_DESC
+	Appearance: RepairBay
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Support
+
+	Tied To: Metallurgy 1
+	
+	Available: Techs.Metallurgy.Level > 0
+	Level: ceil(weight(Techs.ShipSystems.Level, 0.3, Techs.Metallurgy.Level, 0.7))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 75 * Size
+	
+	Costs: Metals[250 * Size], Electronics[50 * Size], AdvParts[50 * Size], Labr[5 * Size]
+	Complexity: 2.2
+	
+	Tick Rate: 1
+	
+	vRepair: Size * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	
+	Provides: Repair with
+		Rate[vRepair]
+
+	Requires:
+		To Run: Control[20 * Size]
+
+	Hints: Regen[vRepair]
+
+
+System: RepairTool
+	Name: #SS_REPAIRTOOL_NAME
+	Description: #SS_REPAIRTOOL_DESC
+	Appearance: Repairtool
+	Explosion: electrical_spark lasting 0.25
+	
+	Tags: Repairer, Support, Tool, Work:Repairer, Tool:Repairer, TimedReload
+	Tied To: Materials 1
+	
+	Available: Techs.Materials.Level > 0
+	Level: Techs.Materials.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[80 * Size], Electronics[30 * Size], AdvParts[50 * Size]
+	Complexity: 2.5
+	
+	Tick Rate: 10
+	
+	vRemoteRep: Size * 2.5 * pow(LEVEL_GAIN_CURVE, Level)
+	
+	Provides: RepairGun with RepairRate[vRemoteRep], Range[150 + pow(Object.Scale,.25)]
+
+	Requires:
+		To Run:
+			Control[20 * Size]
+	
+	Hints: RepOther[vRemoteRep]
+
+
+
+
+
+

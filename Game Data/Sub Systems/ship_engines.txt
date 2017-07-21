@@ -1,0 +1,104 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: BussardRamjet
+	Name: #SS_RAMJET_NAME
+	Description: #SS_RAMJET_DESC
+	Appearance: BussardRamjet
+	Explosion: armor_explode lasting 0.25
+	
+	Tags: Engine
+	Tied To: ParticlePhysics 1, Engines 1
+
+	Available: (Techs.ParticlePhysics.Level > 0) && (Techs.Engines.Level > 0)
+	Level: floor((Techs.ParticlePhysics.Level + Techs.Engines.Level) / 2)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[150 * Size], Electronics[10 * Size], AdvParts[10 * Size], Labr[5 * Size]
+	Complexity: 0.75
+	
+	vThrust: Size * 280 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),12)) * GAME_THRUST_MULT
+	
+	Provides: Propulsion with
+		Amount[vThrust]
+	
+	Hints: Thrust[vThrust]
+
+
+System: IonThruster
+	Name: #SS_IONTHRUSTER_NAME
+	Description: #SS_IONTHRUSTER_DESC
+	Appearance: ThrusterIon
+	Explosion: armor_explode lasting 0.4
+	
+	Tags: Engine
+	Tied To: Engines 5, EnergyPhysics 5
+
+	Available: (Techs.Engines.Level > 4) && (Techs.EnergyPhysics.Level > 4)
+	Level: floor(weight(Techs.Engines.Level, 0.7, Techs.EnergyPhysics.Level, 0.3))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[200 * progress(Size, 0.05, Level)], Electronics[15 * progress(Size, 0.05, Level)], AdvParts[100 * progress(Size, 0.05, Level)], Labr[5 * Size]
+	Complexity: 0.5
+	
+	vThrust: Size * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vEfficieny: 0.000036 * (0.5 + 0.5 * decay(pow(LEVEL_GAIN_CURVE,Level),35))
+	vPowCost: 5 * decay(pow(LEVEL_GAIN_CURVE,Level),35) * Size
+	
+	Provides: FuelStorage with
+		Amount[Size * 10]
+	
+	Provides: IonThrust with
+		Amount[vThrust],
+		Efficiency[vEfficieny], //Scales with size because effective thrust is inversely scaled to psuedo-account for mass
+		PowCost[vPowCost]
+
+	Requires:
+		To Run: Control[5 * Size]
+	
+	Hints: Thrust[vThrust], Power[vPowCost * -1], FuelUse[vEfficieny * vThrust * -1], Fuel[Size * 10]
+
+
+System: Thruster
+	Name: #SS_THRUSTER_NAME
+	Description: #SS_THRUSTER_DESC
+	Appearance: ThrusterRocket
+	Explosion: armor_explode lasting 0.4
+	
+	Tags: Engine
+	Tied To: Engines 1
+
+	Available: Techs.Engines.Level > 0
+	Level: Techs.Engines.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+	
+	Costs: Metals[200 * progress(Size, 0.05, Level)], Electronics[15 * progress(Size, 0.05, Level)], AdvParts[100 * progress(Size, 0.05, Level)], Labr[5 * Size]
+	Complexity: 0.5
+	
+	vThrust: Size * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vEfficieny: 0.00009 * (1 + 1 * decay(pow(LEVEL_GAIN_CURVE,Level),35))
+	
+	Provides: FuelStorage with
+		Amount[Size * 10]
+	
+	Provides: FuelThrust with
+		Amount[vThrust],
+		Efficiency[vEfficieny]
+
+	Requires:
+		To Run: Control[5 * Size]
+	
+	Hints: Thrust[vThrust], FuelUse[vEfficieny * vThrust * -1], Fuel[Size * 10]
+
+

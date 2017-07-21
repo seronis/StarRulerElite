@@ -1,0 +1,226 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: FighterHull
+	Name: #SS_FIGHTERHULL_NAME
+	Description: #SS_FIGHTERHULL_DESC
+	Appearance: StealthHull
+	Explosion: ship_explode lasting 0.25
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo, Restrict:Flak
+	Tied To: ShipConstruction 1
+
+	//Equips To: Hull //Since we can't do special damage logic with this hull, treat it as a normal sub system for damage purposes
+	PreDamageOrder: -20
+
+	Available: Techs.ShipConstruction.Level > 0
+	Level: Techs.ShipConstruction.Level
+	
+	vMaxSize: pow(LEVEL_GAIN_CURVE, max(Level - 1, 0))
+	Size: min(Object.Size,vMaxSize * 15)
+
+	vOneSpace: Object.Size * (1 / 15)
+	Durability: Size * HEALTH_MULT * 2 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 7
+
+	Costs: Metals[280 + 50 * Size], Electronics[100 + 10 * Size], AdvParts[48 + 4 * Size], Labr[4 * Size]
+	Complexity: 1
+	
+	Tick Rate: 1
+	
+	vDodgeChange: 0.3 + (0.65 * decay(pow(LEVEL_GAIN_CURVE,Level)-1,50))
+	
+	Provides: MoveDodge with HitMod[vDodgeChange]
+	Provides: DestructsShip
+	
+	Hints: Local/DodgeChance[100 * (1 - vDodgeChange)], Local/HullSoak[25], Local/HullHP[Durability], Local/MaxScale[vMaxSize]
+
+
+System: HeavyHull
+	Name: #SS_HVYHULL_NAME
+	Description: #SS_HVYHULL_DESC
+	Appearance: HeavyHull
+	Explosion: ship_explode centered lasting 1.5
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 3, Armor 3
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: (Techs.ShipConstruction.Level > 2) && (Techs.Armor.Level > 2)
+	Level: floor(weight(Techs.ShipConstruction.Level, 0.7, Techs.Armor.Level, 0.3))
+	
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size * (14 / 15)
+	Durability: Size * HEALTH_MULT * 50 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 40
+
+	Costs: Metals[poly(Size, 500, 100, 33 * sizePenalty)], Electronics[poly(Size, 175, 10, 3.3 * sizePenalty)], AdvParts[poly(Size,85,5,1.67 * sizePenalty)], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.7], DmgAlter[-1 * Scale]
+	
+	Hints: Local/DamageReduction[Scale], Local/HullSoak[70], Local/HullHP[Durability]
+	
+System: LightHull
+	Name: #SS_LIGHTHULL_NAME
+	Description: #SS_LIGHTHULL_DESC
+	Appearance: LightHull
+	Explosion: ship_explode centered lasting 0.5
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 3, ShipSystems 3
+	
+	Equips To: Hull
+	PreDamageOrder: -2
+	
+	Available: (Techs.ShipConstruction.Level > 2) && (Techs.ShipSystems.Level > 2)
+	Level: weight(Techs.ShipConstruction.Level, 0.7, Techs.ShipSystems.Level, 0.3)
+	
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size * (16 / 15)
+
+	Durability: Size * HEALTH_MULT * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 10
+	
+	Costs: Metals[poly(Size, 250, 37.5, 10 * sizePenalty)], Electronics[poly(Size, 100, 7.5, 2.5 * sizePenalty)], AdvParts[poly(Size,50,3,1 * sizePenalty)], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.3], DmgAlter[Scale]
+	
+	Hints: Local/DamageReduction[-1 * Scale], Local/HullSoak[30], Local/HullHP[Durability]
+
+
+System: MediumHull
+	Name: #SS_MEDHULL_NAME
+	Description: #SS_MEDHULL_DESC
+	Appearance: MediumHull
+	Explosion: ship_explode centered lasting 1.0
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 1
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: Techs.ShipConstruction.Level > 0
+	Level: Techs.ShipConstruction.Level
+	
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size
+	Durability: Size * HEALTH_MULT * 20 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 20
+
+	Costs: Metals[poly(Size, 350, 50, 16 * sizePenalty)], Electronics[poly(Size, 125, 10, 3.3 * sizePenalty)], AdvParts[poly(Size,60,4,1.33 * sizePenalty)], Labr[5 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.5], DmgAlter[0]
+	
+	Hints: Local/HullSoak[50], Local/HullHP[Durability]
+
+
+
+System: StationHull
+	Name: #SS_STATIONHULL_NAME
+	Description: #SS_STATIONHULL_DESC
+	Appearance: HeavyHull
+	Explosion: ship_explode centered lasting 2.1
+	
+	Tags: IgnoresScale, Hull, Station, Restrict:Engine, Restrict:Jump Drive, Fetch:Fuel, Fetch:Ammo
+	Tied To: ShipConstruction 1
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: (Techs.ShipConstruction.Level > 0)
+	
+	Level: Techs.ShipConstruction.Level
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 400) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size * (17 / 15)
+	Durability: Size * HEALTH_MULT * 50 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 40
+
+	Costs: Metals[poly(Size, 1500, 80, 26 * sizePenalty)], Electronics[poly(Size, 500, 8, 2.6 * sizePenalty)], AdvParts[poly(Size,270,3.2,1.067 * sizePenalty)], Labr[10 * Size]
+	Complexity: 0.2
+	
+	Tick Rate: 1
+
+	Provides: HullSoak with ReceivePct[0.8], DmgAlter[-1 * Scale]
+	
+	Hints: Local/DamageReduction[Scale], Local/HullSoak[80], Local/HullHP[Durability]
+
+
+System: StealthHull
+	Name: #SS_STEALHHULL_NAME
+	Description: #SS_STEALHHULL_DESC
+	Appearance: StealthHull
+	Explosion: ship_explode lasting 1
+	
+	Tags: IgnoresScale, Hull, Fetch:Fuel, Fetch:Ammo
+	Tied To: Stealth 4, ShipConstruction 4
+
+	Equips To: Hull
+	PreDamageOrder: -6
+	
+	Available: (Techs.Stealth.Level > 3) && (Techs.ShipConstruction.Level > 3)
+	
+	Level: floor(weight(Techs.ShipConstruction.Level - 3, 0.4, Techs.Stealth.Level - 3, 0.6))
+	megaLevel: Techs.MegaConstruction.Level As Level
+	sizePenalty: (1 / 100) * decay(pow(LEVEL_GAIN_CURVE, megaLevel), 2)
+	vOneSpace: Object.Size * (1 / 15)
+	Size: Object.Size
+	Durability: Size * HEALTH_MULT * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: Size * 20
+	
+	Costs: Metals[poly(Size, 200, 40, 13.3 * sizePenalty)], Electronics[poly(Size, 50, 10, 3.33 * sizePenalty)], AdvParts[poly(Size,200,40,13.33 * sizePenalty)], Labr[5 * Size]
+	Complexity: 1
+	
+	Tick Rate: 1
+	
+	vDodgeChange: 0.05 + (0.85 * decay(pow(LEVEL_GAIN_CURVE,Level)-1,45))
+	
+	Provides: Chameleon with HitMod[vDodgeChange]
+
+	Provides: HullSoak with ReceivePct[0.0], DmgAlter[0]
+	
+	Hints: Local/MissChance[100 * (1 - vDodgeChange)], Local/HullSoak[0], Local/HullHP[Durability]
+
+
+System: RingworldGen
+	Name: #SS_RINGWORLD_NAME
+	Description: #SS_RINGWORLD_DESC
+	Appearance: QuantumComputerCore
+
+	Tags: IgnoresScale, Hull
+	Tied To: MegaConstruction 22, Gravitics 16, WarpPhysics 16
+
+	Equips To: Hull
+	PreDamageOrder: -2
+
+	Available: (Techs.MegaConstruction.Level > 21) && (Techs.Gravitics.Level > 15) && (Techs.WarpPhysics.Level > 15)
+	Mass: 20000000
+
+	Costs: Metals[20 * pow(10,9)], Electronics[6 * pow(10,9)], AdvParts[2 * pow(10,9)]
+
+	Provides: RingworldGen
+
+
+

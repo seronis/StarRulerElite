@@ -1,0 +1,194 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: AntiMatterGen
+	Name: #SS_AMGEN_NAME
+	Description: #SS_AMGEN_DESC
+	Appearance: AntimatterGenerator
+	Explosion: antimatter_boom_heavy centered lasting 1.0
+	
+	Tags: Support, Power
+	Tied To: EnergyPhysics 7, Science 4
+
+	Available: (Techs.EnergyPhysics.Level > 6) && (Techs.Science.Level > 3)
+	Level: ceil((Techs.EnergyPhysics.Level - 6) / 2)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+
+	Costs: Metals[200 * Size], Electronics[200 * Size], AdvParts[200 * Size], Labr[5 * Size]
+	Complexity: 2.4
+	
+	vGen: Size * 100 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vCost: 0.001 * decay(Size, 30)
+
+	Provides: Power with
+		Rate[vGen],
+		Cost[vCost] //Larger power generators tend to be more efficient
+
+	Provides: Capacitance with
+		Amount[vGen * 5]
+		
+	Provides: PowerOrBoom
+	
+	Triggerable: Detonation: ShipExplosion with Damage[Size * 500 * GAME_DAMAGE_MULT], Accuracy[0.75], Range[sqrt(Size) * 6]
+
+	Requires:
+		To Run: Control[15 * Size]
+	
+	//Multiply by 1.8 to approximate charge rate at 20% of max charge
+	Hints: Power[1.8 * vGen], FuelUse[-1.8 * vGen * vCost], Local/SelfDestruct[Size * 500 * GAME_DAMAGE_MULT], Local/NovaRange[sqrt(Size) * 6], Charge[vGen * 5]
+
+
+System: FusionGen
+	Name: #SS_FUSIONGEN_NAME
+	Description: #SS_FUSIONGEN_DESC
+	Appearance: FusionGenerator
+	Explosion: antimatter_boom2 centered lasting 1.0
+	
+	Tags: Support, Power
+	Tied To: EnergyPhysics 5
+
+	Available: Techs.EnergyPhysics.Level > 4
+	Level: Techs.EnergyPhysics.Level - 4
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 40 * Size
+
+	Costs: Metals[200 * Size], Electronics[100 * Size], AdvParts[100 * Size], Labr[5 * Size]
+	Complexity: 0.7
+	
+	vGen: Size * 50 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vCost: 0.004 * decay(Size, 30)
+
+	Provides: Power with
+		Rate[vGen],
+		Cost[vCost] //Larger power generators tend to be more efficient
+
+	Provides: Capacitance with
+		Amount[vGen * 5]
+		
+	Provides: ExplodesShip
+	
+	Triggerable: Detonation: ShipExplosion with Damage[Size * 100 * GAME_DAMAGE_MULT], Accuracy[0.75], Range[sqrt(Size) * 6]
+
+	Requires:
+		To Run: Control[5 * Size]
+	
+	//Multiply by 1.8 to approximate charge rate at 20% of max charge
+	Hints: Power[1.8 * vGen], FuelUse[-1.8 * vGen * vCost], Local/SelfDestruct[Size * 100 * GAME_DAMAGE_MULT], Local/NovaRange[sqrt(Size) * 6], Charge[vGen * 5]
+
+
+System: MatterGen
+	Name: #SS_MATTERGEN_NAME
+	Description: #SS_MATTERGEN_DESC
+	Appearance: AntimatterGenerator
+	Explosion: electrical_spark lasting 0.5
+
+	Tags: Support
+	Tied To: ParticlePhysics 18, EnergyPhysics 16
+
+	Available: ((Techs.ParticlePhysics.Level >= 18) && (Techs.EnergyPhysics.Level >= 16)) || Traits.remnants
+	Level: max(floor(weight(Techs.ParticlePhysics.Level - 17, 0.8, Techs.EnergyPhysics.Level - 15, 0.2)), 1)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 40 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 60 * Size
+
+	Costs: Metals[200 * Size], Electronics[100 * Size], AdvParts[100 * Size]
+
+	vMatterRate: Size * (4 - (3 * decay(pow(LEVEL_GAIN_CURVE,Level), 30)))
+	vPowCost: Size * 40 * decay(pow(LEVEL_GAIN_CURVE,Level),125)
+
+	Provides: AmmoStorage with
+		Amount[Size * 10]
+
+	Provides: FuelStorage with
+		Amount[Size * 10]
+	
+	Provides: MatterGeneration with Rate[vMatterRate], PowCost[vPowCost]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Power[-1 * vPowCost], Local/MatterGen[vMatterRate]
+
+System: PowerGen
+	Name: #SS_POWERGEN_NAME
+	Description: #SS_POWERGEN_DESC
+	Appearance: NuclearReactor
+	Explosion: subsys_powerexplode lasting 1.25
+	
+	Tags: Support, Power
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[200 * Size], Electronics[10 * Size], Labr[5 * Size]
+	Complexity: 0.7
+	
+	vGen: Size * 25 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vCost: 0.01 * decay(Size, 30)
+
+	Provides: Power with
+		Rate[vGen],
+		Cost[vCost] //Larger power generators tend to be more efficient
+
+	Provides: Capacitance with
+		Amount[vGen * 5] //Hold 2.5 seconds of power output
+
+	Requires:
+		To Run: Control[2 * Size]
+	
+	//Multiply by 1.8 to approximate charge rate at 20% of max charge
+	Hints: Power[1.8 * vGen], FuelUse[vCost * vGen * -1.8], Charge[vGen * 5]
+
+
+System: SolarPowerGen
+	Name: #SS_SOLARPANELS_NAME
+	Description: #SS_SOLARPANELS_DESC
+	Appearance: SolarPanel
+	Explosion: electrical_spark lasting 0.5
+	
+	Tags: Support
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 40 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[50 * Size], Electronics[30 * Size], Labr[5 * Size]
+	Complexity: 0.5
+	
+	vGenFactor: 50
+	vEfficiency: 1 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+	vCharge: Size * 100 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 40))
+
+	Provides: SolarPower with
+		Efficiency[vEfficiency],
+		SurfaceArea[Size * vGenFactor]
+		
+	Provides: Capacitance with
+		Amount[vCharge]
+
+	Requires: External
+	
+	Hints: Power[vEfficiency * vGenFactor * Size * 0.1], Charge[vCharge]
+
+
+
+
+
