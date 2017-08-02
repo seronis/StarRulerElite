@@ -1,0 +1,66 @@
+//Damage factor for all weapons
+GAME_DAMAGE_MULT:	1
+
+//Shield Max HP factor for all shields
+GAME_SHIELD_MULT:	1
+
+//Shield Regeneration rate factor for all shields
+GAME_SHIELD_REG_MULT:	1
+
+//Armor Max HP factor for all armors
+GAME_ARMOR_MULT:	1
+
+//Thrust Strength factor for all engines
+GAME_THRUST_MULT:	1
+
+//Research Cost Multiplier
+RES_COST_MULT:		1
+
+//Whether to show all technologies
+RES_SHOW_ALL_TECHS:	0
+
+//Research Start Level
+RES_START_LEVEL:	0
+
+//Research gain curve
+RES_GAIN_CURVE:	1.3
+
+//Link Cost Multiplier
+LINK_COST:		100000
+
+//Standard Research cost curve
+//  Higher is more costly (by far)
+RES_COST_CURVE:		2
+
+//Standard Level gains curve
+LEVEL_GAIN_CURVE:	1.4
+
+//Per-level multiplier to health of sub systems (based on the materials tech)
+HEALTH_CURVE: 1.4
+
+//Base multiplier to sub system health (Also affects hulls)
+HEALTH_MULT: 1.0
+
+//Increase in cost per level
+COST_INC_CRV:	1.2
+
+//Labor cost multiplier for structures
+BLDG_LABR_MULT:	2.0
+
+//Resource Generation Factor
+RES_GEN_MULT:	0.167
+
+//Base Resource Generation Level (Result is Level Factor + Base Factor)
+RES_BASE_FACT:	0.0
+
+//Trade rate factor
+TRADE_RATE_MULT: 1.0
+
+//Minimum size for sub systems on a blueprint
+SS_MIN_SCALE: 0.0625
+
+//Maximum size for sub systems on a blueprint
+SS_MAX_SCALE: 8
+
+//Disparity in strength for a system to be blockaded
+BLOCKADE_RATIO: 2.0
