@@ -7,6 +7,6 @@
 	<range tag="#NGM_Spacing" setting="MAP_SYSTEM_SPACING" type="float" min="2500" max="32500" default="7500" pos="1,0" smallstep="500" largestep="2500" />
 	
 	<checkbox tag="#NGM_SpaceObjects" setting="MAP_ODDITIES" off="0" on="1" default="on" pos="0,1" />
-	<checkbox tag="#NGM_Flatten" setting="MAP_FLATTEN" off="0" on="1" default="off" pos="1,1" />
+	<checkbox tag="#NGM_Flatten" setting="MAP_FLATTEN" off="0" on="1" default="on" pos="1,1" />
 	<checkbox tag="#NGM_BalancedStart" setting="MAP_BALANCED_START" off="0" on="1" default="on" pos="0,2" />
 </map>
