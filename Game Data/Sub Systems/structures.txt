@@ -362,7 +362,7 @@ System: Farm
 	Description: #SS_FARM_DESC
 
 	Available: not(Traits.no_food) // Techs.Biology.Level > 0
-	Level: max(Techs.Biology.Level, 0.5) //Start with a modicum of understanding of agriculture (Level 1 of biology will be a significant improvement)
+	Level: max(Techs.Biology.Level, 0.75) //Start with a modicum of understanding of agriculture (Level 1 of biology will be a significant improvement)
 	Size: Scale
 	Durability: 430 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
