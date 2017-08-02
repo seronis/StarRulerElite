@@ -181,10 +181,16 @@ const int MIN_HEIGHT = 543;
 const int MAX_SYSLIST_WIDTH = 200;
 const float unitsPerAU = 1000.f;
 
-const float[] scaleValues = {0.5f, 1.f, 4.f, 8.f, 16.f, 32.f, 512.f, 4096.f};
-const string[] scaleNames = {"#LES_Fighter", "#LES_Bomber", "#LES_Destroyer",
-	"#LES_Frigate", "#LES_Cruiser", "#LES_Battleship", "#LES_Supercapital",
-	"#LES_PlanetBuster"};
+const float[] scaleValues = {
+	0.5f, 1.f, 4.f,
+	8.f, 16.f, 32.f,
+	512.f, 4096.f
+	};
+const string[] scaleNames = {
+	"#LES_Fighter", "#LES_Bomber", "#LES_Destroyer",
+	"#LES_Frigate", "#LES_Cruiser", "#LES_Battleship",
+	"#LES_Supercapital", "#LES_PlanetBuster"
+	};
 
 string@ localeLayoutCost = "#LC_", localeLayoutHint = "#LH_";
 const string@ tagHull = "Hull", strHP = "HP", strMass = "Mass", tagStructure = "Structure";
@@ -498,7 +504,7 @@ class LayoutWindow : ScriptedGuiHandler {
 				}
 				else if (evt.Caller is saveButton) {
 					if (saveLayout()) {
-						if (!shiftKey)
+						if (shiftKey)
 							clearLayout();
 					}
 				}
@@ -4010,7 +4016,11 @@ class subSysDragger : ScriptedGuiHandler {
 	
 	//Steps up by the smallest scale step
 	void incrementScale() {
-		scale = min( scale + minScale, maxScale);
+		float scaleStep = minScale;
+		if( scale >= 1.f ) scaleStep = scaleStep * 2;
+		if( scale >= 2.f ) scaleStep = scaleStep * 2;
+		if( scale >= 4.f ) scaleStep = scaleStep * 2;
+		scale = min( scale + scaleStep, maxScale);
 	}
 	
 	//Scaling Down functions
@@ -4025,7 +4035,11 @@ class subSysDragger : ScriptedGuiHandler {
 	
 	//Steps down by the smallest scale step
 	void decrementScale() {
-		scale = max( scale - minScale, minScale);
+		float scaleStep = minScale;
+		if( scale > 1.f ) scaleStep = scaleStep * 2;
+		if( scale > 2.f ) scaleStep = scaleStep * 2;
+		if( scale > 4.f ) scaleStep = scaleStep * 2;
+		scale = max( scale - scaleStep, minScale);
 	}
 
 	//Get blueprint position
@@ -4108,7 +4122,7 @@ class subSysDragger : ScriptedGuiHandler {
 /* }}} */
 /* {{{ Sub System Entry */
 const float maxRadius = 3.3359375f;
-float minScale = 0.25f, maxScale = 4.f;
+float minScale = 0.0625f, maxScale = 8.f;
 
 class subSysEntry {
 	uint sysID;
@@ -4144,7 +4158,11 @@ class subSysEntry {
 	
 	//Steps up by the smallest scale step
 	void incrementScale() {
-		scale = min( scale + minScale, maxScale);
+		float scaleStep = minScale;
+		if( scale >= 1.f ) scaleStep = scaleStep * 2;
+		if( scale >= 2.f ) scaleStep = scaleStep * 2;
+		if( scale >= 4.f ) scaleStep = scaleStep * 2;
+		scale = min( scale + scaleStep, maxScale);
 	}
 	
 	//Scaling Down functions
@@ -4159,7 +4177,11 @@ class subSysEntry {
 	
 	//Steps down by the smallest scale step
 	void decrementScale() {
-		scale = max( scale - minScale, minScale);
+		float scaleStep = minScale;
+		if( scale > 1.f ) scaleStep = scaleStep * 2;
+		if( scale > 2.f ) scaleStep = scaleStep * 2;
+		if( scale > 4.f ) scaleStep = scaleStep * 2;
+		scale = max( scale - scaleStep, minScale);
 	}
 	
 	bool setPosition(const pos2df &in newPos) {
@@ -4474,8 +4496,8 @@ void init() {
 	@glowTex = getMaterialTexture("layout_linked_glow");
 	glowTexRect = glowTex.rect;
 
-	minScale = getGameSetting("SS_MIN_SCALE", 0.25f);
-	maxScale = getGameSetting("SS_MAX_SCALE", 4.f);
+	minScale = getGameSetting("SS_MIN_SCALE", 0.0625f);
+	maxScale = getGameSetting("SS_MAX_SCALE", 8.f);
 
 	int xres = getScreenWidth(), yres = getScreenHeight();
 
