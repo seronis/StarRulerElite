@@ -142,7 +142,7 @@ System: StationHull
 	Appearance: HeavyHull
 	Explosion: ship_explode centered lasting 2.1
 	
-	Tags: IgnoresScale, Hull, Station, Restrict:Engine, Restrict:Jump Drive, Fetch:Fuel, Fetch:Ammo
+	Tags: IgnoresScale, Hull, Station, Restrict:Engine, Restrict:JumpDrive, Fetch:Fuel, Fetch:Ammo
 	Tied To: ShipConstruction 1
 
 	Equips To: Hull
