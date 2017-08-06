@@ -45,7 +45,10 @@ HEALTH_MULT: 1.0
 COST_INC_CRV:	1.2
 
 //Labor cost multiplier for structures
-BLDG_LABR_MULT:	2.0
+BLDG_LABR_MULT:	1.00	//1.00 == 1 labor per 100 resources used
+
+//Labor cost multiplier for structures
+SHIP_LABR_MULT: 0.05	//0.05 == 1 labor per 20 resources used
 
 //Resource Generation Factor
 RES_GEN_MULT:	0.167
