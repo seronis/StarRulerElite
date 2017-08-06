@@ -1,0 +1,46 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: Exporter
+	Name: #SS_EXPORTER_NAME
+	Description: #SS_EXPORTER_DESC
+
+	Appearance: MetFab
+	Explosion: armor_explode lasting 0.5
+
+	Tied To: Economics 6
+	Tags: BankAccess
+
+	Available: (Techs.Economics.Level > 5) && not(Traits.no_bank)
+	Level: Techs.Economics.Level - 5
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[80 * Size], Labr[10 * Size]
+
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 2 * pow(LEVEL_GAIN_CURVE, Level) * TRADE_RATE_MULT
+
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	// Resource per tick is randomized, so we need to multiply the
+	// rate by 3 to get that actual export rate for each resource.
+	Provides: BankExport with Amount[vRate * 3]
+
+	Requires:
+		To Run: Control[10 * Size]
+
+	Hints: Cargo[vCargoStore], Local/BankExport[vRate]
+
+
+
+
+
+

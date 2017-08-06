@@ -1,0 +1,124 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: FuelCell
+	Name: #SS_FUELCELL_NAME
+	Description: #SS_FUELCELL_DESC
+	Appearance: FuelCell
+	Explosion: fuel_cell_explode lasting 0.7
+
+	Tags: Support, Storage, Storage:Fuel
+	Tied To: ShipSystems 1, EnergyPhysics 1
+
+	Available: (Techs.ShipSystems.Level > 0) && (Techs.EnergyPhysics.Level > 0)
+	Level: floor((Techs.ShipSystems.Level + Techs.EnergyPhysics.Level) / 1.5)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 35 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[150 * Size], Labr[5 * Size]
+	Complexity: 0.4
+
+	Tick Rate: 1
+
+	vFuelStore: Size * 200 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+
+	Provides: FuelStorage with
+		Amount[vFuelStore]
+
+	Hints: Fuel[vFuelStore]
+
+
+System: AmmoStorage
+	Name: #SS_AMMOCACHE_NAME
+	Description: #SS_AMMOCACHE_DESC
+	Appearance: Ammocache
+	Explosion: fuel_cell_explode lasting 1.2
+
+	Tags: Storage, Storage:Ammo
+	Tied To: ShipSystems 1, Cargo 1
+
+	Available: (Techs.ShipSystems.Level > 0) && (Techs.Cargo.Level > 0)
+	Level: ceil((Techs.ShipSystems.Level + Techs.Cargo.Level) / 1.5)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 60 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[200 * Size], Labr[2 * Size]
+	Complexity: 0.4
+
+	Tick Rate: 1
+
+	vAmmoStore: Size * 125 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+
+	Provides: AmmoStorage with
+		Amount[vAmmoStore]
+
+	Hints: Ammo[vAmmoStore]
+
+
+System: CargoBay
+	Name: #SS_CARGOBAY_NAME
+	Description: #SS_CARGOBAY_DESC
+	Appearance: Storage
+	Explosion: vent_gas lasting 1
+
+	Tags: CargoBay, Storage, Storage:Cargo, Storage:Resources
+	Tied To: Cargo 1
+
+	Available: Techs.Cargo.Level > 0
+	Level: Techs.Cargo.Level + floor(Techs.ShipSystems.Level/3)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: Size * 5 * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: Size * 5
+
+	Costs: Metals[Size * 5], Labr[SHIP_LABR_MULT * Size * 5]
+	Complexity: 1
+
+	Tick Rate: 1
+
+	vCargoStore: Size * 50 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 4) - decay(pow(LEVEL_GAIN_CURVE, Level), 16) - decay(pow(LEVEL_GAIN_CURVE, Level), 64) - decay(pow(LEVEL_GAIN_CURVE, Level), 256))
+
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Hints: Cargo[vCargoStore]
+
+
+System: ShipBay
+	Name: #SS_SHIPBAY_NAME
+	Description: #SS_SHIPBAY_DESC
+	Appearance: ShipBay
+	Explosion: armor_explode lasting 0.75
+
+	Tags: ShipBay
+	Tied To: ShipConstruction 1
+
+	Available: Techs.ShipConstruction.Level > 0
+	Level: floor(Techs.Cargo.Level/5) + Techs.ShipConstruction.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 5 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 5 * Size
+
+	Costs: Metals[20 * Size], Electronics[5 * Size], AdvParts[1 * Size], Labr[5 * Size]
+	Complexity: 0.2
+
+	Tick Rate: 1
+
+	vShipBay: Size * (1 / 32) * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 12)) //A ship made of only ship bays can store a slightly smaller ship than itself at max tech
+
+	Provides: ShipStorage with
+		Amount[vShipBay]
+
+	Hints: ShipBay[vShipBay] //Divide by space taken by a scale 1 ship
+
+
+
+
+

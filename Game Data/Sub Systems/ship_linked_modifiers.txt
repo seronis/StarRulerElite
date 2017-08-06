@@ -1,0 +1,117 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: ExternalMount
+	Name: #SS_EXTERNALMOUNT_NAME
+	Description: #SS_EXTERNALMOUNT_DESC
+	Appearance: ExternalMount
+	Explosion: small_explosion lasting 0.5
+
+	Tags: NegatesSpace, IgnoresScale, Link
+	Tied To: ShipConstruction 4
+
+	Available: Techs.ShipConstruction.Level >= 4
+	Level: 1
+	Size: Object.Scale
+	Mass: 40 * Size
+
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 30 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+
+	Costs: Metals[Size * 275]
+	Alters: subSysAlterations::dummyAlter
+
+	PreDamageOrder: -8
+	Provides: DamageRedirection
+
+
+System: BackupPower
+	Name: #SS_BACKUPPOWER_NAME
+	Description: #SS_BACKUPPOWER_DESC
+	Appearance: NuclearReactor
+	Explosion: subsys_powerexplode lasting 0.35
+
+	Tags: Link
+	Tied To: EnergyPhysics 1
+
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 50 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[100 * Size], Electronics[50 * Size], AdvParts[5 * Size], Labr[5 * Size]
+	Complexity: 0.4
+
+	Alters: subSysAlterations::reducePowerNeeds[Size * 40 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))]
+
+	Requires:
+		To Run: Control[2 * Size]
+
+	Hints: Local/BackupPower[Size * 40 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level), 50))]
+
+
+System: QuantumComputer
+	Name: #SS_QUANTUMCOMP_NAME
+	Description: #SS_QUANTUMCOMP_DESC
+	Appearance: QuantumComputerCore
+	Explosion: electrical_spark lasting 0.25
+
+	Tags: Link
+	Tied To: Computers 5, Science 2
+
+	Available: (((Techs.Computers.Level >= 5) && (Techs.Science.Level > 1)) || Traits.remnants) && not(Traits.no_computers)
+	Level: ceil((Techs.Computers.Level - 4) / 2)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 15 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 75 * Size
+
+	Costs: Metals[50 * Size], Electronics[600 * Size], AdvParts[200 * Size], Labr[5 * Size]
+	Complexity: 10
+
+	Tick Rate: 1
+
+	Alters: subSysAlterations::reduceControlReq[Size * 150 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Hints: Local/ReduceControl[Size * 150 * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))]
+
+
+System: QuantumCompressor
+	Name: #SS_SPACESAVER_NAME
+	Description: #SS_SPACESAVER_DESC
+	Appearance: QuantumCompressor
+	Explosion: electrical_spark lasting 0.25
+
+	Tags: Link
+	Tied To: Cargo 3, WarpPhysics 3
+
+	Available: (Techs.Cargo.Level > 2) && (Techs.WarpPhysics.Level > 2)
+	Level: floor(weight(Techs.Cargo.Level - 2, 0.25, Techs.WarpPhysics.Level - 2, 0.75))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 15 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 50 * Size
+
+	Costs: Metals[50 * Size], Electronics[50 * Size], AdvParts[180 * Size], Labr[5 * Size]
+	Complexity: 10
+
+	Tick Rate: 1
+
+	Alters: subSysAlterations::increaseCargoSpace[Size][2 / decay(pow(LEVEL_GAIN_CURVE,Level),30)]
+
+	Consumes:
+		To Run: Power[25 * Size]
+
+	Hints: Local/IncreaseSpace[2 / decay(pow(LEVEL_GAIN_CURVE,Level),30)]
+
+
+
+
+

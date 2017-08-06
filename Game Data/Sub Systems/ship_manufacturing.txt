@@ -1,0 +1,155 @@
+//Keyword: specifies an entry for the current system
+//If the keyword isn't an internal keyword, it's treated as a special variable that can be accessed by scripts
+//	Note: When the keyword is a user-defined type as above, it must be a valid formula
+
+
+System: Refinery
+	Name: #SS_REFINERY_NAME
+	Description: #SS_REFINERY_DESC
+	Appearance: MetFab
+	Explosion: armor_explode lasting 0.5
+
+	Tags: Deposit:Metals
+	Tied To: Metallurgy 6
+
+	Available: Techs.Metallurgy.Level > 5
+	Level: Techs.Metallurgy.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[80 * Size], Labr[10 * Size]
+
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 4 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Provides: RefineMetal with
+		Rate[vRate], OreCostPer[1]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Requires:
+		To Run: Control[10 * Size]
+
+	Hints: Cargo[vCargoStore], Local/RefineRate[vRate]
+
+
+System: ElectsFab
+	Name: #SS_ELECTSFAB_NAME
+	Description: #SS_ELECTSFAB_DESC
+	Appearance: ElecFab
+	Explosion: armor_explode lasting 0.5
+
+	Tags: Deposit:Electronics
+	Tied To: Metallurgy 8, Computers 6
+
+	Available: (Techs.Metallurgy.Level >= 8) && (Techs.Computers.Level >= 6)
+	Level: floor(weight(Techs.Metallurgy.Level, 0.7, Techs.Computers.Level, 0.3))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Metals[80 * Size], Electronics[60 * Size], Labr[15 * Size]
+
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 2 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Provides: FabElects with
+		Rate[vRate], MtlCostPer[1]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Requires:
+		To Run: Control[5 * Size]
+
+	Hints: Cargo[vCargoStore], Local/ElectsFabRate[vRate]
+
+
+System: AdvAssembler
+	Name: #SS_ADVFAB_NAME
+	Description: #SS_ADVFAB_DESC
+	Appearance: AdvFab
+	Explosion: armor_explode lasting 0.5
+
+	Tags: Deposit:AdvParts
+	Tied To: Metallurgy 10, Computers 8, Nanotech 6
+
+	Available: (Techs.Metallurgy.Level >= 10) && (Techs.Computers.Level >= 8) && (Techs.Nanotech.Level >= 6)
+	Level: floor(weight(Techs.Metallurgy.Level, 0.5, Techs.Computers.Level, 0.2, Techs.Nanotech.Level, 0.3))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 15 * Size
+
+	Costs: Electronics[60 * Size], AdvParts[60 * Size]
+
+	Tick Rate: 4
+
+	vCargoStore: Size * 10
+	vRate: Size * 1 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Provides: FabAdvParts with
+		Rate[vRate], MtlCostPer[1], ElcCostPer[1]
+
+	Consumes:
+		To Run: Power[10 * Size]
+
+	Hints: Cargo[vCargoStore], Local/AdvFabRate[vRate]
+
+
+System: ConstructionBay
+	Name: #SS_BUILDBAY_NAME
+	Description: #SS_BUILDBAY_DESC
+	Appearance: ConstructionBay
+	Explosion: armor_explode lasting 0.5
+
+	Tags: BuildBay, BuildsShips, PostOrder:Fetch:Metals:0.3, PostOrder:Fetch:Electronics:0.3, PostOrder:Fetch:AdvParts:0.3, Storage:Resources
+	Tied To: ShipConstruction 1
+
+	Available: Techs.ShipConstruction.Level > 0
+	Level: floor(Techs.Cargo.Level/5) + Techs.ShipConstruction.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 10 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 5 * Size
+
+	Costs: Metals[20 * Size], Electronics[5 * Size], AdvParts[1 * Size], Labr[5 * Size]
+	Complexity: 0.2
+
+	Tick Rate: 1
+
+	vEcoStore: Size * 40 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
+
+	Provides: AdvPartsStorage with
+		Amount[vEcoStore * 0.2]
+
+	Provides: ElecStorage with
+		Amount[vEcoStore * 0.3]
+
+	Provides: MetalStorage with
+		Amount[vEcoStore * 0.5]
+
+	Provides: AutoLabor with
+		Rate[Size * 2 * pow(LEVEL_GAIN_CURVE, Level)], Store[Size * 10 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),45))]
+
+	Hints: EcoStore[vEcoStore]
+
+
+
