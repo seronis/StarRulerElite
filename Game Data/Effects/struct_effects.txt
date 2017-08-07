@@ -1,0 +1,128 @@
+//structure_effects.txt
+//===========
+//Effect definitions that are use primarily for structures
+
+Name:	NeedWorkers
+	Value: Workers
+	
+	OnActive: BasicEffects::AddWorkersRequired
+	OnDeactive: BasicEffects::SubWorkersRequired
+
+Name:	MetalStorage
+	Value: Amount
+
+	OnConstruct:AddMax(Amount, "Metals")
+	OnDestruct:	SubMax(Amount, "Metals")
+
+Name:	ElecStorage
+	Value: Amount
+
+	OnConstruct:	AddMax(Amount, "Electronics")
+	OnDestruct:	SubMax(Amount, "Electronics")
+
+Name:	AdvPartsStorage
+	Value: Amount
+
+	OnConstruct:	AddMax(Amount, "AdvParts")
+	OnDestruct:	SubMax(Amount, "AdvParts")
+
+Name:	CapitalSupport
+	Value: Metals
+	Value: Electronics
+	Value: AdvParts
+	Value: Food
+	
+	Tick:	StructureEffects::PlanetCapitalTick
+
+Name:	MineMetals
+	Value: Rate
+	
+	OnActive:	AddMaxTracked(Rate, "MineM", 0, "MetalsProd")
+	OnDeactive: SubMaxTracked(Rate, "MineM", "MetalsProd")
+
+Name:	MakeMetals
+	Value: Rate
+	
+	Tick:	Generate("Metals", Rate)
+
+Name:	BuildElectronics
+	Value: Rate
+
+	OnActive:	AddMaxTracked(Rate, "ElcG", 0, "ElectronicsProd")
+	OnDeactive: SubMaxTracked(Rate, "ElcG", "ElectronicsProd")
+
+Name:	BuildAdvParts
+	Value: Rate	
+
+	OnActive:	AddMaxTracked(Rate, "AdvG", 0, "AdvPartsProd")
+	OnDeactive: SubMaxTracked(Rate, "AdvG", "AdvPartsProd")
+
+//Produces [PerPerson] * Workers Metals per second, up to [MaxRate] per second
+Name:	RecycleMetals
+	Value: PerPerson
+	Value: MaxRate
+	
+	Tick:	BasicEffects::RecycleMetals
+
+Name:	Trade
+	Value: Rate
+
+	Once: AddAmount(0, "Trade") //Initialize the var
+	OnActive: AddMax(Rate, "Trade", 1)
+	OnDeactive: SubMax(Rate, "Trade")
+
+Name:	MakeFood
+	Value: Rate
+
+	OnActive:	AddMax(Rate, "FudGe", 1)
+	OnDeactive:	SubMax(Rate, "FudGe")
+	Tick:	Generate("Food", Rate)
+
+Name:	MakeGoods
+	Value: Rate
+
+	OnActive:	AddMax(Rate, "GudsG", 1)
+	OnDeactive:	SubMax(Rate, "GudsG")
+
+Name:	MakeLuxuries
+	Value: Rate
+
+	OnActive:	AddMax(Rate, "LuxG", 1)
+	OnDeactive:	SubMax(Rate, "LuxG")
+	
+Name:	FoodStorage
+	Value: Amount
+
+	Once:		AddAmount(Amount, "Food")
+	OnActive:	AddMax(Amount, "Food")
+	OnDeactive:	SubMax(Amount, "Food")
+
+Name:	Housing
+	Value: Amount
+	
+	OnActive:	AddMaxPop(Amount)
+	OnDeactive:	SubMaxPop(Amount)
+	OnDamage:	Combat::DmgToPpl
+
+Name:	LaborPool
+	Value: Amount
+
+	OnActive:	AddMax(Amount, "Labr")
+	OnDeactive:	SubMax(Amount, "Labr")
+
+Name:	AutoLabor
+	Value: Store
+	Value: Rate
+
+	OnActive:	AddMax(Store, "Labr")
+	OnDeactive:	SubMax(Store, "Labr")
+	Tick: GenerateNoCargo("Labr", Rate)
+	
+Name:	PopEconomy
+	Once:	planet::popEcoInit
+
+Name:	DamageResistance
+	Value: Amount
+	
+	OnActive:	AddMax(Amount, "DR")
+	OnDeactive:	SubMax(Amount, "DR")
