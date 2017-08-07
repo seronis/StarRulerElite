@@ -214,6 +214,3 @@ System: SolarPowerGen
 	Hints: Power[vEfficiency * vGenFactor * Size * 0.1], Charge[vCharge]
 
 
-
-
-
