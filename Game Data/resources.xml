@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<resource name="DeepOre">
+	<alwaysVisible/>
+	<recycle pct="1.0"/>
+</resource>
+
+<resource name="Ore">
+	<alwaysVisible/>
+	<canTransfer/>
+	<canBeCargo/>
+	<recycle pct="1.0"/>
+</resource>
+
+<resource name="Scrap">
+	<canTransfer/>
+	<canBeCargo/>
+	<recycle pct="1.0"/>
+</resource>
+
+<resource name="Metals">
+	<canTransfer/>
+	<canBeCargo/>
+	<recycle pct="0.666"/>
+</resource>
+
+<resource name="Electronics">
+	<canTransfer/>
+	<canBeCargo/>
+	<recycle pct="0.500"/>
+</resource>
+
+<resource name="AdvParts">
+	<canTransfer/>
+	<canBeCargo/>
+	<recycle pct="0.333"/>
+</resource>
+
+<resource name="Food">
+	<canTransfer/>
+	<isEssential/>
+	<recycle pct="1.0"/>
+</resource>
+
+<resource name="Fuel">
+	<canTransfer/>
+	<isEssential/>
+	<recycle pct="1.0"/>
+	<duplicate>Ammo</duplicate>
+</resource>
+
+<resource name="Labr">
+	<recycle pct="0.0"/>
+</resource>
+
+<resource name="Damage">
+	<alwaysVisible/>
+	<duplicate>Shields,Workers</duplicate>
+</resource>
+
+<resource name="TradeMode">
+	<isSetting/>
+</resource>
+
+
