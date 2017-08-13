@@ -1,0 +1,151 @@
+#define pi 3.141592653589793238462643383279
+
+const float pipRads = 2.0 * pi / 72.0;
+const float pipMargin = 0.15 * pipRads;
+
+const float gridWidth = 8.0;
+const float gridSize = 1000.0;
+
+const float subGridWidth = 2.0;
+const float subGridSize = 250.0;
+
+const float subsubGridWidth = 0.5;
+const float subsubGridSize = 50.0;
+
+uniform float radius;
+uniform float camDist;
+uniform float visible;
+uniform float cycle;
+uniform vec3 planeColor;
+uniform vec4 glowColor;
+
+uniform float emp1_endrad;
+uniform float emp2_endrad;
+uniform float emp3_endrad;
+uniform float emp4_endrad;
+
+uniform float emp2_startrad;
+uniform float emp3_startrad;
+uniform float emp4_startrad;
+
+uniform vec3 emp1_col;
+uniform vec3 emp2_col;
+uniform vec3 emp3_col;
+uniform vec3 emp4_col;
+
+vec4 strengthPips(float distance, float bordMult) {
+	float ang = atan(gl_TexCoord[0].y, gl_TexCoord[0].x) + pi;
+	if(ang > emp4_endrad)
+		return vec4(0, 0, 0, 0);
+	
+	if(bordMult < 1.5 && mod(ang, pipRads) * bordMult < pipMargin)
+		return vec4(0, 0, 0, 0);
+
+	vec3 col;
+	if (ang < emp1_endrad) {
+		col = emp1_col;
+	}
+	else if (ang < emp2_endrad) {
+		if (ang < emp2_startrad)
+			return vec4(0, 0, 0, 0);
+		col = emp2_col;
+	}
+	else if (ang < emp3_endrad) {
+		if (ang < emp3_startrad)
+			return vec4(0, 0, 0, 0);
+		col = emp3_col;
+	}
+	else if (ang < emp4_endrad) {
+		if (ang < emp4_startrad)
+			return vec4(0, 0, 0, 0);
+		col = emp4_col;
+	}
+
+	if (visible == 0.0)
+		return vec4(col, (1.0 - distance) / (0.04 * bordMult) * 0.4);
+	return vec4(col, 1.0);
+}
+
+vec4 grid(float distance, float bordMult) {
+	if(distance >= 1.0)
+		return vec4(0, 0, 0, 0);
+
+	float innerPipBorder = 1.0 - (0.04 * bordMult);
+	if (distance > innerPipBorder) {
+		return strengthPips(distance, bordMult);
+	}
+
+	vec4 res;
+	res.rgb = planeColor;
+	float baseAlpha = 0.08 + 0.08 * min(camDist / 75000.0, 1.0);
+	
+	if(distance > 1.0 - 0.05 * bordMult) {
+		res.a = baseAlpha * 2.0;
+		return res;
+	}
+
+	vec2 absCoords = gl_TexCoord[0].xy * radius;
+	vec2 gridPos = abs(mod(absCoords, gridSize));
+	gridPos = min(gridPos, gridSize - gridPos);
+
+	// Main grid alpha
+	if(camDist < 50000.0) {
+		if(gridPos.x <= gridWidth || gridPos.y <= gridWidth) {
+			res.a = gl_Color.a * 2.0;
+			return res;
+		}
+
+		if(camDist < 10000.0) {
+			vec2 subGridPos = abs(mod(absCoords, subGridSize));
+			subGridPos = min(subGridPos, subGridSize - subGridPos);
+			if(subGridPos.x <= subGridWidth || subGridPos.y <= subGridWidth) {
+				res.a = baseAlpha * 1.8;
+				return res;
+			}
+			
+			if (camDist < 2000.0) {
+				vec2 subsubGridPos = abs(mod(absCoords, subsubGridSize));
+				subsubGridPos = min(subsubGridPos, subsubGridSize - subsubGridPos);
+				if(subsubGridPos.x <= subsubGridWidth || subsubGridPos.y <= subsubGridWidth) {
+					res.a = baseAlpha * 1.5;
+					return res;
+				}
+			}
+		}
+	}
+	
+	res.a = baseAlpha;
+	return res;
+}
+
+vec4 attackGlow(vec4 color, float distance, float bordMult) {
+	float innerPipBorder = 1.0 - (0.04 * bordMult);
+	float outerBorder =  1.0 - (0.05 * bordMult);
+	if (distance < outerBorder || (distance > innerPipBorder && color.a != 0.0) || distance > 1.0)
+		return color;
+
+	vec4 col = glowColor;
+	if (distance > innerPipBorder) {
+		col.a = 0.07 + 0.1 * smoothstep(0.0, 0.5, abs(cycle - 0.5));
+		return col;
+	}
+	else {
+		col.a = 0.1 + 0.6 * smoothstep(0.0, 0.5, abs(cycle - 0.5));
+		return mix(color, col, col.a);
+	}
+}
+
+void main() {
+	float distance = length(gl_TexCoord[0].xy);
+	float bordMult = min(camDist / 30000.0, 4.0) + 1.0;
+
+	vec4 color = grid(distance, bordMult);
+
+	if (glowColor.a != 0.0)
+		color = attackGlow(color, distance, bordMult);
+
+	if (color.a == 0.0)
+		discard;
+
+	gl_FragColor = color;
+}
