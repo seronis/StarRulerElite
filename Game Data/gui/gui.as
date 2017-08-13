@@ -40,7 +40,7 @@ double em_lastVisMsg = -1;
 int gameShipLimit;
 
 GuiImage@ tickerBG;
-GuiStaticText@ tickerTop, tickerBottom, tickerBottomRight, tickerTopPercent;
+GuiStaticText@ tickerTop, tickerResETA, tickerResRate, tickerTopPercent;
 GuiExtText@ shipLimit;
 
 GuiButton@ msgLog, msgExpand, msgShrink, civActs, bankToggle, econReportButton, speedUpButton, slowDownButton, pauseButton;
@@ -205,23 +205,30 @@ void onTriggerEscapeMenu() {
 	toggleEscapeMenu();
 }
 
-void setTicker(string@ top, string@ bottom) {
+void setTicker(string@ top, string@ eta) {
 	tickerTopPercent.setText(top);
 	tickerTop.setText(top);
-	tickerBottom.setText(bottom);
-	tickerBottomRight.setText(null);
+	tickerResETA.setText(eta);
+	tickerResRate.setText(null);
 }
 
-void setTicker(string@ top, string@ bottom, string@ bottomRight) {
+void setTicker(string@ top, string@ eta, string@ res) {
 	tickerTopPercent.setText(top);
 	tickerTop.setText(top);
-	tickerBottom.setText(bottom);
-	tickerBottomRight.setText(bottomRight);
+	dim2di textSize = getTextDimension(tickerTop.getText());
+	tickerTop.setSize(dim2di(textSize.width, tickerTop.getSize().height));
+	tickerTopPercent.setSize(dim2di(0.01 * textSize.width, tickerTopPercent.getSize().height));
+	
+	tickerResETA.setText(eta);
+	tickerResETA.setToolTip(res);
+	tickerResRate.setText(res);
+	tickerResRate.setToolTip(eta);
 }
 
 void setTickerPercent(float perc, Color col) {
 	dim2di textSize = getTextDimension(tickerTopPercent.getText());
 	tickerTopPercent.setSize(dim2di(perc * textSize.width, tickerTopPercent.getSize().height));
+	tickerTop.setSize(dim2di(textSize.width, tickerTopPercent.getSize().height));
 	tickerTopPercent.setColor(col);
 }
 
@@ -296,8 +303,17 @@ void setTickerVisible(bool visible) {
 void setTickerResearchVisible(bool visible) {
 	tickerTop.setVisible(visible);
 	tickerTopPercent.setVisible(visible);
-	tickerBottom.setVisible(visible);
-	tickerBottomRight.setVisible(visible);
+	tickerResETA.setVisible(visible);
+	tickerResRate.setVisible(visible);
+}
+
+bool toggleResRateETA(const GUIEvent@ evt) {
+	if(evt.EventType == GEVT_Clicked) {
+		bool visible = tickerResETA.isVisible();
+		tickerResETA.setVisible(!visible);
+		tickerResRate.setVisible(visible);
+	}
+	return false;
 }
 
 void init() {
@@ -307,10 +323,10 @@ void init() {
 	empMsgBG.setAlignment(EA_Center, EA_Top, EA_Center, EA_Top);
 	
 	@glowLine = GuiImage( pos2di(0,0), "glow_line", null);
-	@nrov_name = GuiExtText( recti(pos2di(0,0), dim2di(115,15)), null ); nrov_name.setShadow(Color(255,0,0,0));
-	@nrov_hpTag = GuiExtText( recti(pos2di(0,0), dim2di(46,15)), null); nrov_hpTag.setShadow(Color(255,0,0,0)); nrov_hpTag.setText("#align:right#HP:");
-	@nrov_hpBar = GuiBar( recti( pos2di(0,0), dim2di(50,7)), null); nrov_hpBar.set( Color(255,0,255,0), Color(255,255,0,0), true, 1);
-	@nrov_build = GuiExtText( recti(pos2di(0,0), dim2di(200,15)), null); nrov_build.setShadow(Color(255,0,0,0));
+	@nrov_name  = GuiExtText( recti(pos2di(0,0), dim2di(115,15)), null ); nrov_name.setShadow(Color(255,0,0,0));
+	@nrov_build = GuiExtText( recti(pos2di(0,0), dim2di(200,15)), null);  nrov_build.setShadow(Color(255,0,0,0));
+	@nrov_hpTag = GuiExtText( recti(pos2di(0,0), dim2di(46,15)), null);   nrov_hpTag.setShadow(Color(255,0,0,0)); nrov_hpTag.setText("#align:right#HP:");
+	@nrov_hpBar = GuiBar( recti( pos2di(0,0), dim2di(50,7)), null);       nrov_hpBar.set( Color(255,0,255,0), Color(255,255,0,0), true, 1);
 	hideNearOverlay();
 	
 	@empireMessages = GuiExtText(recti( pos2di(8,3), dim2di(500 - 38, 18)), empMsgBG);
@@ -372,18 +388,22 @@ void init() {
 	@mouseOverlay = GuiExtText(recti( pos2di(-1,-1), dim2di(300, 200)), null);
 	mouseOverlay.setNoclipped(true);
 	
-	@tickerBG = GuiImage( pos2di(0,0), "elite_globalbank_ticker", null);
-	@tickerTop = GuiStaticText( recti( pos2di(11,8), dim2di(200, 15) ), null, false, false, false, tickerBG);
-	@tickerTopPercent = GuiStaticText( recti( pos2di(11,8), dim2di(20, 15) ), null, false, false, false, tickerBG);
+	@tickerBG = GuiImage( pos2di(2,4), "elite_globalbank_ticker", null);
+	@tickerTop        = GuiStaticText( recti( pos2di(  8, 6), dim2di(200, 15) ), null, false, false, false, tickerBG);
+	@tickerTopPercent = GuiStaticText( recti( pos2di(  8, 6), dim2di( 20, 15) ), null, false, false, false, tickerBG);
 
-	@tickerBottom = GuiStaticText( recti( pos2di(11,16+8+8), dim2di(195, 15) ), null, false, false, false, tickerBG);
-	@tickerBottomRight = GuiStaticText( recti( pos2di(11,16+8+8), dim2di(255, 15) ), null, false, false, false, tickerBG);
+	@tickerResETA     = GuiStaticText( recti( pos2di(170, 6), dim2di( 96, 15) ), null, false, false, false, tickerBG);
+	@tickerResRate    = GuiStaticText( recti( pos2di(170, 6), dim2di( 96, 15) ), null, false, false, false, tickerBG);
 
-	tickerBottomRight.setTextAlignment(EA_Right, EA_Top);
+	tickerResETA.setTextAlignment( EA_Right, EA_Top);
+	tickerResRate.setTextAlignment(EA_Right, EA_Top);
+//	bindGuiCallback(tickerResRate, "toggleResRateETA");
+//	bindGuiCallback(tickerResETA, "toggleResRateETA");
+	tickerResRate.setVisible(false);
 
 	tickerTop.setColor( Color(255, 255, 255, 255) );
-	tickerBottom.setColor( Color(255, 255, 255, 255) );
-	tickerBottomRight.setColor( Color(255, 255, 255, 255) );
+	tickerResETA.setColor( Color(255, 255, 255, 255) );
+	tickerResRate.setColor( Color(255, 255, 255, 255) );
 
 	@bankAdv   = GuiExtText(recti(pos2di(-35, 60), dim2di(82, 18)), tickerBG);
 	@bankElc   = GuiExtText(recti(pos2di( 25, 60), dim2di(82, 18)), tickerBG);
@@ -407,10 +427,6 @@ void init() {
 	ico.setToolTip(localize("#GBR_metals"));
 	@top_icos[2] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(230, 62), dim2di(10, 16)), gui_sprite("planet_resource_list", 5) , tickerBG);
-	ico.setToolTip(localize("#GBR_fuel"));
-	@top_icos[6] = @ico;
-
 	@ico = GuiScripted(recti(pos2di(47, 77), dim2di(17,17)), gui_sprite("planet_topbar_resources", 0), tickerBG);
 	ico.setToolTip(localize("#GBR_food"));
 	@top_icos[3] = @ico;
@@ -422,6 +438,10 @@ void init() {
 	@ico = GuiScripted(recti(pos2di(167, 77), dim2di(17,17)), gui_sprite("planet_topbar_resources", 7), tickerBG);
 	ico.setToolTip(localize("#GBR_luxuries"));
 	@top_icos[5] = @ico;
+
+	@ico = GuiScripted(recti(pos2di(230, 62), dim2di(10, 16)), gui_sprite("planet_resource_list", 5) , tickerBG);
+	ico.setToolTip(localize("#GBR_fuel"));
+	@top_icos[6] = @ico;
 
 	@ico = GuiScripted(recti(pos2di(230, 77), dim2di(17,17)), gui_sprite("planet_resource_list", 6), tickerBG);
 	ico.setToolTip(localize("#GBR_ammo"));
