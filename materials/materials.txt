@@ -1,5 +1,9 @@
 
 #include "~/materials/materials.txt"
 
-Material: elite_globalbank_ticker
+Material: elite_econ_ticker
  Texture: Images/GUI/elite_ticker.png
+
+SpriteBank: hard_resource_icons
+ Texture: Images/GUI/hard_resource_icons.png
+ AutoTile: colmajor, 16, 16
