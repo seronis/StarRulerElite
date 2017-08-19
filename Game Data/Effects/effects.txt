@@ -1,0 +1,459 @@
+//Effect Entries
+
+//Name: Begins a new effect. Until the next Name:, all entries are given to the most recent effect
+
+//Value: Specifies the name of a value held by the effect
+//		 Every effect may have 0-4 values, and they may have any name
+//		 These values are specified by Sub Systems and Effectors in the form of Value[Formula]
+//		 You reference these values by using their name without quotes in function templates, or by receiving them in a script call
+
+//FUNCTIONS
+//  Functions are how effects affect objects
+//	No function definition is mandatory, although effects without at least one function are no more than placeholders
+//
+//OnActive(): Triggered once when the component becomes active
+//OnDeactive(): Triggered once when the component deactivates
+//OnConstruct(): Called whenever something is constructed - Called prior to OnActivate
+//OnDestruct(): Called when a sub system is damaged to 0% health - Only called as a result of damage, no other reason
+//OnOwnerChange(): Called just before the object changes owners - Passed the from and to empires as arguments before the floats
+//Once(): Called after something is constructed/activated the first time
+//Tick(): Called varying times per second:
+//			Structures: No more than 10x per second
+//			Ship Sub-Systems: Tick-rate for the game (typically 20x per second)
+//			Applied effects: Exactly 4x per second, with odd remaining times being treated as a partial tick
+//			Other ticks will typically be applied at the game's tick-rate (~20x per second)
+//
+//Functions are defined as such:
+//MODULE::FUNCTION
+//
+//Internal functions:
+// These may be refered to as internal::FUNCTION, ::FUNCTION, or just FUNCTION
+// Internal functions are a sort of template: For example, AddMax(1, "Test") would add 1 to the maximum value for the "Test" state, but AddMax(3, "Power") adds 3 to "Power"'s max value
+// Internal functions have different requirements for their template. For example, AddMax() accepts anything for the first argument, but requires a string (state name) for the second
+//
+//Script functions:
+// All script files used in effects must be loaded as a server script
+// To specify a function, use the file's name as the module (e.g. the Trade function in BasicEffects.as is referenced as BasicEffects::Trade)
+//
+// Script functions must accept the following arguments:
+//  Event@ - The event associated with the trigger of the effect
+//  0-6 float values - These values are passed to the script in the same order they are defined in the effect definition. The argument names don't have to match, but it is suggested.
+//		Note: For now, Functions have to accept the same number of floats as the effect they are referenced by defines, even if they don't use them.
+
+Name:	AmmoStorage
+	Value: Amount
+
+	Once: AddAmount(Amount, "Ammo")
+	OnConstruct:	AddMax(Amount, "Ammo")
+	OnDestruct:		SubMax(Amount, "Ammo")
+
+Name:	DestructsShip
+	OnDestruct: Death
+
+Name:	ExplodesShip
+	OnDestruct: BasicEffects::SelfDestruct
+
+Name:	PowerOrDeath
+	Tick: BasicEffects::DestructOnPowerOff
+	OnDestruct: Death
+
+Name:	PowerOrBoom
+	Tick: BasicEffects::DestructOnPowerOff
+	OnDeactive: BasicEffects::KillSystem
+	OnDestruct: BasicEffects::SelfDestruct
+
+Name:	HullSoak
+	Value: ReceivePct
+	Value: DmgAlter
+	
+	OnGlobalDamage: Combat::DealHullDamage
+	OnDestruct: Death
+	
+Name:	SelfHeal
+	Value: Rate
+	Value: UpToHP
+	
+	Tick:	Combat::healMyDamage
+	
+Name:	Damage
+	Value: Damage
+	
+	OnActive:	Combat::dealDamage
+
+//Damage is reduced by [Amount], then applied
+//If damage is reduced below 0, nothing happens
+Name:	SoakDamage
+	Value: Amount
+	
+	OnDamage: Skip
+	OnGlobalDamage:	Combat::SoakDamage
+
+//Takes normal damage up to [Amount]. Damage beyond [Amount] is multiplied by [AbsorbPct] and also applied.
+Name:	ReactDamage
+	Value: Amount
+	Value: AbsorbPct
+	
+	OnDamage: Skip
+	OnGlobalDamage:	Combat::ReactDamage
+	
+Name:	EnergyDmg
+	Value: Damage
+	Value: Cost
+	
+	Tick:	Combat::EnergyDamage
+	
+Name:	PhasedEnergyDmg
+	Value: Damage
+	Value: Cost
+	
+	Tick:	Combat::PhasedDamage
+	
+Name:	star_damage	
+	Tick:	Combat::StarDamage
+
+//Deals damage in two parts: Upon impact, deals [FrontDamage]; Over time, deals [DoTDamage]/second
+Name:	PlasmaDmg
+	Value: FrontDamage
+	Value: DoTDamage
+	
+	OnActive: Combat::PlasmaFrontDamage
+	Tick:	Combat::PlasmaDoTDamage
+	
+Name:	ProjectileDmg
+	Value: Damage
+	Value: Cost
+	
+	OnActive:	Combat::ProjDamage
+
+Name:	ArtilleryDmg
+	Value: Damage
+	
+	OnActive:	Combat::ArtyDamage
+	
+Name:	ProjDamage
+	Value: Damage
+	
+	OnActive:	Combat::ProjDamage
+
+Name:	PopulationDamage
+	Value: Damage
+	
+	OnActive:	Combat::PopDamage
+	
+Name:	ProjPierceDamage
+	Value: Damage
+	
+	OnActive:	Combat::ProjPierceDamage
+	
+Name:	ExplosiveDamage
+	Value: Damage
+	
+	OnActive:	Combat::ExplosiveDamage
+
+Name:	DoT
+	Value: Damage
+	
+	Tick: Combat::DoT
+
+Name:	ChanceDoT
+	Value: Damage
+	Value: Chance
+	
+	Tick: Combat::ChanceDoT
+
+Name:	ChanceDoTAoE
+	Value: Damage
+	Value: Chance
+	
+	Tick: Combat::ChanceDoTAoE
+
+Name:	SpaceDamage
+	Value: DamageRate
+	Tick: Combat::SpaceDamage
+
+Name:	Board
+	Value: Troops
+	
+	Tick: boarding::BoardTick
+	
+Name:	TakePower
+	Value: Rate
+	
+	Tick:	Combat::SuckPower
+
+Name:	Cargo
+	Value: Amount
+
+	OnActive:	AddCargoSpace(Amount)
+	OnDeactive:	SubCargoSpace(Amount)
+
+Name:	ShipStorage
+	Value: Amount
+
+	OnActive:	AddShipSpace(Amount)
+	OnDeactive:	SubShipSpace(Amount)
+
+Name:	SolarPower
+	Value: Efficiency
+	Value: SurfaceArea
+	
+	Tick: BasicEffects::SolarPower
+
+Name:	CollectFuel
+	Value: Rate
+	
+	Tick: GenerateNoCargo("Fuel", Rate)
+
+Name:	MakeBioFuel
+	Value: Rate
+	Value: FoodCostPer
+
+	Tick: ProduceNoCargo("Fuel", "Food", Rate, FoodCostPer)
+
+Name:	MakeAmmo
+	Value: Rate
+	Value: MetalCostPer
+
+	Tick: ProduceNoCargo("Ammo", "Metals", Rate, MetalCostPer)
+
+Name:	FuelStorage
+	Value: Amount
+	
+	Once:			AddAmount(Amount, "Fuel")
+	OnConstruct:	AddMax(Amount, "Fuel")
+	OnDestruct:		SubMax(Amount, "Fuel")
+
+Name:	Propulsion
+	Value: Amount
+	
+	OnActive:	IncSpeed(Amount)
+	OnDeactive:	DecSpeed(Amount)
+
+
+Name:	FuelThrust
+	Value: Amount
+	Value: Efficiency
+	
+	OnActive:	BasicEffects::SpeedIfFuel
+	OnDeactive:	DecSpeed(Amount)
+	Tick:		BasicEffects::FuelThrustCons
+
+
+Name:	IonThrust
+	Value: Amount
+	Value: Efficiency
+	Value: PowCost
+	
+	OnActive:	BasicEffects::SpeedIfFuel
+	OnDeactive:	DecSpeed(Amount)
+	Tick:		BasicEffects::IonThrustCons
+
+
+Name:	Control
+	Value: Amount
+
+	OnActive:	AddMax(Amount, "Control", 1)
+	OnDeactive:		SubMax(Amount, "Control")
+
+Name:	CrewQuarters
+	Value: Amount
+	Value: Regen
+
+	Once: AddAmount(Amount, "Crew")
+	OnActive:	AddMax(Amount, "Crew")
+	OnDeactive:		SubMax(Amount, "Crew")
+	Tick:	GenerateNoCargo("Crew", Regen)
+
+Name:	TroopQuarters
+	Value: Amount
+	Value: Regen
+
+	Once: AddAmount(Amount, "Troops")
+	OnActive:	AddMax(Amount, "Troops")
+	OnDeactive:		SubMax(Amount, "Troops")
+	Tick:	GenerateNoCargo("Troops", Regen)
+
+Name:	AirStorage
+	Value: Amount
+
+	Once: AddAmount(Amount, "Air")
+	OnConstruct:	AddMax(Amount, "Air")
+	OnDestruct:		SubMax(Amount, "Air")
+
+Name:	MakeAir
+	Value: Amount
+
+	Tick: GenerateNoCargo("Air", Amount)
+
+Name:	Chameleon
+	Value: HitMod
+	
+	OnGlobalDamage:	Combat::HitMod
+
+Name:	MoveDodge
+	Value: HitMod
+	
+	OnGlobalDamage:	Combat::DodgeHitMod
+
+//Name:	Shields
+//	Value: Rate
+//	Value: Cost
+//	Value: FluxMult
+//
+//	Tick:	ProduceNoCargo("Shields", "Power", Rate, Cost)
+
+//Provides 'leaky' shields: Less damage is absorbed at lower charge%'s
+//	Absorption the absorption% at 100% charge. (e.g. 0.5 would leak 50% of damage at full charge, and get worse. 2 would not leak until less than 50% health)
+Name: Shields
+	Value: Amount
+	Value: Absorption
+
+	OnActive:	AddMax(Amount, "Shields")
+	OnDeactive:	SubMax(Amount, "Shields")
+	OnGlobalDamage:	Combat::ShieldSoak
+
+//Regenerates shields at [Rate]/second, each unit costing [Cost] Power
+Name: ShieldRegen
+	Value: Rate
+	Value: Cost
+	
+	Tick:	Combat::ShieldRegen
+
+Name:	FluxCap
+	Value: Amount
+
+	OnActive:	AddMax(Amount, "Shields")
+	OnDeactive:	SubMax(Amount, "Shields")
+
+Name:	Research
+	Value: Amount
+	
+	OnActive:	IncResearch(Amount)
+	OnOwnerChange: StructureEffects::ChangeResearchOwner
+	OnDeactive:	DecResearch(Amount)
+
+Name:	MineOre
+	Value: Rate
+	Value: PowCost
+	
+	Tick:	BasicEffects::MineOre
+
+Name:	DrainResource
+	Value: Rate
+	
+	Tick:	BasicEffects::DrainResource
+
+//Provides [Rate] Power per second at minimum, 2x[Rate] at maximum (no current charge), each unit of Power costing [Cost] Fuel
+Name: 	Power
+	Value: Rate
+	Value: Cost
+
+	Tick:	BasicEffects::PowerGen
+
+Name:	Capacitance
+	Value: Amount
+
+	Once: 		AddAmount(Amount, "Power")
+	OnActive:	AddMax(Amount, "Power")
+	OnDeactive:	SubMax(Amount, "Power")
+
+Name:	Repair
+	Value: Rate
+	
+	Tick: Repair(Rate)
+
+Name:	TimeMod
+	Value: Factor
+	Tick:	BasicEffects::TimeModifier
+
+//Converts [Rate] health/second from the target to Metals for the source at 1 dmg : [Factor] Metals
+Name:	Salvage
+	Value: Rate
+	Value: Factor
+	
+	Tick:	BasicEffects::Salvage
+
+Name:	RefineMetal
+	Value: Rate
+	Value: OreCostPer
+	
+	Tick:	Produce("Metals", "Ore", Rate, OreCostPer)
+
+Name:	FabElects
+	Value: Rate
+	Value: MtlCostPer
+	
+	Tick:	Produce("Electronics", "Metals", Rate, MtlCostPer)
+
+Name:	FabAdvParts
+	Value: Rate
+	Value: MtlCostPer
+	Value: ElcCostPer
+	
+	Tick:	BasicEffects::FabricateAdv
+
+//Attempts to capture the target's hull per tick (All other factors ignored, ScanQuality is a % chance from 0-1 to capture the hull per second)
+Name:	Analyze
+	Value: ScanQuality
+	Value: PowCost
+	
+	Tick:	BasicEffects::Analyze
+
+
+Name:	NegateControl
+	Value: Amount
+	
+	OnActive: AddRequire(Amount, "Control")
+	OnDeactive: SubRequire(Amount, "Control")
+
+Name:	CapPlanet
+	
+	OnActive: BasicEffects::CapturePlanet
+
+Name:	JumpDriveEvent
+
+	OnDeactive: JumpDrive::Jump
+
+Name:	RingworldGen
+	
+	Tick: BasicEffects::CreateRingworld
+
+Name:	MakeStructures
+	Value: Amount
+	
+	OnActive: AddMax(Amount, "MakeStructures")
+	OnDeactive: SubMax(Amount, "MakeStructures")
+
+Name:	BankExport
+	Value: Amount
+
+	Tick:	BasicEffects::BankExport
+
+Name:	MatterGeneration
+	Value: Rate
+	Value: PowCost
+
+	Tick:	BasicEffects::MatterGen
+
+Name:	AddVelocity
+	Value: Force
+	Value: PowCost
+
+	Tick:	Combat::ImpartForce
+
+Name:	InterdictVelocity
+	Value: Force
+	Value: PowCost
+
+	Tick:	Combat::MatchVelocity
+
+Name:	Quasar
+	OnDestruct: Combat::QuasarExplode
+
+Name:	QuasarDamage
+	Value: Damage
+
+	Tick: Combat::QuasarDamage
+
+Name:	DamageRedirection
+	OnGlobalDamage:	Combat::RedirectDamage
