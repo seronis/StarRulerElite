@@ -40,13 +40,6 @@
 //  0-6 float values - These values are passed to the script in the same order they are defined in the effect definition. The argument names don't have to match, but it is suggested.
 //		Note: For now, Functions have to accept the same number of floats as the effect they are referenced by defines, even if they don't use them.
 
-Name:	AmmoStorage
-	Value: Amount
-
-	Once: AddAmount(Amount, "Ammo")
-	OnConstruct:	AddMax(Amount, "Ammo")
-	OnDestruct:		SubMax(Amount, "Ammo")
-
 Name:	DestructsShip
 	OnDestruct: Death
 
@@ -215,13 +208,6 @@ Name:	MakeAmmo
 	Value: MetalCostPer
 
 	Tick: ProduceNoCargo("Ammo", "Metals", Rate, MetalCostPer)
-
-Name:	FuelStorage
-	Value: Amount
-	
-	Once:			AddAmount(Amount, "Fuel")
-	OnConstruct:	AddMax(Amount, "Fuel")
-	OnDestruct:		SubMax(Amount, "Fuel")
 
 Name:	Propulsion
 	Value: Amount

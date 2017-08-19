@@ -2,107 +2,216 @@
 //===========
 //Effect definitions that are use primarily for structures
 
-Name:	NeedWorkers
-	Value: Workers
-	
-	OnActive: BasicEffects::AddWorkersRequired
-	OnDeactive: BasicEffects::SubWorkersRequired
-
-Name:	MetalStorage
+Name:	StorageAdvp
 	Value: Amount
 
-	OnConstruct:AddMax(Amount, "Metals")
-	OnDestruct:	SubMax(Amount, "Metals")
+	OnConstruct: AddMax(Amount, "AdvParts")
+	OnDestruct:  SubMax(Amount, "AdvParts")
 
-Name:	ElecStorage
+Name:	StorageAdvpFilled
 	Value: Amount
 
-	OnConstruct:	AddMax(Amount, "Electronics")
-	OnDestruct:	SubMax(Amount, "Electronics")
+	Once:     AddAmount(Amount, "AdvParts")
+	OnConstruct: AddMax(Amount, "AdvParts")
+	OnDestruct:  SubMax(Amount, "AdvParts")
 
-Name:	AdvPartsStorage
+Name:	StorageElec
 	Value: Amount
 
-	OnConstruct:	AddMax(Amount, "AdvParts")
-	OnDestruct:	SubMax(Amount, "AdvParts")
+	OnConstruct: AddMax(Amount, "Electronics")
+	OnDestruct:  SubMax(Amount, "Electronics")
+
+Name:	StorageElecFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Electronics")
+	OnConstruct: AddMax(Amount, "Electronics")
+	OnDestruct:  SubMax(Amount, "Electronics")
+
+Name:	StorageMetl
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Metals")
+	OnDestruct:  SubMax(Amount, "Metals")
+
+Name:	StorageMetlFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Metals")
+	OnConstruct: AddMax(Amount, "Metals")
+	OnDestruct:  SubMax(Amount, "Metals")
+
+Name:	StorageOres
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Ore")
+	OnDestruct:  SubMax(Amount, "Ore")
+
+Name:	StorageOresFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Ore")
+	OnConstruct: AddMax(Amount, "Ore")
+	OnDestruct:  SubMax(Amount, "Ore")
+
+Name:	StorageScrp
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Scrap")
+	OnDestruct:  SubMax(Amount, "Scrap")
+
+Name:	StorageScrpFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Scrap")
+	OnConstruct: AddMax(Amount, "Scrap")
+	OnDestruct:  SubMax(Amount, "Scrap")
+
+Name:	StorageFood
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Food")
+	OnDestruct:  SubMax(Amount, "Food")
+
+Name:	StorageFoodFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Food")
+	OnConstruct: AddMax(Amount, "Food")
+	OnDestruct:  SubMax(Amount, "Food")
+
+Name:	StorageFuel
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Fuel")
+	OnDestruct:  SubMax(Amount, "Fuel")
+
+Name:	StorageFuelFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Fuel")
+	OnConstruct: AddMax(Amount, "Fuel")
+	OnDestruct:  SubMax(Amount, "Fuel")
+
+Name:	StorageAmmo
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Ammo")
+	OnDestruct:  SubMax(Amount, "Ammo")
+
+Name:	StorageAmmoFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Ammo")
+	OnConstruct: AddMax(Amount, "Ammo")
+	OnDestruct:  SubMax(Amount, "Ammo")
+
+Name:	StorageGuds
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Guds")
+	OnDestruct:  SubMax(Amount, "Guds")
+
+Name:	StorageGudsFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Guds")
+	OnConstruct: AddMax(Amount, "Guds")
+	OnDestruct:  SubMax(Amount, "Guds")
+
+Name:	StorageLuxs
+	Value: Amount
+
+	OnConstruct: AddMax(Amount, "Luxs")
+	OnDestruct:  SubMax(Amount, "Luxs")
+
+Name:	StorageLuxsFilled
+	Value: Amount
+
+	Once:     AddAmount(Amount, "Luxs")
+	OnConstruct: AddMax(Amount, "Luxs")
+	OnDestruct:  SubMax(Amount, "Luxs")
+
+
+
+
 
 Name:	CapitalSupport
 	Value: Metals
 	Value: Electronics
 	Value: AdvParts
 	Value: Food
-	
+
 	Tick:	StructureEffects::PlanetCapitalTick
 
 Name:	MineMetals
 	Value: Rate
-	
+
 	OnActive:	AddMaxTracked(Rate, "MineM", 0, "MetalsProd")
 	OnDeactive: SubMaxTracked(Rate, "MineM", "MetalsProd")
 
 Name:	MakeMetals
 	Value: Rate
-	
+
 	Tick:	Generate("Metals", Rate)
 
 Name:	BuildElectronics
 	Value: Rate
 
-	OnActive:	AddMaxTracked(Rate, "ElcG", 0, "ElectronicsProd")
-	OnDeactive: SubMaxTracked(Rate, "ElcG", "ElectronicsProd")
+	OnActive:	AddMaxTracked(Rate, "ElecGen", 0, "ElectronicsProd")
+	OnDeactive: SubMaxTracked(Rate, "ElecGen", "ElectronicsProd")
 
 Name:	BuildAdvParts
 	Value: Rate	
 
-	OnActive:	AddMaxTracked(Rate, "AdvG", 0, "AdvPartsProd")
-	OnDeactive: SubMaxTracked(Rate, "AdvG", "AdvPartsProd")
+	OnActive:	AddMaxTracked(Rate, "AdvpGen", 0, "AdvPartsProd")
+	OnDeactive: SubMaxTracked(Rate, "AdvpGen", "AdvPartsProd")
 
 //Produces [PerPerson] * Workers Metals per second, up to [MaxRate] per second
 Name:	RecycleMetals
 	Value: PerPerson
 	Value: MaxRate
-	
+
 	Tick:	BasicEffects::RecycleMetals
 
 Name:	Trade
 	Value: Rate
 
 	Once: AddAmount(0, "Trade") //Initialize the var
-	OnActive: AddMax(Rate, "Trade", 1)
+	OnActive:   AddMax(Rate, "Trade", 1)
 	OnDeactive: SubMax(Rate, "Trade")
 
 Name:	MakeFood
 	Value: Rate
 
-	OnActive:	AddMax(Rate, "FudGe", 1)
-	OnDeactive:	SubMax(Rate, "FudGe")
+	OnActive:	AddMax(Rate, "FoodGen", 1)
+	OnDeactive:	SubMax(Rate, "FoodGen")
 	Tick:	Generate("Food", Rate)
 
 Name:	MakeGoods
 	Value: Rate
 
-	OnActive:	AddMax(Rate, "GudsG", 1)
-	OnDeactive:	SubMax(Rate, "GudsG")
+	OnActive:	AddMax(Rate, "GudsGen", 1)
+	OnDeactive:	SubMax(Rate, "GudsGen")
 
 Name:	MakeLuxuries
 	Value: Rate
 
-	OnActive:	AddMax(Rate, "LuxG", 1)
-	OnDeactive:	SubMax(Rate, "LuxG")
-	
-Name:	FoodStorage
-	Value: Amount
-
-	Once:		AddAmount(Amount, "Food")
-	OnActive:	AddMax(Amount, "Food")
-	OnDeactive:	SubMax(Amount, "Food")
+	OnActive:	AddMax(Rate, "LuxsGen", 1)
+	OnDeactive:	SubMax(Rate, "LuxsGen")
 
 Name:	Housing
 	Value: Amount
-	
+
 	OnActive:	AddMaxPop(Amount)
 	OnDeactive:	SubMaxPop(Amount)
 	OnDamage:	Combat::DmgToPpl
+
+Name:	NeedWorkers
+	Value: Workers
+
+	OnActive: BasicEffects::AddWorkersRequired
+	OnDeactive: BasicEffects::SubWorkersRequired
 
 Name:	LaborPool
 	Value: Amount
@@ -117,12 +226,12 @@ Name:	AutoLabor
 	OnActive:	AddMax(Store, "Labr")
 	OnDeactive:	SubMax(Store, "Labr")
 	Tick: GenerateNoCargo("Labr", Rate)
-	
+
 Name:	PopEconomy
 	Once:	planet::popEcoInit
 
 Name:	DamageResistance
 	Value: Amount
-	
+
 	OnActive:	AddMax(Amount, "DR")
 	OnDeactive:	SubMax(Amount, "DR")
