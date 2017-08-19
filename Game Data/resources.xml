@@ -49,6 +49,13 @@
 	<duplicate>Ammo</duplicate>
 </resource>
 
+<resource name="Guds">
+	<canTransfer/>
+	<canBeCargo/>
+	<recycle pct="1.0"/>
+	<duplicate>Luxs</duplicate>
+</resource>
+
 <resource name="Labr">
 	<recycle pct="0.0"/>
 </resource>
