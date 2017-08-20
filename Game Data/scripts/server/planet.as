@@ -1,14 +1,31 @@
-const string@ strOre = "Ore", strDamage = "Damage", strMass = "mass";
-const string@ strMtl = "Metals", strMine = "MineM", strMtlGen = "MtlG";
-const string@ strElc = "Electronics", strElcGen = "ElcG";
+
+const string@ strAdvpGen = "AdvpGen", strAdvp = "AdvParts";		//manufactured from metal and elecs
+const string@ strElecGen = "ElecGen", strElec = "Electronics";	//manufactured from metal
+const string@ strMetlGen = "MetlGen", strMetl = "Metals";		//refined from ore or recycled from scrap
+const string@ strOresGen = "OresGen", strOres = "Ore";			//ore is generated purely from DeepOre resource via mining
+const string@ strScrpGen = "ScrpGen", strScrp = "Scrap";		//scrap is generated as a byproduct of manufacturing. can be recycled back to metal
+
+const string@ strFoodGen = "FoodGen", strFood = "Food";
+const string@ strFuelGen = "FuelGen", strFuel = "Fuel";
+const string@ strAmmoGen = "AmmoGen", strAmmo = "Ammo";
+const string@ strGudsGen = "GudsGen", strGuds = "Guds";
+const string@ strLuxsGen = "LuxsGen", strLuxs = "Luxs";
+
+/*
+const string@ strOre = "Ore";
+const string@ strLuxsGen = "LuxG", strGudsGen = "GudsG";
+const string@ strMetl = "Metals", strMetlGen = "MineM";
+const string@ strElec = "Electronics", strElecGen = "ElecGen";
 const string@ strAdv = "AdvParts", strAdvGen = "AdvG", strFoodGen = "FudGe";
 const string@ strFood = "Food", strGoods = "Guds", strLuxuries = "Luxs";
 const string@ strFuel = "Fuel", strFuelGen = "FuelG", strAmmo = "Ammo", strAmmoGen = "AmmoG";
+*/
+
 const string@ strLabor = "Labr", strWorkers = "Workers", strTrade = "Trade", strMood = "Mood", strTradeMode = "TradeMode";
 const string@ actShortWorkWeek = "work_low", actForcedLabor = "work_forced", actTaxBreak = "tax_break", strEthics = "ethics", strEcoMode = "eco_mode";
 const string@ actStockPile = "act_stockpile";
 const string@ strRadius = "radius", strStatic = "static";
-const string@ strLuxsGen = "LuxG", strGudsGen = "GudsG";
+const string@ strDamage = "Damage", strMass = "mass";
 
 const string@ strNoFood = "no_food", strFastConsumption = "fast_consumption", strConsumeMetals = "consume_metals", strFastReproduction = "fast_reproduction";
 const string@ strPlanetClearOnLost = "planet_clear_on_lost", strDisableCivilActs = "disable_civil_acts";
@@ -97,23 +114,29 @@ enum TradeMode {
 void popEcoInit(Event@ evt) {
 	State@ mood = evt.obj.getState(strMood);
 	mood.max = 1.f;
-	evt.obj.getState(strLuxsGen);
-	evt.obj.getState(strGudsGen);
-	evt.obj.getState(strFoodGen);
-	evt.obj.getState(strTrade);
-	evt.obj.getState(strFoodGen);
+	evt.obj.getState(strAdvp);
+	evt.obj.getState(strAdvpGen);
+	evt.obj.getState(strElec);
+	evt.obj.getState(strElecGen);
+	evt.obj.getState(strMetl);
+	evt.obj.getState(strMetlGen);
+	evt.obj.getState(strOres);
+	evt.obj.getState(strOresGen);
+	evt.obj.getState(strScrp);
+	evt.obj.getState(strScrpGen);
+	
 	evt.obj.getState(strFood);
-	evt.obj.getState(strMtl);
-	evt.obj.getState(strMine);
-	evt.obj.getState(strMtlGen);
-	evt.obj.getState(strElc);
-	evt.obj.getState(strElcGen);
-	evt.obj.getState(strAdv);
-	evt.obj.getState(strAdvGen);
+	evt.obj.getState(strFoodGen);
 	evt.obj.getState(strFuel);
 	evt.obj.getState(strFuelGen);
 	evt.obj.getState(strAmmo);
 	evt.obj.getState(strAmmoGen);
+	evt.obj.getState(strGuds);
+	evt.obj.getState(strGudsGen);
+	evt.obj.getState(strLuxs);
+	evt.obj.getState(strLuxsGen);
+	
+	evt.obj.getState(strTrade);
 }
 
 float modifyEcoRate(float rate, ecoMode type, ecoMode rateMode, ecoMode typeMode) {
@@ -180,7 +203,7 @@ void tick(Planet@ pl, float time) {
 		// Consume metals if we have that trait
 		if (emp.hasTraitTag(strConsumeMetals)) {
 			double consumption = 6/million * double(consumptionRate);
-			foodSupplyPct = populationConsume(pl, strMtl, consumption, time);
+			foodSupplyPct = populationConsume(pl, strMetl, consumption, time);
 		}
 	}
 	
@@ -276,15 +299,15 @@ void tick(Planet@ pl, float time) {
 	System@ parent = obj.getParent();
 	bool blockaded = parent !is null && parent.isBlockadedFor(emp);
 	
-	State@ advRate = obj.getState(strAdvGen);
+	State@ advRate = obj.getState(strAdvpGen);
 	if(@advRate != null && advRate.max > 0)
 		advRate.val = makeAdvParts(obj, modifyEcoRate(advRate.max * tickEco, EM_AdvParts, ecoRate, ecoType)) / time;
 		
-	State@ elcRate = obj.getState(strElcGen);
+	State@ elcRate = obj.getState(strElecGen);
 	if(@elcRate != null && elcRate.max > 0)
 		elcRate.val = makeElectronics(obj, modifyEcoRate(elcRate.max * tickEco, EM_Elects, ecoRate, ecoType)) / time;
 	
-	State@ mtlRate = obj.getState(strMine);
+	State@ mtlRate = obj.getState(strMetlGen);
 	if(@mtlRate != null && mtlRate.max > 0)
 		mtlRate.val = processOre(obj, modifyEcoRate(mtlRate.max * tickEco, EM_Metals, ecoRate, ecoType)) / time;
 		
@@ -321,7 +344,7 @@ void tick(Planet@ pl, float time) {
 		}
 
 		if (!blockaded) {
-			float consumedGoods = emp.consumeStat(strGoods, needGoods - gotGoods);
+			float consumedGoods = emp.consumeStat(strGuds, needGoods - gotGoods);
 			gotGoods += consumedGoods;
 			goodsRate.inCargo = consumedGoods;
 		}
@@ -350,7 +373,7 @@ void tick(Planet@ pl, float time) {
 
 		luxsRate.inCargo = gotLux;
 		if (!blockaded) {
-			float consumedLux = emp.consumeStat(strLuxuries, needLux - gotLux);
+			float consumedLux = emp.consumeStat(strLuxs, needLux - gotLux);
 			gotLux += consumedLux;
 			luxsRate.inCargo = consumedLux;
 		}
@@ -371,13 +394,13 @@ void tick(Planet@ pl, float time) {
 	// Add excess goods/luxuries to the bank
 	if (!blockaded) {
 		if (produceGoods > 0) {
-			emp.addStat(strGoods, produceGoods);
+			emp.addStat(strGuds, produceGoods);
 			goodsRate.inCargo -= produceGoods;
 		}
 		goodsRate.inCargo /= time;
 
 		if (produceLuxs > 0) {
-			emp.addStat(strLuxuries, produceLuxs);
+			emp.addStat(strLuxs, produceLuxs);
 			luxsRate.inCargo -= produceLuxs;
 		}
 		luxsRate.inCargo /= time;
@@ -412,13 +435,13 @@ void tick(Planet@ pl, float time) {
 			State@ sp_Food = obj.getState(strFood);
 			float foodWeight = getResourceWeight(sp_Food, cargoSpaceLeft, tradeTarget); //float(e/max(i,1.0));
 			
-			State@ sp_Metals = obj.getState(strMtl);
+			State@ sp_Metals = obj.getState(strMetl);
 			float mtlWeight = getResourceWeight(sp_Metals, cargoSpaceLeft, tradeTarget);
 			
-			State@ sp_Elecs = obj.getState(strElc);
+			State@ sp_Elecs = obj.getState(strElec);
 			float elecWeight = getResourceWeight(sp_Elecs, cargoSpaceLeft, tradeTarget);
 			
-			State@ sp_Advs = obj.getState(strAdv);
+			State@ sp_Advs = obj.getState(strAdvp);
 			float advWeight = getResourceWeight(sp_Advs, cargoSpaceLeft, tradeTarget);
 			
 			State@ sp_Fuel = obj.getState(strFuel);
@@ -430,9 +453,9 @@ void tick(Planet@ pl, float time) {
 			float totalWeight = abs(foodWeight) + abs(mtlWeight) + abs(elecWeight) + abs(advWeight) + abs(fuelWeight) + abs(ammoWeight);
 			
 			if(totalWeight > 0) {
-				advRate.inCargo  = tradeResource(emp, obj, sp_Advs,   strAdv,  tickTrade *  advWeight/totalWeight, tradeEff, advMode);
-				elcRate.inCargo  = tradeResource(emp, obj, sp_Elecs,  strElc,  tickTrade * elecWeight/totalWeight, tradeEff, elcMode);
-				mtlRate.inCargo  = tradeResource(emp, obj, sp_Metals, strMtl,  tickTrade *  mtlWeight/totalWeight, tradeEff, mtlMode);
+				advRate.inCargo  = tradeResource(emp, obj, sp_Advs,   strAdvp, tickTrade *  advWeight/totalWeight, tradeEff, advMode);
+				elcRate.inCargo  = tradeResource(emp, obj, sp_Elecs,  strElec, tickTrade * elecWeight/totalWeight, tradeEff, elcMode);
+				mtlRate.inCargo  = tradeResource(emp, obj, sp_Metals, strMetl, tickTrade *  mtlWeight/totalWeight, tradeEff, mtlMode);
 				foodRate.inCargo = tradeResource(emp, obj, sp_Food,   strFood, tickTrade * foodWeight/totalWeight, 1.f,      fudMode);
 				fuelRate.inCargo = tradeResource(emp, obj, sp_Fuel,   strFuel, tickTrade * fuelWeight/totalWeight, tradeEff, fudMode);
 				ammoRate.inCargo = tradeResource(emp, obj, sp_Ammo,   strAmmo, tickTrade * ammoWeight/totalWeight, tradeEff, mtlMode);
@@ -457,19 +480,19 @@ void tick(Planet@ pl, float time) {
 			}
 
 			if(tickTrade > 0) {
-				traded = tradeResource(emp, obj, sp_Advs, strAdv, tickTrade * sign(advWeight), tradeEff, advMode);
+				traded = tradeResource(emp, obj, sp_Advs, strAdvp, tickTrade * sign(advWeight), tradeEff, advMode);
 				advRate.inCargo += traded;
 				tickTrade -= abs(traded);
 			}
 
 			if (tickTrade > 0) {
-				traded = tradeResource(emp, obj, sp_Elecs, strElc, tickTrade * sign(elecWeight), tradeEff, elcMode);
+				traded = tradeResource(emp, obj, sp_Elecs, strElec, tickTrade * sign(elecWeight), tradeEff, elcMode);
 				elcRate.inCargo += traded;
 				tickTrade -= abs(traded);
 			}
 
 			if (tickTrade > 0) {
-				traded = tradeResource(emp, obj, sp_Metals, strMtl, tickTrade * sign(mtlWeight), tradeEff, mtlMode);
+				traded = tradeResource(emp, obj, sp_Metals, strMetl, tickTrade * sign(mtlWeight), tradeEff, mtlMode);
 				mtlRate.inCargo += traded;
 				tickTrade -= abs(traded);
 			}
@@ -621,7 +644,7 @@ bool onDestroy(Planet@ pl, bool silent) {
 		if (sys is null)
 			return false;
 
-		State@ ore = pl.toObject().getState(strOre);
+		State@ ore = pl.toObject().getState(strOres);
 
 		// A percentage of max ore is base
 		float remnOre = ore.max * 0.1f;
@@ -630,7 +653,7 @@ bool onDestroy(Planet@ pl, bool silent) {
 		remnOre += ore.getAvailable();
 
 		// All the metals left on the planet
-		remnOre += pl.toObject().getState(strMtl).getAvailable();
+		remnOre += pl.toObject().getState(strMetl).getAvailable();
 
 		// Make asteroids
 		Oddity_Desc asteroid_desc;
@@ -654,7 +677,7 @@ bool onDestroy(Planet@ pl, bool silent) {
 
 			Object@ asteroid = sys.makeOddity(asteroid_desc);
 		
-			State@ ore = asteroid.getState(strOre);
+			State@ ore = asteroid.getState(strOres);
 			ore.max = useOre;
 			ore.val = ore.max;
 

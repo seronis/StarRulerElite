@@ -20,27 +20,41 @@ const float econUpdateLength = 1.f;
 const float syncDelay = 0.333f;
 const float queueCheckDelay = 1.f;
 
-const string@ strFood = "Food", strOre = "Ore", strDamage = "Damage";
-const string@ strLabor = "Labr", strWorkers = "Workers", strMood = "Mood";
-const string@ strMetals = "Metals", strElects = "Electronics", strAdvParts = "AdvParts", strFuel = "Fuel", strAmmo = "Ammo";
-string@ strUnique = "Unique";
+const string@ strAdvpGen = "AdvpGen", strAdvp = "AdvParts";
+const string@ strElecGen = "ElecGen", strElec = "Electronics";
+const string@ strMetlGen = "MetlGen", strMetl = "Metals";
+const string@ strOresGen = "OresGen", strOres = "Ore";
+const string@ strScrpGen = "ScrpGen", strScrp = "Scrap";
+const string@ strFoodGen = "FoodGen", strFood = "Food";
+const string@ strFuelGen = "FuelGen", strFuel = "Fuel";
+const string@ strAmmoGen = "AmmoGen", strAmmo = "Ammo";
+const string@ strGudsGen = "GudsGen", strGuds = "Guds";
+const string@ strLuxsGen = "LuxsGen", strLuxs = "Luxs";
+
+const string@ strDeep = "DeepOre", strLabor = "Labr", strWorkers = "Workers", strMood = "Mood";
+const string@ strDamage = "Damage";
+
+const string@ strUnique = "Unique";
 
 const string@ strDisableCivilActs = "disable_civil_acts", strFastConsumption = "fast_consumption", strNoFood = "no_food";
 const string@ actShortWorkWeek = "work_low", actForcedLabor = "work_forced", actTaxBreak = "tax_break";
 const string@ strLowLuxuries = "low_luxuries_consumption", strHighLuxuries = "high_luxuries_consumption";
 const string@ strIndifferent = "forever_indifferent";
-const string@ strAdvGen = "AdvG", strElcGen = "ElcG", strMtlGen = "MineM", strFoodGen = "FudGe", strFuelG = "FuelG", strAmmoG = "AmmoG";
-string@ strElectronics = "Electronics";
-const string@ strLuxsGen = "LuxG", strGudsGen = "GudsG", strTrade = "Trade", strTradeMode = "TradeMode";
+const string@ strTrade = "Trade", strTradeMode = "TradeMode";
 const double million = 1000000.0;
 
 const string[] shipTooltipHints = {"Armor", "Shield", "Thrust", "Fuel", "ShipBay"};
 uint shipTooltipHintCount = 5;
-
+/*
 string@[] resNames =   { "#advparts",    "#electronics", "#metals",      "#food",
                          "#goods",       "#luxuries",    "#fuel",        "#ammo"      };
 uint[] resColors =     {  0xffc2e4ff,     0xfff6ff00,     0xffeaeaea,     0xff197b30,
                           0xff987433,     0xffffb9b9,     0xffff8000,     0xffaaaaaa  };
+*/
+string@[] resNames =   { "#advparts",     "#electronics", "#metals",      "#ore",         "#scrap",
+                         "#food",         "#fuel",        "#ammo",        "#goods",       "#luxuries",   };
+uint[] resColors =     {  0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff,
+                          0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff     };
 						  
 /* }}} */
 /* {{{ Planet Window Handle */
@@ -247,7 +261,7 @@ class PlanetWindow : ScriptedGuiHandler {
 	float econUpdateTick;
 
 	void init(GuiElement@ ele) {
-		economyValues.resize(7*8);
+		economyValues.resize(7*10);
 		syncTimer = 0.f;
 		queueCheckTime = 0.f;
 		buildingStructures = 0;
@@ -309,7 +323,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		@resources = ResourceGrid(topPanel, pos2di(7, 103), 6);
 		resources.iconSize = dim2di(17, 17);
 		resources.add(gui_sprite("planet_topbar_resources", 0), localize("#PLTT_Food"), 0, 0);
-		resources.add(gui_sprite("planet_topbar_resources", 1), localize("#PLTT_Ore"), 0);
+		resources.add(gui_sprite("planet_topbar_resources", 1), localize("#PLTT_Deep"), 0);
 		resources.add(gui_sprite("planet_topbar_resources", 2), localize("#PLTT_Damage"), 0);
 		resources.add(gui_sprite("planet_topbar_resources", 3), localize("#PLTT_Labor"), 0, 0);
 		resources.add(gui_sprite("planet_topbar_resources", 4), localize("#PLTT_Workers"), 0, 0);
@@ -478,13 +492,13 @@ class PlanetWindow : ScriptedGuiHandler {
 		txt.setTextAlignment(EA_Right, EA_Top);
 
 		// Create economy data fields
-		for (uint i = 0; i < 8; ++i) {
+		for (uint i = 0; i < 10; ++i) {
 			GuiStaticText@ text = GuiStaticText(recti(pos2di(12, 128+(20*i)), dim2di(60, 20)), null, false, false, false, econPanel);
 			text.setText(localize(resNames[i]));
 			text.setColor(Color(resColors[i]));
 			@economyValues[(i*7)] = text;
 
-			if (i < 4 || i > 5) {
+		//	if (i < 4 || i > 5) {
 				@text = GuiStaticText(recti(pos2di(130, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
 				text.setTextAlignment(EA_Right, EA_Top);
 				@economyValues[(i*7)+1] = text;
@@ -495,7 +509,7 @@ class PlanetWindow : ScriptedGuiHandler {
 				@text = GuiStaticText(recti(pos2di(180, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
 				text.setTextAlignment(EA_Right, EA_Top);
 				@economyValues[(i*7)+2] = text;
-			}
+		//	}
 
 			for (uint h = 0; h < 4; ++h) {
 				@text = GuiStaticText(recti(pos2di(230+(115*h), 128+(20*i)), dim2di(105, 20)), null, false, false, false, econPanel);
@@ -771,8 +785,8 @@ class PlanetWindow : ScriptedGuiHandler {
 			resources.update(0, val + cargo, max);
 
 		// - Ore levels
-		if (obj.getStateVals(strOre, val, max, req, cargo))
-			resources.update(1, val + cargo);
+		if (obj.getStateVals(strDeep, val, max, req, cargo))
+			resources.update(1, val);
 
 		// - Damage levels
 		if (obj.getStateVals(strDamage, val, max, req, cargo))
@@ -800,13 +814,13 @@ class PlanetWindow : ScriptedGuiHandler {
 				queueName.setText(combine(obj.getConstructionName(0), " (", f_to_s(progress * 100.f, 0), "%)"));
 
 				float req = 0.f, done = 0.f;
-				obj.getConstructionCost(0, strMetals, done, req);
+				obj.getConstructionCost(0, strMetl, done, req);
 				activeCost.update(1, done, req);
 
-				obj.getConstructionCost(0, strElects, done, req);
+				obj.getConstructionCost(0, strElec, done, req);
 				activeCost.update(2, done, req);
 
-				obj.getConstructionCost(0, strAdvParts, done, req);
+				obj.getConstructionCost(0, strAdvp, done, req);
 				activeCost.update(0, done, req);
 				
 				obj.getConstructionCost(0, strLabor, done, req);
@@ -1598,14 +1612,15 @@ class PlanetWindow : ScriptedGuiHandler {
 		float gotGuds = 0.f, gotLuxs = 0.f;
 		float fulGen = 0.f, amoGen = 0.f, fulTrans = 0.f, amoTrans = 0.f;
 
-		obj.getStateVals( strAdvGen, advGen,  temp, temp, advTrans);
-		obj.getStateVals( strElcGen, elcGen,  temp, temp, elcTrans);
-		obj.getStateVals( strMtlGen, mtlGen,  temp, temp, mtlTrans);
+		obj.getStateVals(strAdvpGen, advGen,  temp, temp, advTrans);
+		obj.getStateVals(strElecGen, elcGen,  temp, temp, elcTrans);
+		obj.getStateVals(strMetlGen, mtlGen,  temp, temp, mtlTrans);
+		
 		obj.getStateVals(strFoodGen, foodGen, temp, temp, fudTrans);
-		obj.getStateVals(strLuxsGen, luxsGen, temp, temp, gotLuxs);
+		obj.getStateVals(strFuelGen, fulGen,  temp, temp, fulTrans);
+		obj.getStateVals(strAmmoGen, amoGen,  temp, temp, amoTrans);
 		obj.getStateVals(strGudsGen, gudsGen, temp, temp, gotGuds);
-		obj.getStateVals(  strFuelG, fulGen,  temp, temp, fulTrans);
-		obj.getStateVals(  strAmmoG, amoGen,  temp, temp, amoTrans);	
+		obj.getStateVals(strLuxsGen, luxsGen, temp, temp, gotLuxs);
 
 		advAvg = movingAvg(advGen, advAvg);
 		mtlAvg = movingAvg(mtlGen, mtlAvg);
@@ -1647,13 +1662,13 @@ class PlanetWindow : ScriptedGuiHandler {
 			}
 
 			float val = 0.f, max = 0.f, cargo = 0.f, temp = 0.f;
-			if (obj.getStateVals(   strAdvParts, val, max, temp, cargo))		updateStorage(0, val+cargo, max);
-			if (obj.getStateVals(strElectronics, val, max, temp, cargo))		updateStorage(1, val+cargo, max);
-			if (obj.getStateVals(     strMetals, val, max, temp, cargo))		updateStorage(2, val+cargo, max);
-			if (obj.getStateVals(       strFood, val, max, temp, cargo))		updateStorage(3, val+cargo, max);
+			if (obj.getStateVals( strAdvp, val, max, temp, cargo))		updateStorage(0, val+cargo, max);
+			if (obj.getStateVals( strElec, val, max, temp, cargo))		updateStorage(1, val+cargo, max);
+			if (obj.getStateVals( strMetl, val, max, temp, cargo))		updateStorage(2, val+cargo, max);
+			if (obj.getStateVals( strFood, val, max, temp, cargo))		updateStorage(3, val+cargo, max);
 			
-			if (obj.getStateVals(       strFuel, val, max, temp, cargo))		updateStorage(6, val+cargo, max);
-			if (obj.getStateVals(       strAmmo, val, max, temp, cargo))		updateStorage(7, val+cargo, max);		
+			if (obj.getStateVals( strFuel, val, max, temp, cargo))		updateStorage(6, val+cargo, max);
+			if (obj.getStateVals( strAmmo, val, max, temp, cargo))		updateStorage(7, val+cargo, max);		
 
 			updateRate(0, advAvg+advGen, 0,         -advExpAvg);
 			updateRate(1, elcAvg+elcGen, -elcCons,  -elcExpAvg);

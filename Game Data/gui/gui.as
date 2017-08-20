@@ -28,12 +28,19 @@ GuiExtText@ nrov_build, clock;
 GuiExtText@ mouseOverlay;
 GuiStaticText@ speedIndicator;
 
-GuiExtText@ bankMtl, bankElc, bankAdv, bankFood, bankGoods, bankLux, bankFuel, bankAmmo;
-float prevMtl = -1, prevElc = -1, prevAdv = -1, prevFood = -1, prevGoods = -1, prevLux = -1, prevFuel = -1, prevAmmo = -1;
-float rateMtl = 0, rateElc = 0, rateAdv = 0, rateFood = 0, rateGoods = 0, rateLux = 0, rateFuel = 0, rateAmmo = 0;
+GuiExtText@ bankAdvp, bankElec, bankMetl, bankOres, bankScrp;
+GuiExtText@ bankFood, bankFuel, bankAmmo, bankGuds, bankLuxs;
+
+float prevAdvp = -1, prevElec = -1, prevMetl = -1, prevOres = -1, prevScrp = -1;
+float prevFood = -1, prevFuel = -1, prevAmmo = -1, prevGuds = -1, prevLuxs = -1;
+
+float rateAdvp = -1, rateElec = -1, rateMetl = -1, rateOres = -1, rateScrp = -1;
+float rateFood = -1, rateFuel = -1, rateAmmo = -1, rateGuds = -1, rateLuxs = -1;
+
 double prevBankUpdate = 0;
 float bankCounter = 0, prevSpeed = 0;
 bool bankMode = false;
+
 double em_lastMsg = -1;
 double em_lastVisMsg = -1;
 
@@ -151,7 +158,7 @@ void onDoubleClick(Object@ obj) {
 			triggerPlanetWin(pl, true);
 		return;
 	}
-	
+
 	// Open system window where appropriate
 	if(obj.toSystem() !is null) {
 		showSystemWindow(obj.toSystem());
@@ -170,7 +177,7 @@ void onDoubleClick(Object@ obj) {
 			return;
 		}
 	}
-	
+
 	setCameraFocus(obj);
 }
 
@@ -218,7 +225,7 @@ void setTicker(string@ top, string@ eta, string@ res) {
 	dim2di textSize = getTextDimension(tickerTop.getText());
 	tickerTop.setSize(dim2di(textSize.width, tickerTop.getSize().height));
 	tickerTopPercent.setSize(dim2di(0.01 * textSize.width, tickerTopPercent.getSize().height));
-	
+
 	tickerResETA.setText(eta);
 	tickerResETA.setToolTip(res);
 	tickerResRate.setText(res);
@@ -232,7 +239,7 @@ void setTickerPercent(float perc, Color col) {
 	tickerTopPercent.setColor(col);
 }
 
-GuiScripted@[] top_icos(8);
+GuiScripted@[] top_icos(10);
 
 bool speedUp(const GUIEvent@ evt) {
 	if (evt.EventType == GEVT_Clicked) {
@@ -318,17 +325,17 @@ bool toggleResRateETA(const GUIEvent@ evt) {
 
 void init() {
 	int width = getScreenWidth();
-	
+
 	@empMsgBG = GuiImage( pos2di(width / 2 - 250, 26), "message_bg", null);
 	empMsgBG.setAlignment(EA_Center, EA_Top, EA_Center, EA_Top);
-	
+
 	@glowLine = GuiImage( pos2di(0,0), "glow_line", null);
 	@nrov_name  = GuiExtText( recti(pos2di(0,0), dim2di(115,15)), null ); nrov_name.setShadow(Color(255,0,0,0));
 	@nrov_build = GuiExtText( recti(pos2di(0,0), dim2di(200,15)), null);  nrov_build.setShadow(Color(255,0,0,0));
 	@nrov_hpTag = GuiExtText( recti(pos2di(0,0), dim2di(46,15)), null);   nrov_hpTag.setShadow(Color(255,0,0,0)); nrov_hpTag.setText("#align:right#HP:");
 	@nrov_hpBar = GuiBar( recti( pos2di(0,0), dim2di(50,7)), null);       nrov_hpBar.set( Color(255,0,255,0), Color(255,255,0,0), true, 1);
 	hideNearOverlay();
-	
+
 	@empireMessages = GuiExtText(recti( pos2di(8,3), dim2di(500 - 38, 18)), empMsgBG);
 	@clock = GuiExtText(recti(pos2di(width-125, 4), dim2di(125, 36)), null);
 	clock.setAlignment(EA_Right, EA_Top, EA_Right, EA_Top);
@@ -355,9 +362,9 @@ void init() {
 	bindGuiCallback(speedUpButton, "speedUp");
 	bindGuiCallback(slowDownButton, "slowDown");
 	bindGuiCallback(pauseButton, "doPause");
-	
+
 	msgShrinkPos = pos2di(500 - 18, 4);
-	
+
 	@msgLog = GuiButton(recti( pos2di(500 - 18 - 17, 4), dim2di(16,16)), null, empMsgBG);
 	msgLog.setImage("msg_box_log");
 	msgLog.setAlignment(EA_Right, EA_Bottom, EA_Right, EA_Bottom);
@@ -379,7 +386,7 @@ void init() {
 		filterButtons[i].setID(filterID);
 		filterButtons[i].setAlignment(EA_Left, EA_Bottom, EA_Left, EA_Bottom);
 	}
-	
+
 	bindGuiCallback(filterID, "refreshMsgs");
 	bindGuiCallback(msgExpand, "expandMsgBox");
 	bindGuiCallback(msgShrink, "shrinkMsgBox");
@@ -387,13 +394,13 @@ void init() {
 
 	@mouseOverlay = GuiExtText(recti( pos2di(-1,-1), dim2di(300, 200)), null);
 	mouseOverlay.setNoclipped(true);
-	
-	@tickerBG = GuiImage( pos2di(2,4), "elite_globalbank_ticker", null);
+
+	@tickerBG = GuiImage( pos2di(2,4), "elite_econ_ticker", null);
 	@tickerTop        = GuiStaticText( recti( pos2di(  8, 6), dim2di(200, 15) ), null, false, false, false, tickerBG);
 	@tickerTopPercent = GuiStaticText( recti( pos2di(  8, 6), dim2di( 20, 15) ), null, false, false, false, tickerBG);
 
-	@tickerResETA     = GuiStaticText( recti( pos2di(170, 6), dim2di( 96, 15) ), null, false, false, false, tickerBG);
-	@tickerResRate    = GuiStaticText( recti( pos2di(170, 6), dim2di( 96, 15) ), null, false, false, false, tickerBG);
+	@tickerResETA     = GuiStaticText( recti( pos2di(250, 6), dim2di( 96, 15) ), null, false, false, false, tickerBG);
+	@tickerResRate    = GuiStaticText( recti( pos2di(250, 6), dim2di( 96, 15) ), null, false, false, false, tickerBG);
 
 	tickerResETA.setTextAlignment( EA_Right, EA_Top);
 	tickerResRate.setTextAlignment(EA_Right, EA_Top);
@@ -405,61 +412,82 @@ void init() {
 	tickerResETA.setColor( Color(255, 255, 255, 255) );
 	tickerResRate.setColor( Color(255, 255, 255, 255) );
 
-	@bankAdv   = GuiExtText(recti(pos2di(-35, 60), dim2di(82, 18)), tickerBG);
-	@bankElc   = GuiExtText(recti(pos2di( 25, 60), dim2di(82, 18)), tickerBG);
-	@bankMtl   = GuiExtText(recti(pos2di( 85, 60), dim2di(82, 18)), tickerBG);
-	@bankFuel  = GuiExtText(recti(pos2di(145, 60), dim2di(82, 18)), tickerBG);
-	@bankFood  = GuiExtText(recti(pos2di(-35, 78), dim2di(82, 18)), tickerBG);
-	@bankGoods = GuiExtText(recti(pos2di( 25, 78), dim2di(82, 18)), tickerBG);
-	@bankLux   = GuiExtText(recti(pos2di( 85, 78), dim2di(82, 18)), tickerBG);
-	@bankAmmo  = GuiExtText(recti(pos2di(145, 78), dim2di(82, 18)), tickerBG);
+	int h1 = 48, v1 = 16; //size of value fields
+	int h2 = 16, v2 = 16; //size of icons
+	int ho = 8, vo = 32;  //margins from window edge
+	int vb = 4;			  //verticle space between elements
 
+	int hb = 4 + h2;	  //horizontal space between elements
+	@bankAdvp = GuiExtText(recti(pos2di(ho+(h1+hb)*0, vo+(v1+vb)*0), dim2di(h1, v1)), tickerBG);
+	@bankElec = GuiExtText(recti(pos2di(ho+(h1+hb)*1, vo+(v1+vb)*0), dim2di(h1, v1)), tickerBG);
+	@bankMetl = GuiExtText(recti(pos2di(ho+(h1+hb)*2, vo+(v1+vb)*0), dim2di(h1, v1)), tickerBG);
+	@bankOres = GuiExtText(recti(pos2di(ho+(h1+hb)*3, vo+(v1+vb)*0), dim2di(h1, v1)), tickerBG);
+	@bankScrp = GuiExtText(recti(pos2di(ho+(h1+hb)*4, vo+(v1+vb)*0), dim2di(h1, v1)), tickerBG);
+
+	@bankFood = GuiExtText(recti(pos2di(ho+(h1+hb)*0, vo+(v1+vb)*1), dim2di(h1, v1)), tickerBG);
+	@bankFuel = GuiExtText(recti(pos2di(ho+(h1+hb)*1, vo+(v1+vb)*1), dim2di(h1, v1)), tickerBG);
+	@bankAmmo = GuiExtText(recti(pos2di(ho+(h1+hb)*2, vo+(v1+vb)*1), dim2di(h1, v1)), tickerBG);
+	@bankGuds = GuiExtText(recti(pos2di(ho+(h1+hb)*3, vo+(v1+vb)*1), dim2di(h1, v1)), tickerBG);
+	@bankLuxs = GuiExtText(recti(pos2di(ho+(h1+hb)*4, vo+(v1+vb)*1), dim2di(h1, v1)), tickerBG);
+
+	ho = 10 + h1;
+	hb = 4 + h1;
 	GuiScripted@ ico;
-	@ico = GuiScripted(recti(pos2di(50, 62), dim2di(10, 16)), gui_sprite("planet_resource_list", 0) , tickerBG);
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*0, vo+(v2+vb)*0), dim2di(16, 16)), gui_sprite("hard_resource_icons", 0) , tickerBG);
 	ico.setToolTip(localize("#GBR_advparts"));
 	@top_icos[0] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(110, 62), dim2di(10, 16)), gui_sprite("planet_resource_list", 1) , tickerBG);
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*1, vo+(v2+vb)*0), dim2di(16, 16)), gui_sprite("hard_resource_icons", 1) , tickerBG);
 	ico.setToolTip(localize("#GBR_electronics"));
 	@top_icos[1] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(170, 62), dim2di(10, 16)), gui_sprite("planet_resource_list", 2) , tickerBG);
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*2, vo+(v2+vb)*0), dim2di(16, 16)), gui_sprite("hard_resource_icons", 2) , tickerBG);
 	ico.setToolTip(localize("#GBR_metals"));
 	@top_icos[2] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(47, 77), dim2di(17,17)), gui_sprite("planet_topbar_resources", 0), tickerBG);
-	ico.setToolTip(localize("#GBR_food"));
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*3, vo+(v2+vb)*0), dim2di(16, 16)), gui_sprite("hard_resource_icons", 3) , tickerBG);
+	ico.setToolTip(localize("#GBR_ore"));
 	@top_icos[3] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(107, 77), dim2di(17,17)), gui_sprite("planet_topbar_resources", 6), tickerBG);
-	ico.setToolTip(localize("#GBR_goods"));
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*4, vo+(v2+vb)*0), dim2di(16, 16)), gui_sprite("hard_resource_icons", 4) , tickerBG);
+	ico.setToolTip(localize("#GBR_scrap"));
 	@top_icos[4] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(167, 77), dim2di(17,17)), gui_sprite("planet_topbar_resources", 7), tickerBG);
-	ico.setToolTip(localize("#GBR_luxuries"));
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*0, vo+(v2+vb)*1), dim2di(16,16)), gui_sprite("hard_resource_icons", 5), tickerBG);
+	ico.setToolTip(localize("#GBR_food"));
 	@top_icos[5] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(230, 62), dim2di(10, 16)), gui_sprite("planet_resource_list", 5) , tickerBG);
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*1, vo+(v2+vb)*1), dim2di(16, 16)), gui_sprite("hard_resource_icons", 6) , tickerBG);
 	ico.setToolTip(localize("#GBR_fuel"));
 	@top_icos[6] = @ico;
 
-	@ico = GuiScripted(recti(pos2di(230, 77), dim2di(17,17)), gui_sprite("planet_resource_list", 6), tickerBG);
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*2, vo+(v2+vb)*1), dim2di(16,16)), gui_sprite("hard_resource_icons", 7), tickerBG);
 	ico.setToolTip(localize("#GBR_ammo"));
 	@top_icos[7] = @ico;
 
-	@bankToggle = GuiButton(recti(pos2di(250, 54), dim2di(22,16)), null, tickerBG);
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*3, vo+(v2+vb)*1), dim2di(16,16)), gui_sprite("hard_resource_icons", 8), tickerBG);
+	ico.setToolTip(localize("#GBR_goods"));
+	@top_icos[8] = @ico;
+
+	@ico = GuiScripted(recti(pos2di(ho+(h2+hb)*4, vo+(v2+vb)*1), dim2di(16,16)), gui_sprite("hard_resource_icons", 9), tickerBG);
+	ico.setToolTip(localize("#GBR_luxuries"));
+	@top_icos[9] = @ico;
+
+
+
+	@bankToggle = GuiButton(recti(pos2di(356, 32), dim2di(22,16)), null, tickerBG);
 	bankToggle.setAppearance(BA_UseAlpha, BA_Background);
 	bankToggle.setSprites("economy_btn_mode", 3, 5, 4);
 	bankToggle.setToolTip(localize("#TT_bankToggle"));
 	bindGuiCallback(bankToggle, "toggleBankDisplay");
 
-	@civActs = GuiButton(recti(pos2di(250, 70), dim2di(22,16)), null, tickerBG);
+	@civActs = GuiButton(recti(pos2di(356, 48), dim2di(22,16)), null, tickerBG);
 	civActs.setAppearance(BA_UseAlpha, BA_Background);
 	civActs.setSprites("economy_btn_mode", 6, 8, 7);
 	civActs.setToolTip(localize("#TT_civActs"));
 	bindGuiCallback(civActs, "openCivilActs");
 
-	@econReportButton = GuiButton(recti(pos2di(250, 86), dim2di(22,16)), null, tickerBG);
+	@econReportButton = GuiButton(recti(pos2di(356, 64), dim2di(22,16)), null, tickerBG);
 	econReportButton.setAppearance(BA_UseAlpha, BA_Background);
 	econReportButton.setSprites("economy_btn_report", 0, 2, 1);
 	econReportButton.setToolTip(localize("#TT_econReport"));
@@ -723,37 +751,44 @@ void tick(float time) {
 			float since = float(gameTime - prevBankUpdate);
 			prevBankUpdate = gameTime;
 			
-			updateBankState(prevMtl,   emp.getStat("Metals"),      rateMtl,   since);
-			updateBankState(prevElc,   emp.getStat("Electronics"), rateElc,   since);
-			updateBankState(prevAdv,   emp.getStat("AdvParts"),    rateAdv,   since);
-			updateBankState(prevFuel,  emp.getStat("Fuel"),        rateFuel,  since);
-			updateBankState(prevFood,  emp.getStat("Food"),        rateFood,  since);
-			updateBankState(prevGoods, emp.getStat("Guds"),        rateGoods, since);
-			updateBankState(prevLux,   emp.getStat("Luxs"),        rateLux,   since);
-			updateBankState(prevAmmo,  emp.getStat("Ammo"),        rateAmmo,  since);
+			updateBankState(prevAdvp, emp.getStat("AdvParts"),    rateAdvp, since);
+			updateBankState(prevElec, emp.getStat("Electronics"), rateElec, since);
+			updateBankState(prevMetl, emp.getStat("Metals"),      rateMetl, since);
+			updateBankState(prevOres, emp.getStat("Ores"),        rateOres, since);
+			updateBankState(prevScrp, emp.getStat("Scrp"),        rateScrp, since);
+			updateBankState(prevFood, emp.getStat("Food"),        rateFood, since);
+			updateBankState(prevFuel, emp.getStat("Fuel"),        rateFuel, since);
+			updateBankState(prevAmmo, emp.getStat("Ammo"),        rateAmmo, since);
+			updateBankState(prevGuds, emp.getStat("Guds"),        rateGuds, since);
+			updateBankState(prevLuxs, emp.getStat("Luxs"),        rateLuxs, since);
 
 			if (!bankMode) {
-				bankMtl.setText(	getStatePrefix(rateMtl,   prevMtl)   +standardize(abs(prevMtl)));
-				bankElc.setText(	getStatePrefix(rateElc,   prevElc)   +standardize(abs(prevElc)));
-				bankAdv.setText(	getStatePrefix(rateAdv,   prevAdv)   +standardize(abs(prevAdv)));
-				bankFuel.setText(	getStatePrefix(rateFuel,  prevFuel)  +standardize(abs(prevFuel)));
-				bankFood.setText(	getStatePrefix(rateFood,  prevFood)  +standardize(abs(prevFood)));
-				bankGoods.setText(	getStatePrefix(rateGoods, prevGoods) +standardize(abs(prevGoods)));
-				bankLux.setText(	getStatePrefix(rateLux,   prevLux)   +standardize(abs(prevLux)));
-				bankAmmo.setText(	getStatePrefix(rateAmmo,  prevAmmo)  +standardize(abs(prevAmmo)));
+				bankAdvp.setText( getStatePrefix(rateAdvp, prevAdvp) +standardize(abs(prevAdvp)));
+				bankElec.setText( getStatePrefix(rateElec, prevElec) +standardize(abs(prevElec)));
+				bankMetl.setText( getStatePrefix(rateMetl, prevMetl) +standardize(abs(prevMetl)));
+				bankOres.setText( getStatePrefix(rateOres, prevOres) +standardize(abs(prevOres)));
+				bankScrp.setText( getStatePrefix(rateScrp, prevScrp) +standardize(abs(prevScrp)));
+				bankFood.setText( getStatePrefix(rateFood, prevFood) +standardize(abs(prevFood)));
+				bankFuel.setText( getStatePrefix(rateFuel, prevFuel) +standardize(abs(prevFuel)));
+				bankAmmo.setText( getStatePrefix(rateAmmo, prevAmmo) +standardize(abs(prevAmmo)));
+				bankGuds.setText( getStatePrefix(rateGuds, prevGuds) +standardize(abs(prevGuds)));
+				bankLuxs.setText( getStatePrefix(rateLuxs, prevLuxs) +standardize(abs(prevLuxs)));
 			}
 			else {
-				bankMtl.setText(	getRatePrefix(rateMtl)   +standardize(abs(rateMtl)));
-				bankElc.setText(	getRatePrefix(rateElc)   +standardize(abs(rateElc)));
-				bankAdv.setText(	getRatePrefix(rateAdv)   +standardize(abs(rateAdv)));
-				bankFuel.setText(	getRatePrefix(rateFuel)  +standardize(abs(rateFuel)));
-				bankFood.setText(	getRatePrefix(rateFood)  +standardize(abs(rateFood)));
-				bankGoods.setText(	getRatePrefix(rateGoods) +standardize(abs(rateGoods)));
-				bankLux.setText(	getRatePrefix(rateLux)   +standardize(abs(rateLux)));
-				bankAmmo.setText(	getRatePrefix(rateAmmo)  +standardize(abs(rateAmmo)));
+				bankAdvp.setText( getRatePrefix(rateAdvp) +standardize(abs(rateAdvp)));
+				bankElec.setText( getRatePrefix(rateElec) +standardize(abs(rateElec)));
+				bankMetl.setText( getRatePrefix(rateMetl) +standardize(abs(rateMetl)));
+				bankOres.setText( getRatePrefix(rateOres) +standardize(abs(rateOres)));
+				bankScrp.setText( getRatePrefix(rateScrp) +standardize(abs(rateScrp)));
+				bankFood.setText( getRatePrefix(rateFood) +standardize(abs(rateFood)));
+				bankFuel.setText( getRatePrefix(rateFuel) +standardize(abs(rateFuel)));
+				bankAmmo.setText( getRatePrefix(rateAmmo) +standardize(abs(rateAmmo)));
+				bankGuds.setText( getRatePrefix(rateGuds) +standardize(abs(rateGuds)));
+				bankLuxs.setText( getRatePrefix(rateLuxs) +standardize(abs(rateLuxs)));
 			}
 
-			rateMtl = rateElc = rateAdv = rateFood = rateGoods = rateLux = rateFuel = rateAmmo = 0.f;
+			rateAdvp = rateElec = rateMetl = rateOres = rateScrp = 0.f;
+			rateFood = rateFuel = rateAmmo = rateGuds = rateLuxs = 0.f;
 		}
 		bankCounter = 0.f;
 	}
