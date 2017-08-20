@@ -95,7 +95,7 @@ System: AdvAssembler
 	Durability: HEALTH_MULT * 30 * Size * pow(HEALTH_CURVE,HPLevel)
 	Mass: 15 * Size
 
-	Costs: Electronics[60 * Size], AdvParts[60 * Size]
+	Costs: Electronics[60 * Size], AdvParts[60 * Size], Labr[5 * Size]
 
 	Tick Rate: 4
 
@@ -137,13 +137,13 @@ System: ConstructionBay
 
 	vEcoStore: Size * 40 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vEcoStore * 0.2]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vEcoStore * 0.3]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vEcoStore * 0.5]
 
 	Provides: AutoLabor with

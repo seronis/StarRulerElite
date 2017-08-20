@@ -1,0 +1,954 @@
+System: CoolantSys
+	Name: #SS_COOLANT_NAME
+	Description: #SS_COOLANT_DESC
+	Appearance: CoolantSystem	
+	Explosion: armor_explode lasting 0.25
+	
+	Tags: Link
+	Tied To: EnergyPhysics 1
+	
+	Available: Techs.EnergyPhysics.Level > 0
+	Level: Techs.EnergyPhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 30 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 50 * Size
+	
+	Costs: Metals[150 * Size], Electronics[5 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	
+	vDelayFactor: 1 / (1 + (Scale/Object.Scale))
+	vPenalty: (1/vDelayFactor)^(1 + decay(pow(LEVEL_GAIN_CURVE,Level-1), 35))
+
+	Alters: subSysAlterations::coolantSystem[vDelayFactor][vPenalty]
+
+	Consumes:
+		To Run:
+			Power[Size * 10]
+	
+	Requires:
+		To Run: Control[Size * 5]
+	
+	Hints: Local/FireSpeedUp[1 / vDelayFactor], Local/CostPenalty[vPenalty]
+
+
+System: AimBot
+	Name: #SS_AIMBOT_NAME
+	Description: #SS_AIMBOT_DESC
+	Appearance: TargetingArray	
+	Explosion: electrical_spark lasting 0.25
+
+	Tags: Link
+	Tied To: Computers 1, Sensors 1
+	
+	Available: (Techs.Computers.Level > 0) && (Techs.Sensors.Level > 0)
+	Level: floor(weight(Techs.Computers.Level, 0.5, Techs.Sensors.Level, 0.5))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 25 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 50 * Size
+	
+	Costs: Metals[50 * Size], Electronics[50 * Size], AdvParts[35 * Size], Labr[5 * Size]
+	Complexity: 1.1
+	
+	vRangeUp: (1 + (Scale/Object.Scale) * (2 - decay(pow(LEVEL_GAIN_CURVE, Level-1), 35)))
+
+	Alters: subSysAlterations::improveAllRange[vRangeUp]
+
+	Consumes:
+		To Run:
+			Power[Size * 10]
+	
+	Requires:
+		To Run: Control[Size * 15]
+
+	Hints: Local/RangeUp[vRangeUp]
+
+System: MultiRack
+	Name: #SS_MULTIRACK_NAME
+	Description: #SS_MULTIRACK_DESC
+	Appearance: MiningLaser	
+	Explosion: armor_explode lasting 0.4
+
+	Tags: Link
+	Tied To: ShipSystems 1
+	
+	Available: Techs.ShipSystems.Level > 0
+	Level: Techs.ShipSystems.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 30 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 50 * Size
+	
+	Costs: Metals[150 * Size], Electronics[5 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	Complexity: 0.5
+
+	Alters: subSysAlterations::makeRapidMount[Size]
+	
+	Requires:
+		To Run: Control[Size * 5]
+
+System: MissileRack
+	Name: #SS_MISSILERACK_NAME
+	Description: #SS_MISSILERACK_DESC
+	Appearance: MissileRack
+	Explosion: fuel_cell_explode lasting 0.3
+
+	Available: Techs.Missiles.Level > 0
+	Level: Techs.Missiles.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon, ClipWeapon
+	Tied To: Missiles 1
+
+	Costs: Metals[150 * Size], Electronics[50 * Size], Labr[5 * Size]
+	Complexity: 1.2
+	
+	vClip: 4 + if(Level > 4, 2, 0) + if(Level > 8, 2, 0) + if(Level > 12, 2, 0)
+	vClipDelay: (4) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 10) + 1)
+	vMslDamage: 15 * Size * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vMslDelay: (0.25) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 10) + 1)
+	vTotalDelay: (vMslDelay * vClip) + vClipDelay
+	vRange: 200 * ((sqrt(1 + Size) / 10) + 0.85)
+	vAmmoUse: 3 * Size
+	vAmmoStore: vAmmoUse * vClip
+	vSpeed: 25
+
+	Provides: ExplosiveWeaponRack with 
+		Damage[vMslDamage], ShotDelay[vMslDelay], Speed[vSpeed],
+		Delay[vClipDelay], ClipSize[vClip], Range[vRange], AmmoUse[vAmmoUse]
+
+	Provides: StorageAmmo with Amount[vAmmoStore]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: Ammo[vAmmoStore], AmmoUse[-1 * vAmmoUse * vClip / vTotalDelay], DPS[(vMslDamage * vClip) / vTotalDelay], Local/DMGperShot[vMslDamage]
+	Hints: Local/Delay[vTotalDelay], Local/ClipDelay[vClipDelay], Local/Clip[vClip], Local/AmmoperShot[vAmmoUse], Local/Range[vRange]
+
+
+System: BoardingParty
+	Name: #SS_BOARDING_NAME
+	Description: #SS_BOARDING_DESC
+	Appearance: BoardingParty
+	Explosion: armor_explode lasting 0.2
+
+	Available: Techs.Missiles.Level > 0
+	Level: Techs.Missiles.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon, ChargedWeapon, Tool:BoardingParty, BoardingParty
+	Tied To: Missiles 1
+
+	Costs: Metals[150 * Size], Electronics[50 * Size], Labr[5 * Size]
+	Complexity: 1.2
+	
+	vTroops: (2 - decay(Level,50)) * 2.5 * Size
+	vRange: 25 * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+
+	Provides: Boarding with Troops[vTroops], Range[vRange]
+	Provides: TroopQuarters with Amount[vTroops], Regen[vTroops * 0.005]
+
+	Requires:
+		To Run:
+			Control[10 * Size], Power[2 * Size], Air[1 * Size]
+	
+	Hints: Troops[vTroops], Local/ProjSpeed[12], Local/Delay[1/.005], Local/Range[vRange]
+
+
+
+System: TorpedoBay
+	Name: #SS_TORPEDOBAY_NAME
+	Description: #SS_TORPEDOBAY_DESC
+	Appearance: TorpedoBay
+	Explosion: fuel_cell_explode lasting 0.4
+
+	Available: Techs.Missiles.Level > 4
+	Level: Techs.Missiles.Level
+	Size: max(Scale,1)
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: Missiles 5
+
+	Costs: Metals[150 * Size], Electronics[50 * Size], Labr[5 * Size]
+	Complexity: 1.2
+	
+	vTorpDamage: Size * 60 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vTorpDelay: max(5, 10 * decay(pow(LEVEL_GAIN_CURVE,Level),15) * decay(Size,50)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.1
+	vTorpRange: progress(250,3*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vTorpSpeed: progress(33,2*LEVEL_GAIN_CURVE,Level)
+	vTorpUse: Size * 24
+
+	Provides: ExplosiveWeapon with Damage[vTorpDamage], Delay[vTorpDelay], AmmoUse[vTorpUse], Range[vTorpRange], Speed[vTorpSpeed], Deviation[vDeviation]
+
+	Provides: StorageAmmo with Amount[vTorpUse * 2]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: Ammo[vTorpUse], AmmoUse[-1 * vTorpUse / vTorpDelay], Local/AmmoperShot[vTorpUse], DPS[vTorpDamage / vTorpDelay], Local/Range[vTorpRange], Local/DMGperShot[vTorpDamage], Local/ProjSpeed[vTorpSpeed], Local/Delay[vTorpDelay]
+
+
+
+
+System: FlakTurret
+	Name: #SS_FLAKTURRET_NAME
+	Description: #SS_FLAKTURRET_DESC
+	Appearance: FlakTurret
+	Explosion: armor_explode lasting 0.3
+	
+	Available: Techs.ProjWeapons.Level > 0
+	Level: Techs.ProjWeapons.Level
+	Size: max(Scale,1)
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 75 * Size
+	
+	Tags: Weapon, Flak
+	Tied To: ProjWeapons 1
+	
+	Costs: Metals[100 * Size], Electronics[40 * Size], AdvParts[20 * Size], Labr[5 * Size]
+	Complexity: 1.25
+	
+	vAOEDamage: Size * 20 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vAOEDelay: 4 * ((sqrt(1 + Size) / 5) + 1)
+	vAOERange: 75 * ((sqrt(1 + Size) / 10) + 0.85)
+	
+	Provides: AreaHits with
+		Damage[vAOEDamage],
+		Accuracy[0.33],
+		Delay[vAOEDelay],
+		Range[vAOERange]
+	
+	Consumes:
+		To Run:
+			Power[5 * Size]
+	
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: AoEDmg[0.33 * vAOEDamage / vAOEDelay], Local/Range[vAOERange], Local/Delay[vAOEDelay]
+
+
+
+System: ShieldBomb
+	Name: #SS_SHIELDBOMB_NAME
+	Description: #SS_SHIELDBOMB_DESC
+	Appearance: PoweredArmor
+	Explosion: electrical_spark lasting 0.2
+	
+	Available: Techs.Shields.Level > 3
+	Level: Techs.Shields.Level - 3
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 75 * Size
+	
+	Tags: Weapon
+	Tied To: Shields 4
+	
+	Costs: Metals[100 * Size], Electronics[100 * Size], AdvParts[50 * Size], Labr[5 * Size]
+	Complexity: 1.25
+	
+	vAOEDamage: Size * 20 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vAOEDelay: 10
+	vShieldCost: 100 * Size * GAME_SHIELD_MULT
+	
+	Provides: ShieldDet with
+		Damage[vAOEDamage],
+		Accuracy[1.0],
+		Delay[vAOEDelay],
+		Range[25 + pow(Size, 0.35)],
+		ShieldCost[vShieldCost],
+		Deviation[1]
+	
+	Requires:
+		To Run:
+			Control[15 * Size]
+	
+	Hints: ShieldBurst[vShieldCost], Local/ShieldCost[vShieldCost], AoEDmg[vAOEDamage / vAOEDelay], Local/Range[25 + pow(Size, 0.35)], Local/Delay[vAOEDelay]
+
+
+
+
+
+
+System: Railgun
+	Name: #SS_RAILGUN_NAME
+	Description: #SS_RAILGUN_DESC
+	Appearance: RailGun
+	Explosion: armor_explode lasting 0.15
+
+	Available: Techs.ProjWeapons.Level > 0
+	Level: Techs.ProjWeapons.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: ProjWeapons 1
+	
+	Costs: Metals[200 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	Complexity: 1
+	
+	vDamage: Size * 20 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: 1.25 * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.1
+	vProjRange: progress(100,2*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vProjSpeed: progress(40,2*LEVEL_GAIN_CURVE,Level)
+	vAmmoUse: Size
+
+	Provides: ProjWeapon with Damage[vDamage], Delay[vDelay], AmmoUse[vAmmoUse],
+		Range[vProjRange], Speed[vProjSpeed], Deviation[vDeviation]
+	
+	Provides: StorageAmmo with Amount[Size * 25]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Ammo[Size * 25], AmmoUse[-1 * vAmmoUse / vDelay], DPS[vDamage / vDelay], Local/Range[vProjRange], Local/DMGperShot[vDamage], Local/AmmoperShot[vAmmoUse], Local/ProjSpeed[vProjSpeed], Local/Delay[vDelay]
+
+
+
+System: ChemicalBomb
+	Name: #SS_CHEMICALBOMB_NAME
+	Description: #SS_CHEMICALBOMB_DESC
+	Appearance: ChemicalBomb
+	Explosion: armor_explode lasting 0.25
+
+	Available: Techs.Chemistry.Level >= 3
+	Level: Techs.Chemistry.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 60 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 60 * Size
+	
+	Tags: Weapon
+	Tied To: Chemistry 3
+	
+	Costs: Metals[100 * Size], AdvParts[50 * Size], Labr[15 * Size]
+	
+	vDamage: Size * 100 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: 2.5 * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.1
+	vProjRange: progress(80,2*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vProjSpeed: progress(40,2*LEVEL_GAIN_CURVE,Level)
+	vAmmoUse: Size
+
+	Provides: PopulationBomb with Damage[vDamage], Delay[vDelay], AmmoUse[vAmmoUse],
+		Range[vProjRange], Speed[vProjSpeed], Deviation[vDeviation]
+	
+	Provides: StorageAmmo with Amount[Size * 25]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Ammo[Size * 25], AmmoUse[-1 * vAmmoUse / vDelay], PopDPS[vDamage / vDelay], Local/Range[vProjRange], Local/DMGperShot[vDamage], Local/AmmoperShot[vAmmoUse], Local/ProjSpeed[vProjSpeed], Local/Delay[vDelay]
+
+
+
+
+
+System: ParticleCannon
+	Name: #SS_PARTICLECANNON_NAME
+	Description: #SS_PARTICLECANNON_DESC
+	Appearance: MuonCannon
+	Explosion: electrical_spark lasting 0.4
+
+	Available: Techs.ParticlePhysics.Level > 0
+	Level: Techs.ParticlePhysics.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: ParticlePhysics 1
+	
+	Costs: Metals[200 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	Complexity: 1
+	
+	vDamage: Size * 30 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: 2.5 * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.15
+	vProjRange: progress(100,2*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vProjSpeed: progress(100,2*LEVEL_GAIN_CURVE,Level)
+	vAmmoUse: 0.5 * Size
+
+	Provides: ParticleWeapon with Damage[vDamage], Delay[vDelay], AmmoUse[vAmmoUse],
+		Range[vProjRange], Speed[vProjSpeed], Deviation[vDeviation]
+	
+	Provides: StorageAmmo with Amount[Size * 5]
+	
+	Consumes:
+		To Run:
+			Power[10 * Size]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Ammo[Size * 5], AmmoUse[-1 * vAmmoUse / vDelay], DPS[vDamage / vDelay], Local/Range[vProjRange], Local/DMGperShot[vDamage], Local/AmmoperShot[vAmmoUse], Local/ProjSpeed[vProjSpeed], Local/Delay[vDelay]
+
+
+
+System: PlasmaThrower
+	Name: #SS_PLASMAGUN_NAME
+	Description: #SS_PLASMAGUN_DESC
+	Appearance: PlasmaThrower
+	Explosion: electrical_spark lasting 0.33
+
+	Available: (Techs.ProjWeapons.Level >= 6) && (Techs.EnergyPhysics.Level >= 3)
+	Level: floor((Techs.ProjWeapons.Level - 2) + (Techs.EnergyPhysics.Level / 20))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: ProjWeapons 6, EnergyPhysics 3
+	
+	Costs: Metals[100 * Size], Electronics[25 * Size], AdvParts[35 * Size], Labr[5 * Size]
+	Complexity: 1.4
+	
+	vDamage: Size * 40 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT / 3
+	vDelay: (1.25 / 3) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.1
+	vProjRange: progress(60,2*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vProjSpeed: progress(20,1.5*LEVEL_GAIN_CURVE,Level)
+	vPowUse: Size * 20
+
+	Provides: PlasmaWeapon with Damage[vDamage], Delay[vDelay], PowerUse[vPowUse],
+		Range[vProjRange], Speed[vProjSpeed], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[15 * Size]
+
+	Hints: Power[-1 * vPowUse / min(vDelay, 1)], DPS[vDamage / vDelay], Local/Range[vProjRange], Local/DMGperShot[vDamage], Local/Delay[vDelay], Local/ProjSpeed[vProjSpeed]
+
+System: Artillery
+	Name: #SS_ARTILLERY_NAME
+	Description: #SS_ARTILLERY_DESC
+	Appearance: Artillery
+	Explosion: fuel_cell_explode lasting 0.2
+
+	Available: Techs.ProjWeapons.Level > 1
+	Level: Techs.ProjWeapons.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 150 * Size
+	
+	Tags: Weapon, Require:Station, Artillery
+	Tied To: ProjWeapons 2
+	
+	Costs: Metals[200 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	Complexity: 1
+	
+	vDamage: Size * 100 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: 10 * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.05
+	vProjRange: progress(500,2*LEVEL_GAIN_CURVE,Level) + Size * ((sqrt(1 + Size) / 10) + 0.85)
+	vProjSpeed: vProjRange * .4
+	vAmmoUse: 10 * Size
+
+	Provides: ArtilleryWeapon with Damage[vDamage], Delay[vDelay], AmmoUse[vAmmoUse],
+		Range[vProjRange], Speed[vProjSpeed], Deviation[vDeviation]
+	
+	Provides: StorageAmmo with Amount[Size * 30]
+
+	Requires:
+		To Run:
+			Control[35 * Size]
+
+	Hints: Ammo[Size * 30], AmmoUse[-1 * vAmmoUse / vDelay], DPS[vDamage / vDelay], Local/Range[vProjRange], Local/MinRange[vProjRange * 0.1], Local/DMGperShot[vDamage], Local/AmmoperShot[10 * Size], Local/ProjSpeed[vProjSpeed], Local/Delay[vDelay]
+
+
+System: Laser
+	Name: #SS_LASER_NAME
+	Description: #SS_LASER_DESC
+	Appearance: LaserGun
+	Explosion: electrical_spark lasting 0.4
+	
+	Available: Techs.BeamWeapons.Level > 0
+	Level: Techs.BeamWeapons.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: 100 * Size * pow(HEALTH_CURVE,HPLevel) * HEALTH_MULT
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 1
+	
+	Costs: Metals[100 * Size], Electronics[25 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	Complexity: 1.5
+	
+	vDamage: Size * 16 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: (1) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vPowCost: Size * 20 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(45,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+	
+	//Notes: DPS decreases slightly with size, such that at size 100, DPS is halved; However, Range increases with size,
+	Provides: EnergyWeapon with Damage[vDamage], Delay[vDelay], Duration[1], PowCost[vPowCost], Range[vBeamRange], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: Power[-1 * vPowCost / min(vDelay, 1)], DPS[vDamage / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vDamage / 4], Local/HitsperShot[4], Local/Duration[1], Local/Delay[vDelay]
+
+
+
+System: ShortLaser
+	Name: #SS_SHORTLASER_NAME
+	Description: #SS_SHORTLASER_DESC
+	Appearance: ShortLaser
+	Explosion: electrical_spark lasting 0.4
+	
+	Available: Techs.BeamWeapons.Level > 0
+	Level: Techs.BeamWeapons.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 1
+	
+	Costs: Metals[100 * Size], Electronics[25 * Size], AdvParts[25 * Size], Labr[5 * Size]
+	Complexity: 1.5
+	
+	vDamage: Size * 29 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: (1.0) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vPowCost: Size * 20 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: (progress(45,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)) / 2
+	vDeviation: 0.1
+	
+	//80% more damage at half the range of the laser
+	Provides: NarrowEnergyWeapon with Damage[vDamage], Delay[vDelay], Duration[1], PowCost[vPowCost], Range[vBeamRange], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: Power[-1 * vPowCost / min(vDelay, 1)], DPS[vDamage / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vDamage / 4], Local/HitsperShot[4], Local/Duration[1], Local/Delay[vDelay]
+
+
+System: OverchargeLaser
+	Name: #SS_OVERLASER_NAME
+	Description: #SS_OVERLASER_DESC
+	Appearance: ShortLaser
+	Explosion: electrical_spark lasting 0.4
+	
+	Available: (Techs.BeamWeapons.Level > 9) || Traits.remnants
+	Level: Techs.BeamWeapons.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 10
+	
+	Costs: Metals[125 * Size], Electronics[225 * Size], AdvParts[225 * Size], Labr[10 * Size]
+	Complexity: 1.5
+	
+	vDamage: Size * 80 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: (5) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vPowCost: Size * 250 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(45,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+	
+	//Notes: DPS decreases slightly with size, such that at size 100, DPS is halved; However, Range increases with size,
+	Provides: EnergyWeapon with Damage[vDamage], Delay[vDelay], Duration[1], PowCost[vPowCost], Range[vBeamRange], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: Power[-1 * vPowCost / min(vDelay, 1)], DPS[vDamage / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vDamage / 4], Local/HitsperShot[4], Local/Duration[1], Local/Delay[vDelay]
+
+
+System: PhasedLaser
+	Name: #SS_PHASEDLASER_NAME
+	Description: #SS_PHASEDLASER_DESC
+	Appearance: PlasmaGun
+	Explosion: electrical_spark lasting 0.4
+	
+	Available: ((Techs.BeamWeapons.Level > 7) && (Techs.WarpPhysics.Level > 7)) || Traits.remnants
+	Level: max(floor(weight(Techs.BeamWeapons.Level, 0.5, Techs.WarpPhysics.Level, 0.5)), 1)
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 8, WarpPhysics 8
+	
+	Costs: Metals[100 * Size], Electronics[50 * Size], AdvParts[125 * Size], Labr[5 * Size]
+	Complexity: 1.5
+	
+	vDamage: Size * 10 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: (1) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vPowCost: Size * 100 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(40,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+	
+	Provides: PhasedEnergyWeapon with Damage[vDamage], Delay[vDelay], Duration[1], PowCost[vPowCost], Range[vBeamRange], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[25 * Size]
+	
+	Hints: Power[-1 * vPowCost / min(vDelay, 1)], DPS[vDamage / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vDamage / 4], Local/HitsperShot[4], Local/Duration[1], Local/Delay[vDelay]
+
+
+
+System: PlasmaBeam
+	Name: #SS_PLASMABEAM_NAME
+	Description: #SS_PLASMABEAM_DESC
+	Appearance: PlasmaGun
+	Explosion: electrical_spark lasting 0.4
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 5, EnergyPhysics 5
+	
+	Available: (Techs.BeamWeapons.Level > 4) && (Techs.EnergyPhysics.Level > 4)
+	Level: floor((Techs.BeamWeapons.Level - 1) + (Techs.EnergyPhysics.Level / 20))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[70 * Size], Electronics[40 * Size], AdvParts[50 * Size], Labr[5 * Size]
+	Complexity: 1.5
+	
+	vDmgFirst: Size * 16 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDmgDoT: Size * 16 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vDelay: (1) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vDeviation: 0.1
+	vPowCost: Size * 50 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(45,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85) / 2
+	
+	//Front-loaded damage plus a DoT after-effect, at a higher power cost than lasers (works well with improved energy systems)
+	Provides: PlasmaPulse with FrontDamage[vDmgFirst], DoTDamageRate[vDmgDoT],
+		Delay[vDelay], Duration[1], PowCost[vPowCost], Range[vBeamRange], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[15 * Size]
+	
+	Hints: Power[-1 * vPowCost / min(vDelay, 1)], DPS[(vDmgFirst + vDmgDoT) / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vDmgFirst / 4], Local/HitsperShot[4], Local/DMGburn[vDmgDoT], Local/Delay[vDelay]
+
+
+
+System: PowerVampire
+	Name: #SS_POWERVAMP_NAME
+	Description: #SS_POWERVAMP_DESC
+	Appearance: ReverseInductor
+	Explosion: electrical_spark lasting 0.5
+	
+	Available: ((Techs.BeamWeapons.Level > 4) && (Techs.EnergyPhysics.Level > 4)) || Traits.remnants
+	Level: ceil(weight(Techs.BeamWeapons.Level - 4, 0.5, Techs.EnergyPhysics.Level - 4, 0.5))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 5, EnergyPhysics 5
+	
+	Costs: Metals[100 * Size], Electronics[35 * Size], AdvParts[35 * Size], Labr[5 * Size]
+	Complexity: 1.5
+	
+	vPowVamp: Size * 30 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 50))
+	vDelay: (1) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vBeamRange: progress(45,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+	
+	Provides: AbsorbPower with Rate[vPowVamp], Delay[vDelay], Duration[1], Range[vBeamRange], Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[15 * Size]
+	
+	Hints: PowerVamp[vPowVamp / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vPowVamp / 4], Local/HitsperShot[4], Local/Duration[1], Local/Delay[vDelay]
+
+System: MindSapper
+	Name: #SS_MINDSAP_NAME
+	Description: #SS_MINDSAP_DESC
+	Appearance: ReverseInductor
+	Explosion: armor_explode lasting 0.5
+
+	Available: (Techs.BeamWeapons.Level > 7) && (Techs.Science.Level > 3)
+	Level: Techs.BeamWeapons.Level - 7
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 20 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Tags: Weapon
+	Tied To: BeamWeapons 8, Science 4
+
+	Costs: Metals[30 * Size], Electronics[90 * Size], AdvParts[50 * Size], Labr[5 * Size]
+	Complexity: 4
+
+	vConDmg: 30 * Size * (2 - decay(pow(LEVEL_GAIN_CURVE, Level),50))
+	vDelay: (1) * (1 + decay(pow(LEVEL_GAIN_CURVE, Level), 100)) * ((sqrt(1 + Size) / 5) + 1)
+	vBeamRange: progress(55,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+
+	Provides: MindSapper with Rate[vConDmg], Delay[vDelay], Duration[1], Range[vBeamRange], Deviation[vDeviation]
+
+	Consumes:
+		To Run:
+			Power[80 * Size]
+
+	Hints: ControlDmg[vConDmg / vDelay], Local/Range[vBeamRange], Local/DMGperShot[vConDmg / 4], Local/HitsperShot[4], Local/Duration[1], Local/Delay[vDelay]
+
+
+//System: Warhead
+//	Name: #SS_WARHEAD_NAME
+//	Description: #SS_WARHEAD_DESC
+//	
+//	Tags: Weapon, Warhead
+//	
+//	Costs: Metals[50 * Size], Electronics[5 * Size], AdvParts[25 * Size]
+//	Complexity: 1.8
+
+
+System: DirectedSpaceFold
+	Name: #SS_SPATIALMANIP_NAME
+	Description: #SS_SPATIALMANIP_DESC
+	Appearance: DSM
+	Explosion: flak lasting 2
+	
+	Tags: Weapon, SuperWeapon, ChargedWeapon, Tool:DSM, DSM
+	Tied To: BeamWeapons 8, EnergyPhysics 8, WarpPhysics 5
+	
+	Available: (Techs.BeamWeapons.Level > 7) && (Techs.EnergyPhysics.Level > 7) && (Techs.WarpPhysics.Level > 4)
+	Level: floor(weight(Techs.BeamWeapons.Level, 7 / 18, Techs.EnergyPhysics.Level, 7 / 18, Techs.WarpPhysics.Level, 4 / 18))
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 250 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 500 * Size //Incredibly dense
+
+	Costs: Metals[400 * Size], Electronics[400 * Size], AdvParts[500 * Size], Labr[5 * Size]
+	Complexity: 20
+	
+	//Damage/Charge ratio is 1 at Size ~ 20
+	vDmgPerCharge: 25000 * Size * 1 * pow(LEVEL_GAIN_CURVE, Level) * GAME_DAMAGE_MULT
+	vRequiredCharge: (500000 + (5000 * Size)) * decay(pow(LEVEL_GAIN_CURVE,Level),45)
+	
+	Provides: ChargeToFireTemplate with Damage[vDmgPerCharge], DealForTime[5], ReqCharge[vRequiredCharge], MaxChargeRate[vRequiredCharge / 60], Range[30 + sqrt(Size)]
+
+	Requires:
+		To Run:
+			Control[50 * Size]
+	
+	Hints: Alpha[vDmgPerCharge], Local/RequiredCharge[vRequiredCharge * -1], SW Max DPS[vDmgPerCharge / 60], Local/Range[30 + sqrt(Size)]
+
+System: MiningLaser
+	Name: #SS_MININGLASER_NAME
+	Description: #SS_MININGLASER_DESC
+	Appearance: MiningLaser
+	Explosion: electrical_spark lasting 1
+	
+	Tags: Miner, Tool:Miner, Work:Miner, Deposit:Ore, UsesCargo
+	Tied To: BeamWeapons 1
+	
+	Available: Techs.BeamWeapons.Level > 0
+	Level: Techs.BeamWeapons.Level
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[100 * Size], Electronics[40 * Size], AdvParts[40 * Size], Labr[5 * Size]
+	Complexity: 1.6
+	
+	vRate: Size * 5 * (pow(LEVEL_GAIN_CURVE, Level) + RES_BASE_FACT) * RES_GEN_MULT
+	vDelay: max(5, 10 * decay(pow(LEVEL_GAIN_CURVE,Level),45))
+	vDuration: 5
+	vPowCost: Size * 40
+	
+	Provides: MiningLaser with Rate[vRate], Delay[vDelay], Duration[vDuration], PowCost[vPowCost]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: Power[-1 * vPowCost / min(vDelay, 1)], Local/MiningRate[(vRate * vDuration)/vDelay]
+
+System: ResourceDrain
+	Name: #SS_RESOURCEDRAIN_NAME
+	Description: #SS_RESOURCEDRAIN_DESC
+	Appearance: MiningLaser
+	Explosion: electrical_spark lasting 1
+
+	Tags: Weapon, ResourceDrain, Tool:ResourceDrain
+	Tied To: BeamWeapons 6, Chemistry 6
+
+	Available: (Techs.BeamWeapons.Level > 5) && (Techs.Chemistry.Level > 5)
+	Level: Techs.BeamWeapons.Level - 5
+
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 80 * Size
+	
+	Costs: Metals[100 * Size], Electronics[40 * Size], AdvParts[40 * Size], Labr[5 * Size]
+	Complexity: 1.6
+	
+	vRate: Size * 20 * pow(LEVEL_GAIN_CURVE, Level)
+	vDelay: 15
+	vDuration: 10
+	vCargoStore: Size * 10 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 12))
+	
+	Provides: ResourceDrain with Rate[vRate], Delay[vDelay], Duration[vDuration]
+	
+	Provides: Cargo with
+		Amount[vCargoStore]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+	
+	Hints: DrainRate[(vRate * vDuration)/vDelay], Cargo[vCargoStore]
+
+System: Repulsor
+	Name: #SS_REPULSOR_NAME
+	Description: #SS_REPULSOR_DESC
+	Appearance: Repulsor
+	Explosion: electrical_spark lasting 0.5
+
+	Tags: Tool:Repulsor, Repulsor, Weapon, SafeTool
+	Tied To: Gravitics 8
+
+	Available: (Techs.Gravitics.Level >= 8)
+	Level: Techs.Gravitics.Level - 7
+
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 60 * Size
+
+	Costs: Electronics[50 * Size], AdvParts[100 * Size]
+
+	// A similarly-sized thruster on the target ship would take 4 seconds to compensate
+	vForce: Size * 4 * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vDelay: max(4, 8 * decay(pow(LEVEL_GAIN_CURVE,Level),45)) * ((sqrt(1 + Size) / 5) + 1)
+	vPowCost: Size * 25 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(150,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+
+	Provides: ImpartForce with
+		Delay[vDelay],
+		Force[vForce],
+		PowCost[vPowCost],
+		Range[vBeamRange],
+		Duration[1],
+		Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Local/Repulsion[vForce], Power[-1 * vPowCost / min(vDelay, 1)], Local/Range[vBeamRange], Local/Delay[vDelay]
+
+System: Attractor
+	Name: #SS_ATTRACTOR_NAME
+	Description: #SS_ATTRACTOR_DESC
+	Appearance: Repulsor
+	Explosion: electrical_spark lasting 0.5
+
+	Tags: Tool:Attractor, Attractor, Weapon, SafeTool
+	Tied To: Gravitics 8
+
+	Available: (Techs.Gravitics.Level >= 8)
+	Level: Techs.Gravitics.Level - 7
+
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 60 * Size
+
+	Costs: Electronics[50 * Size], AdvParts[100 * Size]
+
+	// A similarly-sized thruster on the target ship would take all of its power to compensate
+	vForce: Size * -700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vDelay: max(5, 10 * decay(pow(LEVEL_GAIN_CURVE,Level),45)) * ((sqrt(1 + Size) / 5) + 1)
+	vPowCost: Size * 7 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(150,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vDeviation: 0.1
+
+	Provides: ImpartForce with
+		Delay[vDelay],
+		Force[vForce],
+		PowCost[vPowCost],
+		Range[vBeamRange],
+		Duration[4],
+		Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Local/Attraction[vForce * -1], Power[-4 * vPowCost / min(vDelay, 1)], Local/Range[vBeamRange], Local/Delay[vDelay], Local/Duration[4]
+
+System: Interdictor
+	Name: #SS_INTERDICTOR_NAME
+	Description: #SS_INTERDICTOR_DESC
+	Appearance: Repulsor
+	Explosion: electrical_spark lasting 0.5
+
+	Tags: Tool:Interdictor, Interdictor, Weapon, SafeTool
+	Tied To: Gravitics 12
+
+	Available: (Techs.Gravitics.Level >= 12)
+	Level: Techs.Gravitics.Level - 11
+
+	Size: Scale
+	HPLevel: Techs.Materials.Level-1 As Level
+	Durability: HEALTH_MULT * 100 * Size * pow(HEALTH_CURVE,HPLevel)
+	Mass: 60 * Size
+
+	Costs: Electronics[50 * Size], AdvParts[100 * Size]
+
+	vPowCost: Size * 7 * decay(pow(LEVEL_GAIN_CURVE,Level), 125)
+	vBeamRange: progress(150,1*LEVEL_GAIN_CURVE,Level) * ((sqrt(1 + Size) / 10) + 0.85)
+	vForce: Size * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vDeviation: 0
+	vDelay: 5
+
+	Provides: MatchVelocity with
+		Delay[vDelay],
+		PowCost[vPowCost],
+		Range[vBeamRange],
+		Duration[vDelay],
+		Force[vForce],
+		Deviation[vDeviation]
+
+	Requires:
+		To Run:
+			Control[10 * Size]
+
+	Hints: Power[-5 * vPowCost / min(vDelay, 1)], Local/Range[vBeamRange], Local/Delay[vDelay], Local/Duration[5]r Local/Interdiction[vForce * -1]

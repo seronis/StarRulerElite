@@ -53,7 +53,7 @@ System: IonThruster
 	vEfficieny: 0.000036 * (0.5 + 0.5 * decay(pow(LEVEL_GAIN_CURVE,Level),35))
 	vPowCost: 5 * decay(pow(LEVEL_GAIN_CURVE,Level),35) * Size
 	
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[Size * 10]
 	
 	Provides: IonThrust with
@@ -89,7 +89,7 @@ System: Thruster
 	vThrust: Size * 700 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
 	vEfficieny: 0.00009 * (1 + 1 * decay(pow(LEVEL_GAIN_CURVE,Level),35))
 	
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[Size * 10]
 	
 	Provides: FuelThrust with

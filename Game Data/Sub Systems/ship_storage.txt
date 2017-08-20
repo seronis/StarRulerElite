@@ -26,7 +26,7 @@ System: FuelCell
 
 	vFuelStore: Size * 200 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
 
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[vFuelStore]
 
 	Hints: Fuel[vFuelStore]
@@ -55,7 +55,7 @@ System: AmmoStorage
 
 	vAmmoStore: Size * 125 * (4 - decay(pow(LEVEL_GAIN_CURVE, Level), 25) - decay(pow(LEVEL_GAIN_CURVE, Level), 125) - decay(pow(LEVEL_GAIN_CURVE, Level), 625))
 
-	Provides: AmmoStorage with
+	Provides: StorageAmmo with
 		Amount[vAmmoStore]
 
 	Hints: Ammo[vAmmoStore]

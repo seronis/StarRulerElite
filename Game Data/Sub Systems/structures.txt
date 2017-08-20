@@ -47,14 +47,14 @@ System: MetalMine
 	vMtlStore: Size * 250 * pow(LEVEL_GAIN_CURVE, Level)
 	vWorkers: Size * 800000
 
-	Provides: MineMetals with
-		Rate[vMineRate]
-
-	Provides: MetalStorage with
-		Amount[vMtlStore]
-
 	Provides: NeedWorkers with
 		Workers[vWorkers]
+
+	Provides: StorageMetl with
+		Amount[vMtlStore]
+
+	Provides: MineMetals with
+		Rate[vMineRate]
 
 	Hints: Mines[vMineRate], MtlStore[vMtlStore], Workers[vWorkers * -1]
 
@@ -79,14 +79,14 @@ System: ElectronicFact
 	vElecStore: Size * 100 * pow(LEVEL_GAIN_CURVE, Level)
 	vWorkers: Size*600000
 
-	Provides: BuildElectronics with
-		Rate[vElecFab]
-
-	Provides: ElecStorage with
-		Amount[vElecStore]
-
 	Provides: NeedWorkers with
 		Workers[vWorkers]
+
+	Provides: StorageElec with
+		Amount[vElecStore]
+
+	Provides: BuildElectronics with
+		Rate[vElecFab]
 
 	Hints: ElecFab[vElecFab], ElecStore[vElecStore], Workers[vWorkers * -1]
 
@@ -111,14 +111,14 @@ System: AdvPartFact
 	vAdvStore: Size * 50 * pow(LEVEL_GAIN_CURVE, Level)
 	vWorkers: Size * 400000
 
-	Provides: BuildAdvParts with
-		Rate[vAdvFab]
-
-	Provides: AdvPartsStorage with
-		Amount[vAdvStore]
-
 	Provides: NeedWorkers with
 		Workers[vWorkers]
+
+	Provides: StorageAdvp with
+		Amount[vAdvStore]
+
+	Provides: BuildAdvParts with
+		Rate[vAdvFab]
 
 	Hints: AdvFab[vAdvFab], AdvStore[vAdvStore], Workers[vWorkers * -1]
 
@@ -142,11 +142,14 @@ System: GoodsFactory
 	vWorkers: Size * 800000
 	vGoodsFab: Size * 92 * pow(LEVEL_GAIN_CURVE, Level)
 
-	Provides: MakeGoods with
-		Rate[vGoodsFab]
-
 	Provides: NeedWorkers with
 		Workers[vWorkers]
+
+	Provides: StorageGuds with
+		Amount[vGoodsFab*10]
+
+	Provides: MakeGoods with
+		Rate[vGoodsFab]
 
 	Hints: GoodsFab[vGoodsFab], Workers[vWorkers * -1]
 
@@ -170,11 +173,14 @@ System: LuxsFactory
 	vLuxFab: Size * 5 * pow(LEVEL_GAIN_CURVE, Level)
 	vWorkers: Size * 400000
 
-	Provides: MakeLuxuries with
-		Rate[vLuxFab]
-
 	Provides: NeedWorkers with
 		Workers[vWorkers]
+
+	Provides: StorageLuxs with
+		Amount[vLuxFab*10]
+
+	Provides: MakeLuxuries with
+		Rate[vLuxFab]
 
 	Hints: LuxFab[vLuxFab], Workers[vWorkers * -1]
 
@@ -195,6 +201,9 @@ System: City
 	Costs: Metals[280 * Size * pow(COST_INC_CRV, Level)], Electronics[160 * Size * pow(COST_INC_CRV, Level)], AdvParts[60 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 2
 
+	vGudStore: Size * 32 * pow(LEVEL_GAIN_CURVE, Level)
+	vLuxStore: Size * 32 * pow(LEVEL_GAIN_CURVE, Level)
+	
 	vHousing: Size * 2000000 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
 	vLaborPool: Size * 1.0 * pow(0.5 + LEVEL_GAIN_CURVE / 2, Level)
 	vFoodReq: vHousing * 0.00000006
@@ -202,9 +211,16 @@ System: City
 	Provides: Housing with
 		Amount[vHousing]
 
-	Provides: LaborPool with Amount[vLaborPool]
+	Provides: StorageFood with
+		Amount[vFoodReq * 30]
 
-	Provides: FoodStorage with Amount[vFoodReq * 30]
+	Provides: StorageGuds with
+		Amount[vGudStore]
+
+	Provides: StorageLuxs with
+		Amount[vLuxStore]
+
+	Provides: LaborPool with Amount[vLaborPool]
 
 	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 1.25 * Size]
 
@@ -238,7 +254,7 @@ System: Bunker
 	Provides: Housing with
 		Amount[vHousing]
 
-	Provides: FoodStorage with Amount[vFoodReq * 300]
+	Provides: StorageFood with Amount[vFoodReq * 600]
 
 	Provides: LaborPool with Amount[vLaborPool]
 
@@ -277,15 +293,15 @@ System: Capital
 	Provides: Trade with
 		Rate[vTrade]
 
-	Provides: FoodStorage with Amount[500 + vFoodReq * 60]
+	Provides: StorageFood with Amount[500 + vFoodReq * 60]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vStorage * 0.5]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vStorage * 0.3]
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vStorage * 0.2]
 
 	Provides: Repair with Rate[Durability / 120]
@@ -331,15 +347,15 @@ System: GalacticCapital
 	Provides: Trade with
 		Rate[vTrade]
 
-	Provides: FoodStorage with Amount[500 + vFoodReq * 60]
+	Provides: StorageFood with Amount[500 + vFoodReq * 60]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vStorage * 0.5]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vStorage * 0.3]
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vStorage * 0.2]
 
 	Provides: Repair with Rate[Durability / 120]
@@ -378,7 +394,7 @@ System: Farm
 	Provides: MakeFood with
 		Rate[vFoodGen]
 
-	Provides: FoodStorage with
+	Provides: StorageFood with
 		Amount[vFoodStore]
 
 	Provides: NeedWorkers with
@@ -518,16 +534,16 @@ System: SpacePort
 		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, econLevel)],
 		FoodCostPer[0.2*decay(econLevel,5)]
 
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, cargoLevel)]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vEcoStore * 0.5]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vEcoStore * 0.3]
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vEcoStore * 0.2]
 
 	Provides: NeedWorkers with
@@ -561,13 +577,13 @@ System: ShipYard
 	Provides: AutoLabor with
 		Rate[vLabor], Store[vLaborPool]
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vEcoStore * 0.2]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vEcoStore * 0.3]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vEcoStore * 0.5]
 
 	Provides: ShipStorage with
@@ -577,14 +593,14 @@ System: ShipYard
 		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
 		FoodCostPer[0.2*decay(Level,5)]
 
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[Size*100 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Provides: MakeAmmo with
 		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
 		MetalCostPer[0.2*decay(Level,5)]
 
-	Provides: AmmoStorage with
+	Provides: StorageAmmo with
 		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Requires:
@@ -618,27 +634,27 @@ System: ShipPartsYard
 	Provides: AutoLabor with
 		Rate[vLabor], Store[vLaborPool]
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vEcoStore * 0.2]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vEcoStore * 0.3]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vEcoStore * 0.5]
 
 	Provides: MakeBioFuel with
 		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
 		FoodCostPer[0.2*decay(Level,5)]
 
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[Size*100 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Provides: MakeAmmo with
 		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
 		MetalCostPer[0.2*decay(Level,5)]
 
-	Provides: AmmoStorage with
+	Provides: StorageAmmo with
 		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Requires:
@@ -670,7 +686,7 @@ System: FuelDepot
 		Rate[Size * 20 * pow(LEVEL_GAIN_CURVE, Level)],
 		FoodCostPer[0.2*decay(Level,5)]
 
-	Provides: FuelStorage with
+	Provides: StorageFuel with
 		Amount[Size * 750 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Requires:
@@ -702,7 +718,7 @@ System: AmmoDepot
 		Rate[Size * 20 * pow(LEVEL_GAIN_CURVE, Level)],
 		MetalCostPer[0.2*decay(Level,5)]
 
-	Provides: AmmoStorage with
+	Provides: StorageAmmo with
 		Amount[Size * 750 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Requires:
@@ -734,13 +750,13 @@ System: CargoBlock
 	Provides: Cargo with
 		Amount[vCargoStore / 4]
 
-	Provides: MetalStorage with
+	Provides: StorageMetl with
 		Amount[vCargoStore / 4]
 
-	Provides: ElecStorage with
+	Provides: StorageElec with
 		Amount[vCargoStore / 4]
 
-	Provides: AdvPartsStorage with
+	Provides: StorageAdvp with
 		Amount[vCargoStore / 4]
 
 	Requires:

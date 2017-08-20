@@ -1,0 +1,73 @@
+System: RemnantCapitol
+	Name: #SS_REMNCAPITAL_NAME
+	Description: #SS_REMNCAPITAL_DESC
+
+	Available: Traits.remnants
+	Level: 1
+	Size: Scale
+	Durability: 200000 * Size
+	Mass: 4000 * Size
+	
+	Tags: Structure, Unique, NoManualBuild, Capitol, Unique:Capitol, Unlisted
+	
+	Costs: Labr[BLDG_LABR_MULT * 4000 * Size]
+	Complexity: 1
+	
+	vHousing: Size * 24000000
+	
+	Provides: Housing with
+		Amount[vHousing]
+	
+	Provides: StorageFood with Amount[20000]
+
+	Provides: StorageMetl with
+		Amount[Size * 25000]
+
+	Provides: StorageElec with
+		Amount[Size * 10000]
+
+	Provides: StorageAdvp with
+		Amount[Size * 5000]
+	
+	Provides: Repair with Rate[Durability / 12]
+	
+	Provides: LaborPool with Amount[Size * 10]
+	
+	Provides: PopEconomy
+	
+	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 50 * Size]
+	
+	Provides: CapitalSupport with Metals[Size * 500], Electronics[Size * 250], AdvParts[Size * 100], Food[Size * 10]
+
+	Provides: RemnantCapitolNotification
+
+	Hints: Housing[vHousing], MtlGen[Size * 500], ElecGen[Size * 250], AdvGen[Size * 100], FoodGen[Size * 10]
+
+System: RemnantGate
+	Name: #SS_REMNGATE_NAME
+	Description: #SS_REMNGATE_DESC
+	Appearance: Jumpdrive
+
+	Available: Traits.remnants
+	Level: 1
+	Size: Object.Size * (5 / 15)
+	Durability: 160 * pow(10, 9)
+	Mass: 10
+
+	Tags: Weapon, Hull, Unobtainable, Tool:WarpGate, WarpGate, Unlisted, SafeTool
+	
+	Costs: Metals[1]
+
+	Provides: Control with Amount[pow(10,6)]
+	Provides: Power with Rate[pow(10,6)], Cost[0]
+	Provides: Capacitance with Amount[pow(10,6)]
+	Provides: Repair with Rate[25]
+	Provides: RemnantGateNotification
+
+	Provides: GateWarp with
+		MaxRange[pow(10,12)], RechargeTime[1800],
+		Duration[5], AreaSize[500]
+
+	Triggerable: WarpGraphic: WarpGraphic with AreaSize[500]
+
+	Hints: Power[pow(10,6)], Control[pow(10,6)], Charge[pow(10,6)]
