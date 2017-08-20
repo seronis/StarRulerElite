@@ -1,6 +1,6 @@
 #include "~/Game Data/gui/include/gui_skin.as"
 #include "~/Game Data/gui/include/dialog.as"
-#include "~/Game Data/gui/include/resource_grid.as"
+#include "/include/resource_grid.as"
 #include "~/Game Data/gui/include/layout_stats.as"
 #include "~/Game Data/gui/include/accordion.as"
 #include "~/Game Data/gui/include/order_customizer.as"
@@ -304,13 +304,15 @@ class LayoutWindow : ScriptedGuiHandler {
 		@flightValue = GuiStaticText(recti(423, 29, 500, 49), "N/A", false, false, false, topPanel);
 
 		// Cost icons
-		@costTop = ResourceGrid(topPanel, pos2di(515, 7), dim2di(120, 17), 2);
-		costTop.add(SR_AdvParts, 0);
-		costTop.add(SR_Metals, 0);
+		@costTop = ResourceGrid(topPanel, pos2di(515, 7), dim2di(80, 17), 3);
+		costTop.add(SR_Advp, 0);
+		costTop.add(SR_Elec, 0);
+		costTop.add(SR_Metl, 0);
 
-		@costBottom = ResourceGrid(topPanel, pos2di(515, 29), dim2di(120, 17), 2);
-		costBottom.add(SR_Electronics, 0);
-		costBottom.add(SR_Labor, 0);
+		@costBottom = ResourceGrid(topPanel, pos2di(515, 29), dim2di(80, 17), 3);
+		costBottom.add(SR_Labr, 0);
+		costBottom.add(SR_Fuel, 0);
+		costBottom.add(SR_Ammo, 0);
 
 		// Action buttons
 		@saveButton = Button(dim2di(70, 26), localize("#save"), topPanel);
@@ -509,6 +511,7 @@ class LayoutWindow : ScriptedGuiHandler {
 					}
 				}
 				else if (evt.Caller is clearButton) {
+					//TODO: on shiftkey dont purge scale/name/hull
 					clearLayout();
 				}
 				else if (evt.Caller is exportButton) {
@@ -600,9 +603,11 @@ class LayoutWindow : ScriptedGuiHandler {
 		// Clear cost
 		costTop.update(0, 0);
 		costTop.update(1, 0);
+		costTop.update(2, 0);
 
 		costBottom.update(0, 0);
 		costBottom.update(1, 0);
+		costBottom.update(2, 0);
 
 		// Clear all stored systems
 		for(uint i = 0; i < subSystems.length(); ++i)
@@ -897,9 +902,11 @@ class LayoutWindow : ScriptedGuiHandler {
 
 		// Update cost
 		costTop.update(0, stats.getCost("AdvParts"));
-		costTop.update(1, stats.getCost("Metals"));
-		costBottom.update(0, stats.getCost("Electronics"));
-		costBottom.update(1, stats.getCost("Labr"));
+		costTop.update(1, stats.getCost("Electronics"));
+		costTop.update(2, stats.getCost("Metals"));
+		costBottom.update(0, stats.getCost("Labr"));
+		costBottom.update(1, stats.getCost("Fuel"));
+		costBottom.update(2, stats.getCost("Ammo"));
 
 		// Set space
 		setSpace(stats.spaceTaken, stats.spaceTotal);
@@ -1392,10 +1399,10 @@ class LayoutWindow : ScriptedGuiHandler {
 
 		@sysTitle = GuiExtText(recti(70, 5, 600-4, 473), sysInfoPanel);
 
-		@sysCost = ResourceGrid(sysInfoPanel, pos2di(70, 44), dim2di(70, 17), 4);
+		@sysCost = ResourceGrid(sysInfoPanel, pos2di(70, 44), dim2di(70, 17), 3);
 		sysCost.addDefaults(true);
 		
-		@sysDesc = GuiExtText(recti(8, 68, 600-8, 473), sysInfoPanel);
+		@sysDesc = GuiExtText(recti(8, 74, 600-8, 469), sysInfoPanel);
 		sysDesc.setShadow(Color(255,0,0,0));
 		sysDesc.setText("#tab:66#"+localize("#LET_SelectForDesc"));
 		
