@@ -11,8 +11,8 @@ import int getPlanetIconIndex(string@ physicalType) from "planet_icons";
 import void triggerContextMenu(Object@) from "context_menu";
 
 /* {{{ Constants */
-const int MIN_WIDTH = 730;
-const int MIN_HEIGHT = 468;
+const int MIN_WIDTH = 768;
+const int MIN_HEIGHT = 512;
 
 const float unitsPerAU = 1000.f;
 const float econUpdateLength = 1.f;
@@ -784,7 +784,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		if (obj.getStateVals(strFood, val, max, req, cargo))
 			resources.update(0, val + cargo, max);
 
-		// - Ore levels
+		// - Deep Ore levels
 		if (obj.getStateVals(strDeep, val, max, req, cargo))
 			resources.update(1, val);
 
@@ -2121,7 +2121,7 @@ void init() {
 	unpinnedCol = Color(64, 255, 255, 255);
 	pinnedCol = Color(218, 128, 128, 255);
 
-	defaultSize = dim2di(730, 442);
+	defaultSize = dim2di(768, 512);
 
 	initSkin();
 
