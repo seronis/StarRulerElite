@@ -1023,7 +1023,7 @@ void setMouseOverlayText(Object@ obj) {
 
 	if (hull is null) {
 		float oreVal = 0.f, oreMax = 0.f, temp = 0.f;
-		if (obj.getStateVals("Ore", oreVal, oreMax, temp, temp)) {
+		if (obj.getStateVals("DeepOre", oreVal, oreMax, temp, temp)) {
 			if (visible && oreMax > 0) {
 				mo_text += formatValue(oreVal, oreMax, localize("#MO_Ore"), Color(255, 0xC6, 0x9C, 0x6D), Color(255, 0x73, 0x63, 0x57));
 			}
