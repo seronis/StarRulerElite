@@ -2,7 +2,7 @@
 #include "~/Game Data/gui/include/gui_skin.as"
 #include "~/Game Data/gui/include/pl_queue.as"
 #include "~/Game Data/gui/include/cqueue_saveload.as"
-#include "~/Game Data/gui/include/resource_grid.as"
+#include "/include/resource_grid.as"
 #include "~/Game Data/gui/include/objlist_unique.as"
 #include "~/Game Data/gui/include/blueprints_sort.as"
 
@@ -31,7 +31,7 @@ const string@ strAmmoGen = "AmmoGen", strAmmo = "Ammo";
 const string@ strGudsGen = "GudsGen", strGuds = "Guds";
 const string@ strLuxsGen = "LuxsGen", strLuxs = "Luxs";
 
-const string@ strDeep = "DeepOre", strLabor = "Labr", strWorkers = "Workers", strMood = "Mood";
+const string@ strDeep = "DeepOre", strLabr = "Labr", strWorkers = "Workers", strMood = "Mood";
 const string@ strDamage = "Damage";
 
 const string@ strUnique = "Unique";
@@ -352,7 +352,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		hb_panel.setOverrideColor(Color(0xff000000));
 		hb_panel.setVisible(false);
 
-		@hovered_cost = ResourceGrid(hb_panel, pos2di(10, 170), dim2di(74, 17), 4);
+		@hovered_cost = ResourceGrid(hb_panel, pos2di(10, 170), dim2di(74, 17), 6);
 		hovered_cost.addDefaults(true);
 
 		// Queue build lists
@@ -381,19 +381,23 @@ class PlanetWindow : ScriptedGuiHandler {
 		shipSort.setSelected(2);
 
 		@activeCost = ResourceGrid(queuePanel, pos2di(), 2);
-		activeCost.setSpaced(true);
+	//	activeCost.setSpaced(true);
 		activeCost.setCellSize(dim2di(112, 17));
-		activeCost.setOffset(dim2di(0, 4));
+	//	activeCost.setOffset(dim2di(0, 4));
 
-		activeCost.add(SR_AdvParts, 0, 0);
-		activeCost.add(SR_Metals, 0, 0);
-		activeCost.add(SR_Electronics, 0, 0);
-		activeCost.add(SR_Labor, 0, 0);
+		activeCost.add(SR_Advp, 0, 0);
+		activeCost.add(SR_Labr, 0, 0);
+		activeCost.add(SR_Elec, 0, 0);
+		activeCost.add(SR_Fuel, 0, 0);
+		activeCost.add(SR_Metl, 0, 0);
+		activeCost.add(SR_Ammo, 0, 0);
 
 		activeCost.update(0, "---");
 		activeCost.update(1, "---");
 		activeCost.update(2, "---");
 		activeCost.update(3, "---");
+		activeCost.update(4, "---");
+		activeCost.update(5, "---");
 
 		@totalText = GuiStaticText(recti(0, 0, 173, 20), localize("#PL_TotalCost"), false, false, false, queuePanel);
 		totalText.setTextAlignment(EA_Center, EA_Center);
@@ -401,10 +405,12 @@ class PlanetWindow : ScriptedGuiHandler {
 		@totalCost = ResourceGrid(queuePanel, pos2di(), 2);
 		totalCost.setCellSize(dim2di(86, 17));
 		totalCost.setOffset(dim2di(0, 4));
-		totalCost.add(SR_AdvParts, 0);
-		totalCost.add(SR_Metals, 0);
-		totalCost.add(SR_Electronics, 0);
-		totalCost.add(SR_Labor, 0);
+		totalCost.add(SR_Advp, 0);
+		totalCost.add(SR_Labr, 0);
+		totalCost.add(SR_Elec, 0);
+		totalCost.add(SR_Fuel, 0);
+		totalCost.add(SR_Metl, 0);
+		totalCost.add(SR_Ammo, 0);
 
 		// Queue actions
 		@clearQueueButton = Button(dim2di(173, 22), localize("#PL_CLEAR_QUEUE"), queuePanel);
@@ -592,7 +598,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		shipSort.setSize(dim2di(208, 18));
 		shipSort.setPosition(pos2di(1, size.height - 18));
 
-		activeCost.setPosition(pos2di(size.width - 232, 10));
+		activeCost.setPosition(pos2di(size.width - 232, 4));
 		totalCost.setPosition(pos2di(size.width - 168, 96));
 		totalText.setPosition(pos2di(size.width - 173, 64));
 
@@ -793,7 +799,7 @@ class PlanetWindow : ScriptedGuiHandler {
 			resources.update(2, max - val);
 
 		// - Labor levels
-		if (obj.getStateVals(strLabor, val, max, req, cargo))
+		if (obj.getStateVals(strLabr, val, max, req, cargo))
 			resources.update(3, val, max);
 
 		// - Worker levels
@@ -813,18 +819,25 @@ class PlanetWindow : ScriptedGuiHandler {
 				progress = obj.getConstructionProgress(0);
 				queueName.setText(combine(obj.getConstructionName(0), " (", f_to_s(progress * 100.f, 0), "%)"));
 
-				float req = 0.f, done = 0.f;
-				obj.getConstructionCost(0, strMetl, done, req);
-				activeCost.update(1, done, req);
+				float reqd = 0.f, done = 0.f;
 
-				obj.getConstructionCost(0, strElec, done, req);
-				activeCost.update(2, done, req);
+				obj.getConstructionCost(0, strAdvp, done, reqd);
+				activeCost.update(0, done, reqd);
 
-				obj.getConstructionCost(0, strAdvp, done, req);
-				activeCost.update(0, done, req);
-				
-				obj.getConstructionCost(0, strLabor, done, req);
-				activeCost.update(3, done, req);
+				obj.getConstructionCost(0, strElec, done, reqd);
+				activeCost.update(2, done, reqd);
+
+				obj.getConstructionCost(0, strMetl, done, reqd);
+				activeCost.update(4, done, reqd);
+
+				obj.getConstructionCost(0, strLabr, done, reqd);
+				activeCost.update(1, done, reqd);
+
+				obj.getConstructionCost(0, strFuel, done, reqd);
+				activeCost.update(3, done, reqd);
+
+				obj.getConstructionCost(0, strAmmo, done, reqd);
+				activeCost.update(5, done, reqd);
 			}
 			else {
 				progress = -1.f;
@@ -834,6 +847,8 @@ class PlanetWindow : ScriptedGuiHandler {
 				activeCost.update(1, "---");
 				activeCost.update(2, "---");
 				activeCost.update(3, "---");
+				activeCost.update(4, "---");
+				activeCost.update(5, "---");
 			}
 		}
 
@@ -849,7 +864,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		if (queueCheckTime < 0 || queueSize != lastQueueSize) {
 			queueCheckTime = queueCheckDelay;
 
-			float totalMtl = 0.f, totalElc = 0.f, totalAdv = 0.f, totalLabr = 0.f;
+			float totalMtl = 0.f, totalElc = 0.f, totalAdv = 0.f, totalLabr = 0.f, totalFuel = 0.f, totalAmmo = 0.f;
 			buildingStructures = 0;
 
 			uint cnt = obj.getConstructionQueueSize();
@@ -857,7 +872,7 @@ class PlanetWindow : ScriptedGuiHandler {
 				string@ type = obj.getConstructionType(i);
 				if (@type != null && type == "structure")
 					++buildingStructures;
-			
+
 				if(queuePanel.isVisible()) {
 					float req, done;
 
@@ -869,17 +884,25 @@ class PlanetWindow : ScriptedGuiHandler {
 
 					obj.getConstructionCost(i, "AdvParts", done, req);
 					totalAdv += req;
-					
+
 					obj.getConstructionCost(i, "Labr", done, req);
 					totalLabr += req;
+
+					obj.getConstructionCost(i, "Fuel", done, req);
+					totalFuel += req;
+
+					obj.getConstructionCost(i, "Ammo", done, req);
+					totalAmmo += req;
 				}
 			}
 
 			if (queuePanel.isVisible()) {
 				totalCost.update(0, totalAdv);
-				totalCost.update(1, totalMtl);
+				totalCost.update(1, totalLabr);
 				totalCost.update(2, totalElc);
-				totalCost.update(3, totalLabr);
+				totalCost.update(3, totalFuel);
+				totalCost.update(4, totalMtl);
+				totalCost.update(5, totalAmmo);
 			}
 
 			Color col;
@@ -909,7 +932,7 @@ class PlanetWindow : ScriptedGuiHandler {
 				updateEconText(false);
 			}
 		}
-	
+
 		// Request object syncs periodically
 		if(isClient()) {
 			syncTimer -= time;
@@ -1377,7 +1400,7 @@ class PlanetWindow : ScriptedGuiHandler {
 	void refreshCurStructs() {
 		if(planet is null)
 			return;
-		
+
 		PlanetStructureList list;
 		list.prepare(planet);
 
@@ -1387,7 +1410,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		string@ offline = localize("#PL_OFFLINE");
 		string@ destroyed = localize("#PL_DESTROYED");
 		UniqueList@ ulist = UniqueList(strCnt);
-		
+
 		for(uint i = 0; i < strCnt; ++i) {
 			const subSystem@ sys = list.getStructure(i);
 			string@ sysName = sys.type.getName();
@@ -1456,8 +1479,8 @@ class PlanetWindow : ScriptedGuiHandler {
 		tradeAvg = -1.f;
 		fulAvg = -1.f;
 		amoAvg = -1.f;
-		
-		
+
+
 		advExpAvg = -1.f;
 		elcExpAvg = -1.f;
 		mtlExpAvg = -1.f;
@@ -1615,7 +1638,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		obj.getStateVals(strAdvpGen, advGen,  temp, temp, advTrans);
 		obj.getStateVals(strElecGen, elcGen,  temp, temp, elcTrans);
 		obj.getStateVals(strMetlGen, mtlGen,  temp, temp, mtlTrans);
-		
+
 		obj.getStateVals(strFoodGen, foodGen, temp, temp, fudTrans);
 		obj.getStateVals(strFuelGen, fulGen,  temp, temp, fulTrans);
 		obj.getStateVals(strAmmoGen, amoGen,  temp, temp, amoTrans);
@@ -1666,9 +1689,9 @@ class PlanetWindow : ScriptedGuiHandler {
 			if (obj.getStateVals( strElec, val, max, temp, cargo))		updateStorage(1, val+cargo, max);
 			if (obj.getStateVals( strMetl, val, max, temp, cargo))		updateStorage(2, val+cargo, max);
 			if (obj.getStateVals( strFood, val, max, temp, cargo))		updateStorage(3, val+cargo, max);
-			
+
 			if (obj.getStateVals( strFuel, val, max, temp, cargo))		updateStorage(6, val+cargo, max);
-			if (obj.getStateVals( strAmmo, val, max, temp, cargo))		updateStorage(7, val+cargo, max);		
+			if (obj.getStateVals( strAmmo, val, max, temp, cargo))		updateStorage(7, val+cargo, max);
 
 			updateRate(0, advAvg+advGen, 0,         -advExpAvg);
 			updateRate(1, elcAvg+elcGen, -elcCons,  -elcExpAvg);
@@ -1709,7 +1732,7 @@ class PlanetWindow : ScriptedGuiHandler {
 				text += ": ("+localize("#PH_Level")+" " + f_to_s(subsys.level,0) + ")#font#\n";
 				text += def.getDescription();
 				text += "#r#\n\n#tab:6##c:green#"+localize("#PH_HP")+": " + standardize(subsys.maxHP);
-				
+
 				uint hintCount = def.getHintCount();
 				for(uint i = 0; i < hintCount; ++i) {
 					float val = subsys.getHint(i);
@@ -1728,7 +1751,7 @@ class PlanetWindow : ScriptedGuiHandler {
 				else {
 					hovered_cost.setVisible(true);
 				}
-				
+
 				hovered_build_panel.setText(text);
 				hovered_cost.updateDefaults(subsys);
 			}
