@@ -1,8 +1,8 @@
 #include "~/Game Data/gui/include/gui_sprite.as"
 
-const string@ rg_strMetals = "Metals", rg_strElects = "Electronics", rg_strAdvParts = "AdvParts", rg_strOres = "Ore", rg_strScrap = "Scrap";
-const string@ rg_strFuel = "Fuel", rg_strFuel = "Fuel", rg_strAmmo = "Ammo", rg_strGuds = "Guds", rg_strLuxs = "Luxs";
-const string@ rg_strLabor = "Labr";
+const string@ rg_strMetl = "Metals", rg_strElec = "Electronics", rg_strAdvp = "AdvParts", rg_strOres = "Ore",  rg_strScrp = "Scrap";
+const string@ rg_strFood = "Food",   rg_strFuel = "Fuel",        rg_strAmmo = "Ammo",     rg_strGuds = "Guds", rg_strLuxs = "Luxs";
+const string@ rg_strLabr = "Labr";
 
 enum ResourceIdentifier {
 	SR_Advp,
@@ -87,9 +87,9 @@ class ResourceGrid {
 
 	ScriptedGuiHandler@ getIcon(ResourceIdentifier res) {
 		switch(res) {
-			case SR_Metl: return gui_sprite("planet_resource_list", 2);
-			case SR_Elec: return gui_sprite("planet_resource_list", 1);
 			case SR_Advp: return gui_sprite("planet_resource_list", 0);
+			case SR_Elec: return gui_sprite("planet_resource_list", 1);
+			case SR_Metl: return gui_sprite("planet_resource_list", 2);
 			case SR_Labr: return gui_sprite("planet_resource_list", 3);
 			case SR_Fuel: return gui_sprite("planet_resource_list", 5);
 			case SR_Ammo: return gui_sprite("planet_resource_list", 6);
@@ -99,9 +99,9 @@ class ResourceGrid {
 
 	string@ getToolTip(ResourceIdentifier res) {
 		switch(res) {
-			case SR_Metl: return localize("#metals");
-			case SR_Elec: return localize("#electronics");
 			case SR_Advp: return localize("#advancedparts");
+			case SR_Elec: return localize("#electronics");
+			case SR_Metl: return localize("#metals");
 			case SR_Labr: return localize("#labr");
 			case SR_Fuel: return localize("#fuel");
 			case SR_Ammo: return localize("#ammo");
@@ -129,19 +129,19 @@ class ResourceGrid {
 	}
 
 	void updateDefaults(const subSystem@ sys) {
-		update(SR_Advp, sys.getCost(rg_strAdvParts));
-		update(SR_Elec, sys.getCost(rg_strElects));
-		update(SR_Metl, sys.getCost(rg_strMetals));
-		update(SR_Labr, sys.getCost(rg_strLabor));
+		update(SR_Advp, sys.getCost(rg_strAdvp));
+		update(SR_Elec, sys.getCost(rg_strElec));
+		update(SR_Metl, sys.getCost(rg_strMetl));
+		update(SR_Labr, sys.getCost(rg_strLabr));
 		update(SR_Fuel, sys.getCost(rg_strFuel));
 		update(SR_Ammo, sys.getCost(rg_strAmmo));
 	}
 
 	void updateDefaults(const HullStats@ stats) {
-		update(SR_Advp, stats.getCost(rg_strAdvParts));
-		update(SR_Elec, stats.getCost(rg_strElects));
-		update(SR_Metl, stats.getCost(rg_strMetals));
-		update(SR_Labr, stats.getCost(rg_strLabor));
+		update(SR_Advp, stats.getCost(rg_strAdvp));
+		update(SR_Elec, stats.getCost(rg_strElec));
+		update(SR_Metl, stats.getCost(rg_strMetl));
+		update(SR_Labr, stats.getCost(rg_strLabr));
 		update(SR_Fuel, stats.getCost(rg_strFuel));
 		update(SR_Ammo, stats.getCost(rg_strAmmo));
 	}
