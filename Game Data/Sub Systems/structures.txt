@@ -50,10 +50,16 @@ System: MetalMine
 	Provides: NeedWorkers with
 		Workers[vWorkers]
 
+	Provides: StorageOres with
+		Amount[vMineRate*10]
+
 	Provides: StorageMetl with
 		Amount[vMtlStore]
 
-	Provides: MineMetals with
+	Provides: DeepOreMining with
+		Rate[vMineRate]
+
+	Provides: MetlSmelting with
 		Rate[vMineRate]
 
 	Hints: Mines[vMineRate], MtlStore[vMtlStore], Workers[vWorkers * -1]

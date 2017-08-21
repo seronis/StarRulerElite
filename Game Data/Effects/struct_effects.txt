@@ -134,6 +134,12 @@ Name:	StorageLuxsFilled
 
 
 
+Name:	DeepOreMining
+	Value: Rate
+
+	OnActive:	AddMax(Rate, "OresGen")
+	OnDeactive: SubMax(Rate, "OresGen")
+
 
 
 Name:	CapitalSupport
