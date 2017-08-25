@@ -1,6 +1,16 @@
-string@ strPower = "Power", strOre = "Ore", strParts = "Parts", strDamage = "Damage", strShields = "Shields";
-string@ strFuel = "Fuel", strFood = "Food", strMetals = "Metals", strElects = "Electronics", strAdvParts = "AdvParts";
-string@ strControl = "Control", strCrew = "Crew", strAmmo = "Ammo", strWorkers = "Workers";
+string@ strPower = "Power", strDamage = "Damage", strShields = "Shields";
+string@ strControl = "Control", strCrew = "Crew", strWorkers = "Workers";
+
+const string@ strAdvp = "AdvParts";
+const string@ strElec = "Electronics";
+const string@ strMetl = "Metals";
+const string@ strOres = "Ore";
+const string@ strScrp = "Scrap";
+const string@ strFood = "Food";
+const string@ strFuel = "Fuel";
+const string@ strAmmo = "Ammo";
+const string@ strGuds = "Guds";
+const string@ strLuxs = "Luxs";
 
 //Returns the chace of an event occuring within time t
 //p should be the chance of the event occuring given t=1
@@ -37,7 +47,7 @@ void PowerGen(Event@ evt, float Rate, float Cost) {
 
 void SolarPower(Event@ evt, float Rate, float SurfaceArea) {
 	Object@ obj = evt.obj;
-	
+
 	System@ system = obj.getCurrentSystem();
 	if(@system == null)
 		return;
@@ -132,13 +142,13 @@ void StandardTakeover(Planet@ plt, Empire@ owner, float makeStructures) {
 			@farm = port;
 	if (owner.hasTraitTag("no_bank"))
 		@port = farm;
-	
+
 	int makeStructs = min(makeStructures, plt.getMaxStructureCount() - plt.getStructureCount());
 	if(plt.getStructureCount(capital) == 0) {
 		plt.addStructure(capital);
 		makeStructs -= 1;
 	}
-	
+
 	makeStructs = clamp(makeStructs, 0, 13);
 	switch(makeStructs) {
 		case 13:
@@ -170,11 +180,10 @@ void StandardTakeover(Planet@ plt, Empire@ owner, float makeStructures) {
 		case 0:
 			break;
 	}
-	
+
 	//Set the population to the starting pop (correcting any errors in the existing population)
 	plt.modPopulation(populationFactor * makeStructures - plt.getPopulation());
 
-	
 	int governorType = floor(owner.getSetting("defaultGovernor"));
 	if(owner.getSetting("autoGovern") != 0.f) {
 		plt.setUseGovernor(true);
@@ -248,22 +257,22 @@ void CapturePlanet(Event@ evt) {
 
 			const State@ structs = obj.getState("MakeStructures");
 			float makeStructures = structs is null ? 1.f : floor(structs.max);
-			
+
 			StandardTakeover(plt, owner, makeStructures);
-			
+
 			//Send over resources in the colony ship
 			State@ From, To;
-			
+
 			@From = evt.obj.getState("Metals");
 			@To = targ.getState("Metals");
 			if(@From != null && @To != null)
 				To.add(From.getAvailable(), targ);
-			
+
 			@From = evt.obj.getState("Electronics");
 			@To = targ.getState("Electronics");
 			if(@From != null && @To != null)
 				To.add(From.getAvailable(), targ);
-			
+
 			@From = evt.obj.getState("AdvParts");
 			@To = targ.getState("AdvParts");
 			if(@From != null && @To != null)
@@ -274,7 +283,7 @@ void CapturePlanet(Event@ evt) {
 				progressAchievement(AID_PLANETS_MEDIUM, 1);
 				progressAchievement(AID_PLANETS_LARGE, 1);
 			}
-			
+
 			//state.val1 = colonizerReloadDelay;
 			evt.obj.destroy(true); //Uncomment for non-reusable colony ships
 		}
@@ -305,7 +314,7 @@ float hasCrew(const Object@ src, const Object@ trg, const Effector@ eff) {
 void MineOre(Event@ evt, float Rate, float PowCost) {
 	Object@ targ = evt.target, obj = evt.obj;
 	if(targ !is null && obj !is null) {
-		State@ oreTo = obj.getState(strOre), oreFrom = targ.getState(strOre);
+		State@ oreTo = obj.getState(strOres), oreFrom = targ.getState(strOres);
 		float duration = evt.time;
 
 		State@ powFrom = null;
@@ -318,7 +327,7 @@ void MineOre(Event@ evt, float Rate, float PowCost) {
 			float takeAmt = min(Rate * duration, min(oreTo.getTotalFreeSpace(obj), oreFrom.val));
 			oreTo.add(takeAmt,obj);
 			oreFrom.val -= takeAmt;
-			
+
 			if (PowCost > 0 && powFrom !is null)
 				powFrom.consume(duration * PowCost,obj);
 
@@ -351,21 +360,21 @@ void DrainResource(Event@ evt, float Rate) {
 			}
 
 			// Steal Adv
-			State@ advTo = obj.getState(strAdvParts), advFrom = targ.getState(strAdvParts);
+			State@ advTo = obj.getState(strAdvp), advFrom = targ.getState(strAdvp);
 			amt = min(takeAmt / 3, advFrom.val + advFrom.inCargo);
 			advFrom.consume(amt, targ);
 			advTo.add(amt, obj);
 			takeAmt -= amt;
 
 			// Steal Elc
-			State@ elcTo = obj.getState(strElects), elcFrom = targ.getState(strElects);
+			State@ elcTo = obj.getState(strElec), elcFrom = targ.getState(strElec);
 			amt = min(takeAmt / 2, elcFrom.val + elcFrom.inCargo);
 			elcFrom.consume(amt, targ);
 			elcTo.add(amt, obj);
 			takeAmt -= amt;
 
 			// Steal Mtl
-			State@ mtlTo = obj.getState(strMetals), mtlFrom = targ.getState(strMetals);
+			State@ mtlTo = obj.getState(strMetl), mtlFrom = targ.getState(strMetl);
 			amt = min(takeAmt, mtlFrom.val + mtlFrom.inCargo);
 			mtlFrom.consume(amt, targ);
 			mtlTo.add(amt, obj);
@@ -377,8 +386,8 @@ void MakeAdvParts(Event@ evt, float Rate, float MetalCostPer, float ElectCostPer
 	Object@ targ = evt.target;
 	if(@targ != null) {
 		Rate *= evt.time;
-		State@ APTo = targ.getState(strAdvParts);
-		State@ elFrom = targ.getState(strElects), metalFrom = targ.getState(strMetals);
+		State@ APTo = targ.getState(strAdvp);
+		State@ elFrom = targ.getState(strElec), metalFrom = targ.getState(strMetl);
 		float canMake = min(min(elFrom.getAvailable() / ElectCostPer, metalFrom.getAvailable() / MetalCostPer), Rate);
 		canMake = min(canMake, APTo.getTotalFreeSpace(targ));
 		if(canMake > 0) {
@@ -396,7 +405,7 @@ void RecycleMetals(Event@ evt, float PerPerson, float MaxRate) {
 		Planet@ pl = targ.toPlanet();
 		if(@pl != null)
 			people = pl.getPopulation();
-		State@ metals = obj.getState(strMetals);
+		State@ metals = obj.getState(strMetl);
 		float recyc = min(min(people * PerPerson * evt.time, MaxRate * evt.time), metals.getTotalFreeSpace(obj));
 		metals.add(recyc, obj);
 	}
@@ -406,26 +415,26 @@ void Trade(Event@ evt, float Rate) {
 	Rate *= evt.time;
 	if(Rate <= 0)
 		return;
-	
+
 	Object@ obj = evt.obj;
 	Empire@ owner = obj.getOwner();
-	
+
 	SysRef@ ref = evt.dest;
 	uint resIndex = uint(ref.val1 + 1) % 4;
 	ref.val1 = resIndex;
-	
+
 	const string@ resName = null;
 	switch(resIndex) {
 		case 0:
-			@resName = @strAdvParts; break;
+			@resName = @strAdvp; break;
 		case 1:
-			@resName = @strElects; break;
+			@resName = @strElec; break;
 		case 2:
-			@resName = @strMetals; break;
+			@resName = @strMetl; break;
 		case 3: default:
 			@resName = @strFood; break;
 	}
-	
+
 	State@ resource = obj.getState(resName);
 	if(resource.max > 0) {
 		float resLevel = resource.val / resource.max;
@@ -456,12 +465,12 @@ float CanMine(const Object@ src, const Object@ trg, const Effector@ eff) {
 
 void Salvage(Event@ evt, float rate, float factor) {
 	Object@ targ = @evt.target;
-	
+
 	State@ dmg = targ.getState(strDamage);
 	float hp = dmg.max - dmg.val;
 	if(hp > 0) {
 		Object@ src = @evt.obj;
-		State@ metals = src.getState(strMetals);
+		State@ metals = src.getState(strMetl);
 		float canCollect = min(metals.getTotalFreeSpace(src), min(rate * evt.time * factor, hp * factor));
 		if(canCollect > 0) {
 			targ.damage(src, canCollect / factor);
@@ -479,11 +488,11 @@ void Salvage(Event@ evt, float rate, float factor) {
 //Extra logic for the analyzer
 float UnknownHull(const Object@ from, const Object@ to, const Effector@ eff) {
 	const HulledObj@ ship = @to;
-	
+
 	const Empire@ us = from.getOwner();
 	if(us is null || us.isValid() == false)
 		return 0.f;
-	
+
 	if(us.hasForeignHull(ship.getHull()))
 		return 0.f;
 	else
@@ -501,16 +510,16 @@ void Analyze(Event@ evt, float scanQuality, float PowCost) {
 	else {
 		power.val -= tickCost;
 	}
-	
+
 	//Roll the dice to see if we succeed
 	//Large ships double their scanning speed on small ships, but small ships lose nearly all of their time
 	if(randomf(1.f) < chanceOverTime(scanQuality,evt.time * clamp(evt.obj.radius/evt.target.radius, 0.01f, 2.f)))
 		return;
-	
+
 	Empire@ us = evt.obj.getOwner();
 	if(us is null || us.isValid() == false)
 		return;
-	
+
 	HulledObj@ ship = @evt.target;
 	us.acquireForeignHull(ship.getHull());
 	evt.state = ESC_DISABLE;
@@ -557,21 +566,21 @@ void CreateRingworld(Event@ evt) {
 		orbDesc.IsStatic = true;
 		orbDesc.Offset = vector(0,0,0);
 		plDesc.setOrbit(orbDesc);
-		
+
 		Planet@ pl = sys.makePlanet(plDesc);
-		
+
 		pl.addCondition("ringworld_special");
-		
+
 		pl.setStructureSpace(100.f);
-		
+
 		Object@ planet = pl.toObject();
-		
+
 		State@ ore = planet.getState("Ore");
 		ore.max = 50000.f;
 		ore.val = ore.max;
-		
+
 		planet.getState("Damage").max = 100000000000.f;
-		
+
 		StandardTakeover(planet, evt.obj.getOwner(), 25.f);
 
 		if(canAchieve && evt.obj.getOwner() is getPlayerEmpire())
@@ -595,11 +604,11 @@ void BankExport(Event@ evt, float Amount) {
 	// Check which resource to trade
 	switch(resIndex) {
 		case 0:
-			@resName = @strAdvParts; break;
+			@resName = @strAdvp; break;
 		case 1:
-			@resName = @strElects; break;
+			@resName = @strElec; break;
 		case 2:
-			@resName = @strMetals; break;
+			@resName = @strMetl; break;
 	}
 
 	// Trade up to a certain % of the resource
@@ -662,11 +671,11 @@ void MatterGen(Event@ evt, float Rate, float PowCost) {
 
 void FabricateAdv(Event@ evt, float Rate, float MtlCostPer, float ElcCostPer) {
 	// Available materials
-	State@ mtl = evt.obj.getState(strMetals);
+	State@ mtl = evt.obj.getState(strMetl);
 	float hasMtl = mtl.getAvailable();
 	float cargoMtl = mtl.inCargo;
 
-	State@ elc = evt.obj.getState(strElects);
+	State@ elc = evt.obj.getState(strElec);
 	float hasElc = elc.getAvailable();
 	float cargoElc = elc.inCargo;
 
@@ -675,7 +684,7 @@ void FabricateAdv(Event@ evt, float Rate, float MtlCostPer, float ElcCostPer) {
 	produce = min(produce, hasMtl / MtlCostPer);
 	produce = min(produce, hasElc / ElcCostPer);
 
-	State@ adv = evt.obj.getState(strAdvParts);
+	State@ adv = evt.obj.getState(strAdvp);
 	float space = adv.getTotalFreeSpace(evt.obj);
 	space += min(produce * MtlCostPer, cargoMtl);
 	space += min(produce * ElcCostPer, cargoElc);
@@ -684,9 +693,9 @@ void FabricateAdv(Event@ evt, float Rate, float MtlCostPer, float ElcCostPer) {
 
 	// Make it
 	if (produce > 0) {
-		evt.obj.getState(strMetals).consume(produce * MtlCostPer, evt.obj);
-		evt.obj.getState(strElects).consume(produce * ElcCostPer, evt.obj);
-		evt.obj.getState(strAdvParts).add(produce, evt.obj);
+		evt.obj.getState(strMetl).consume(produce * MtlCostPer, evt.obj);
+		evt.obj.getState(strElec).consume(produce * ElcCostPer, evt.obj);
+		evt.obj.getState(strAdvp).add(produce, evt.obj);
 	}
 }
 
@@ -697,3 +706,88 @@ void AddWorkersRequired(Event@ evt, float amount) {
 void SubWorkersRequired(Event@ evt, float amount) {
 	evt.obj.getState(strWorkers).required -= amount;
 }
+
+void AddAdvpRequired(Event@ evt, float amount) {
+	evt.obj.getState(strAdvp).required += amount;
+}
+
+void SubAdvpRequired(Event@ evt, float amount) {
+	evt.obj.getState(strAdvp).required -= amount;
+}
+
+void AddElecRequired(Event@ evt, float amount) {
+	evt.obj.getState(strElec).required += amount;
+}
+
+void SubElecRequired(Event@ evt, float amount) {
+	evt.obj.getState(strElec).required -= amount;
+}
+
+void AddMetlRequired(Event@ evt, float amount) {
+	evt.obj.getState(strMetl).required += amount;
+}
+
+void SubMetlRequired(Event@ evt, float amount) {
+	evt.obj.getState(strMetl).required -= amount;
+}
+
+void AddOresRequired(Event@ evt, float amount) {
+	evt.obj.getState(strOres).required += amount;
+}
+
+void SubOresRequired(Event@ evt, float amount) {
+	evt.obj.getState(strOres).required -= amount;
+}
+
+void AddScrpRequired(Event@ evt, float amount) {
+	evt.obj.getState(strScrp).required += amount;
+}
+
+void SubScrpRequired(Event@ evt, float amount) {
+	evt.obj.getState(strScrp).required -= amount;
+}
+
+void AddFoodRequired(Event@ evt, float amount) {
+	evt.obj.getState(strFood).required += amount;
+}
+
+void SubFoodRequired(Event@ evt, float amount) {
+	evt.obj.getState(strFood).required -= amount;
+}
+
+void AddFuelRequired(Event@ evt, float amount) {
+	evt.obj.getState(strFuel).required += amount;
+}
+
+void SubFuelRequired(Event@ evt, float amount) {
+	evt.obj.getState(strFuel).required -= amount;
+}
+
+void AddAmmoRequired(Event@ evt, float amount) {
+	evt.obj.getState(strAmmo).required += amount;
+}
+
+void SubAmmoRequired(Event@ evt, float amount) {
+	evt.obj.getState(strAmmo).required -= amount;
+}
+
+void AddGudsRequired(Event@ evt, float amount) {
+	evt.obj.getState(strGuds).required += amount;
+}
+
+void SubGudsRequired(Event@ evt, float amount) {
+	evt.obj.getState(strGuds).required -= amount;
+}
+
+void AddLuxsRequired(Event@ evt, float amount) {
+	evt.obj.getState(strLuxs).required += amount;
+}
+
+void SubLuxsRequired(Event@ evt, float amount) {
+	evt.obj.getState(strLuxs).required -= amount;
+}
+
+
+
+
+
