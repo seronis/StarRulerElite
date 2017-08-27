@@ -1605,16 +1605,38 @@ your empire. Their names and descriptions are displayed here.
 #PLTT_Electronics: Electronics: Produced from Metals
 #PLTT_Metals: Metals: Primarily mined from Ore.
 
+
+#PH_AdvpStore: Advanced Parts Storage
+#PH_ElecStore: Electronics Storage
+#PH_MetlStore: Metal Storage
+#PH_OresStore: Mined Ore Storage
+#PH_ScrpStore: Scrap Metal Storage
+#PH_FoodStore: Food Storage
+#PH_FuelStore: Fuel Storage
+#PH_AmmoStore: Ammo Storage
+#PH_GudsStore: Goods Storage
+#PH_LuxsStore: Luxuries Storage
+
+#PH_AdvpGen: Adv.Parts produced per second
+#PH_ElecGen: Electronics produced per second
+#PH_MetlGen: Metal produced per second
+#PH_OresGen: Ore extracted per second
+#PH_ScrpGen: Scrap by-product per second
+#PH_FoodGen: Food produced per second
+#PH_FuelGen: Fuel produced per second
+#PH_AmmoGen: Ammo produced per second
+#PH_GudsGen: Goods produced per second
+#PH_LuxsGen: Luxuries produced per second
+
+#PH_MetlCost: Metal consumed per second
+#PH_FoodCost: Food consumed per second
+#PH_FuelCost: Fuel consumed per second
+
 #PH_AdvFab: Base Advanced Parts built per second
 #PH_AdvGen: Advanced Parts generated per second
-#PH_AdvStore: Advanced Parts Storage
 #PH_Cargo: Cargo Storage
 #PH_DPS: Damage per second
 #PH_ElecFab: Base Electronics built per second
-#PH_ElecGen: Electronics generated per second
-#PH_ElecStore: Electronics Storage
-#PH_FoodGen: Food grown per second
-#PH_FoodStore: Food Storage
 #PH_GoodsFab: Goods made per second
 #PH_Housing: Housing for workers
 #PH_Labor: Labor Generation per second
@@ -1623,7 +1645,6 @@ your empire. Their names and descriptions are displayed here.
 #PH_LuxFab: Luxuries made per second
 #PH_MtlGen: Metal generated per second
 #PH_Mines: Base Metal mined per second
-#PH_MtlStore: Metal Storage
 #PH_Range: Range
 #PH_Research: Research per second
 #PH_Shield: Shields hitpoints

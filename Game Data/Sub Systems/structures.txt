@@ -3,7 +3,7 @@ System: SciLab
 	Description: #SS_SCILAB_DESC
 
 	Available: true
-	Level: max(Techs.Science.Level,0.5)
+	Level: max(floor(Techs.Science.Level),0)
 	Size: Scale
 	Durability: 325 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
@@ -31,14 +31,14 @@ System: MetalMine
 	Name: #SS_METALMINE_NAME
 	Description: #SS_METALMINE_DESC
 
-	Available: Techs.Metallurgy.Level > 0
-	Level: Techs.Metallurgy.Level
+	Available: true
+	Level: max(floor(Techs.Metallurgy.Level),0)
 	Size: Scale
 	Durability: 455 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Metallurgy 1
+	Tied To: Metallurgy 0
 
 	Costs: Metals[420 * Size * pow(COST_INC_CRV, Level)], Electronics[50 * Size * pow(COST_INC_CRV, Level)], AdvParts[30 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 5
@@ -62,21 +62,21 @@ System: MetalMine
 	Provides: MetlSmelting with
 		Rate[vMineRate]
 
-	Hints: Mines[vMineRate], MtlStore[vMtlStore], Workers[vWorkers * -1]
+	Hints: OresGen[vMineRate], OresStore[vMineRate*10], MetlGen[vMineRate], MetlStore[vMtlStore], Workers[vWorkers * -1]
 
 
 System: ElectronicFact
 	Name: #SS_ELECTFACT_NAME
 	Description: #SS_ELECTFACT_DESC
 
-	Available: Techs.Metallurgy.Level
-	Level: Techs.Metallurgy.Level
+	Available: true
+	Level: max(floor(Techs.Metallurgy.Level),0)
 	Size: Scale
 	Durability: 420 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Metallurgy 1
+	Tied To: Metallurgy 0
 
 	Costs: Metals[340 * Size * pow(COST_INC_CRV, Level)], Electronics[100 * Size * pow(COST_INC_CRV, Level)], AdvParts[60 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 5
@@ -94,21 +94,21 @@ System: ElectronicFact
 	Provides: BuildElectronics with
 		Rate[vElecFab]
 
-	Hints: ElecFab[vElecFab], ElecStore[vElecStore], Workers[vWorkers * -1]
+	Hints: ElecGen[vElecFab], ElecStore[vElecStore], Workers[vWorkers * -1]
 
 
 System: AdvPartFact
 	Name: #SS_ADVFACT_NAME
 	Description: #SS_ADVFACT_DESC
 
-	Available: Techs.Metallurgy.Level > 0
-	Level: Techs.Metallurgy.Level
+	Available: true
+	Level: max(floor(Techs.Metallurgy.Level),0)
 	Size: Scale
 	Durability: 365 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Metallurgy 1
+	Tied To: Metallurgy 0
 
 	Costs: Metals[260 * Size * pow(COST_INC_CRV, Level)], Electronics[150 * Size * pow(COST_INC_CRV, Level)], AdvParts[90 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 5
@@ -126,21 +126,21 @@ System: AdvPartFact
 	Provides: BuildAdvParts with
 		Rate[vAdvFab]
 
-	Hints: AdvFab[vAdvFab], AdvStore[vAdvStore], Workers[vWorkers * -1]
+	Hints: AdvpGen[vAdvFab], AdvpStore[vAdvStore], Workers[vWorkers * -1]
 
 
 System: GoodsFactory
 	Name: #SS_GOODSFACT_NAME
 	Description: #SS_GOODSFACT_DESC
 
-	Available: (Techs.Economics.Level > 0) && not(Traits.forever_indifferent)
-	Level: floor(Techs.Economics.Level)
+	Available: (floor(Techs.Economics.Level) > 1) || not(Traits.forever_indifferent)
+	Level:  max(floor(Techs.Economics.Level) , 0)
 	Size: Scale
 	Durability: 395 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Economics 1
+	Tied To: Economics 0
 
 	Costs: Metals[290 * Size * pow(COST_INC_CRV, Level)], Electronics[150 * Size * pow(COST_INC_CRV, Level)], AdvParts[60 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 5
@@ -157,21 +157,21 @@ System: GoodsFactory
 	Provides: MakeGoods with
 		Rate[vGoodsFab]
 
-	Hints: GoodsFab[vGoodsFab], Workers[vWorkers * -1]
+	Hints: GudsGen[vGoodsFab], GudsStore[vGoodsFab*10], Workers[vWorkers * -1]
 
 
 System: LuxsFactory
 	Name: #SS_LUXSFACT_NAME
 	Description: #SS_LUXSFACT_DESC
 
-	Available: (Techs.Economics.Level > 0) && not(Traits.forever_indifferent)
-	Level: floor(Techs.Economics.Level)
+	Available: (floor(Techs.Economics.Level) > 1) || not(Traits.forever_indifferent)
+	Level:  max(floor(Techs.Economics.Level) , 0)
 	Size: Scale
 	Durability: 380 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Economics 1
+	Tied To: Economics 0
 
 	Costs: Metals[280 * Size * pow(COST_INC_CRV, Level)], Electronics[160 * Size * pow(COST_INC_CRV, Level)], AdvParts[60 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 5
@@ -188,7 +188,7 @@ System: LuxsFactory
 	Provides: MakeLuxuries with
 		Rate[vLuxFab]
 
-	Hints: LuxFab[vLuxFab], Workers[vWorkers * -1]
+	Hints: LuxsGen[vLuxFab], LuxsStore[vLuxFab*10], Workers[vWorkers * -1]
 
 
 System: City
@@ -196,7 +196,7 @@ System: City
 	Description: #SS_CITY_DESC
 
 	Available: true
-	Level: max(Techs.Sociology.Level,1)
+	Level: max(floor(Techs.Sociology.Level),0)
 	Size: Scale
 	Durability: 380 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
@@ -218,7 +218,7 @@ System: City
 		Amount[vHousing]
 
 	Provides: StorageFood with
-		Amount[vFoodReq * 30]
+		Amount[vFoodReq*30]
 
 	Provides: StorageGuds with
 		Amount[vGudStore]
@@ -230,21 +230,21 @@ System: City
 
 	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 1.25 * Size]
 
-	Hints: Housing[vHousing], LaborPool[vLaborPool]
+	Hints: Housing[vHousing], LaborPool[vLaborPool], FoodStore[vFoodReq*30]
 
 
 System: Bunker
 	Name: #SS_BUNKER_NAME
 	Description: #SS_BUNKER_DESC
 
-	Available: (Techs.Armor.Level > 6)
-	Level: ceil(weight(Techs.Armor.Level - 6, 0.5))
+	Available: (floor(Techs.Armor.Level) > 1) && (floor(Techs.Sociology.Level) > 1)
+	Level:  max(floor(Techs.Armor.Level),floor(Techs.Sociology.Level))
 	Size: Scale
 	Durability: 3*970 * Size * pow(LEVEL_GAIN_CURVE, Level) * GAME_ARMOR_MULT
 	Mass: 1000 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Armor 7
+	Tied To: Armor 2, Sociology 2
 
 	Costs: Metals[945 * Size * pow(COST_INC_CRV, Level)], Electronics[40 * Size * pow(COST_INC_CRV, Level)], AdvParts[15 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 10 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 2
@@ -260,13 +260,13 @@ System: Bunker
 	Provides: Housing with
 		Amount[vHousing]
 
-	Provides: StorageFood with Amount[vFoodReq * 600]
+	Provides: StorageFood with Amount[vFoodReq*600]
 
 	Provides: LaborPool with Amount[vLaborPool]
 
 	Provides: DamageResistance with Amount[pow(LEVEL_GAIN_CURVE, Level) * 2.5 * Size]
 
-	Hints: Housing[vHousing], LaborPool[vLaborPool], Soak[vSoakDamage]
+	Hints: Housing[vHousing], LaborPool[vLaborPool], Soak[vSoakDamage], FoodStore[vFoodReq*600]
 
 
 System: Capital
@@ -274,12 +274,13 @@ System: Capital
 	Description: #SS_CAPITAL_DESC
 
 	Available: true
-	Level: max(1, Techs.Sociology.Level)
+	Level: max(floor(Techs.Sociology.Level),0)
 	Size: Scale
 	Durability: 2 * 870 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 1000 * Size * pow(COST_INC_CRV, Level)
 
-	Tags: Structure, Unique
+	Tags: Structure, Unique, Capital, Unique:Capital
+	Tied To: Sociology 0
 
 	Costs: Metals[770 * Size * pow(COST_INC_CRV, Level)], Electronics[140 * Size * pow(COST_INC_CRV, Level)], AdvParts[90 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 10 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
@@ -320,7 +321,7 @@ System: Capital
 
 	Provides: CapitalSupport with Metals[vCapSupport * 0.5], Electronics[vCapSupport * 0.3], AdvParts[vCapSupport * 0.2], Food[vFoodReq]
 
-	Hints: Housing[vHousing], TradeRate[vTrade], MtlGen[vCapSupport * 0.5], ElecGen[vCapSupport * 0.3], AdvGen[vCapSupport * 0.2], FoodGen[vFoodReq]
+	Hints: Housing[vHousing], TradeRate[vTrade], MetlGen[vCapSupport * 0.5], ElecGen[vCapSupport * 0.3], AdvpGen[vCapSupport * 0.2], FoodGen[vFoodReq]
 
 
 System: GalacticCapital
@@ -328,12 +329,13 @@ System: GalacticCapital
 	Description: #SS_GLXCAPITAL_DESC
 
 	Available: true
-	Level: max(1, Techs.Sociology.Level)
+	Level: max(floor(Techs.Sociology.Level),0)
 	Size: Scale
 	Durability: 2 * 870 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 1000 * Size * pow(COST_INC_CRV, Level)
 
-	Tags: Structure, Unique
+	Tags: Structure, Unique, Capital, Unique:Capital
+	Tied To: Sociology 0
 
 	Costs: Metals[770 * Size * pow(COST_INC_CRV, Level)], Electronics[140 * Size * pow(COST_INC_CRV, Level)], AdvParts[90 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 10 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
@@ -374,15 +376,15 @@ System: GalacticCapital
 
 	Provides: CapitalSupport with Metals[vCapSupport * 0.5], Electronics[vCapSupport * 0.3], AdvParts[vCapSupport * 0.2], Food[vFoodReq]
 
-	Hints: Housing[vHousing], TradeRate[vTrade], MtlGen[vCapSupport * 0.5], ElecGen[vCapSupport * 0.3], AdvGen[vCapSupport * 0.2], FoodGen[vFoodReq]
+	Hints: Housing[vHousing], TradeRate[vTrade], MetlGen[vCapSupport * 0.5], ElecGen[vCapSupport * 0.3], AdvpGen[vCapSupport * 0.2], FoodGen[vFoodReq]
 
 
 System: Farm
 	Name: #SS_FARM_NAME
 	Description: #SS_FARM_DESC
 
-	Available: not(Traits.no_food) // Techs.Biology.Level > 0
-	Level: max(Techs.Biology.Level, 0.75) //Start with a modicum of understanding of agriculture (Level 1 of biology will be a significant improvement)
+	Available: (floor(Techs.Biology.Level) > 1) || not(Traits.no_food)
+	Level:  max(floor(Techs.Biology.Level) , 0)
 	Size: Scale
 	Durability: 430 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
@@ -413,8 +415,8 @@ System: PlanetCannon
 	Name: #SS_PLANETCANNON_NAME
 	Description: #SS_PLANETCANNON_DESC
 
-	Available: Techs.ProjWeapons.Level > 0
-	Level: Techs.ProjWeapons.Level
+	Available: floor(Techs.ProjWeapons.Level) > 0
+	Level: max(floor(Techs.ProjWeapons.Level) , 0)
 	Size: Scale
 	Durability: 1240 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 1500 * Size * pow(COST_INC_CRV, Level)
@@ -446,8 +448,8 @@ System: PlanetLaser
 	Name: #SS_PLANETLASER_NAME
 	Description: #SS_PLANETLASER_DESC
 
-	Available: Techs.BeamWeapons.Level > 0
-	Level: Techs.BeamWeapons.Level
+	Available: floor(Techs.BeamWeapons.Level) > 0
+	Level: max(floor(Techs.BeamWeapons.Level) , 0)
 	Size: Scale
 	Durability: 1240 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 1500 * Size * pow(COST_INC_CRV, Level)
@@ -480,8 +482,8 @@ System: PlanetShields
 	Name: #SS_PLANETSHIELDS_NAME
 	Description: #SS_PLANETSHIELDS_DESC
 
-	Available: Techs.Shields.Level > 6
-	Level: ceil(6 + weight(Techs.Shields.Level - 6, 0.5))
+	Available: floor(Techs.Shields.Level) > 0
+	Level: max(floor(Techs.Shields.Level) , 0)
 	Size: Scale
 	Durability: 1240 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 1500 * Size * pow(COST_INC_CRV, Level)
@@ -510,25 +512,22 @@ System: SpacePort
 	Name: #SS_SPACEPORT_NAME
 	Description: #SS_SPACEPORT_DESC
 
-	Available: Techs.Economics.Level && not(Traits.no_bank)
-	Level: Techs.Economics.Level
-	econLevel: Techs.Economics.Level As Level
-	cargoLevel: Techs.Cargo.Level
-
+	Available: floor(Techs.Economics.Level) > 0
+	Level: max(floor(Techs.Economics.Level) , 0)
 	Size: Scale
-	Durability: 370 * Size * pow(LEVEL_GAIN_CURVE, econLevel)
-	Mass: 500 * Size * pow(COST_INC_CRV, econLevel)
+	Durability: 370 * Size * pow(LEVEL_GAIN_CURVE, Level)
+	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure, ShipBay
-	Tied To: Economics 1, Cargo 0
+	Tied To: Economics 1
 
-	Costs: Metals[270 * Size * pow(COST_INC_CRV, econLevel)], Electronics[140 * Size * pow(COST_INC_CRV, econLevel)], AdvParts[90 * Size * pow(COST_INC_CRV, econLevel)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
+	Costs: Metals[270 * Size * pow(COST_INC_CRV, Level)], Electronics[140 * Size * pow(COST_INC_CRV, Level)], AdvParts[90 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
 
-	vEcoStore: Size * 5 * pow(LEVEL_GAIN_CURVE, cargoLevel)
-	vTrade: Size * 10 * pow(LEVEL_GAIN_CURVE, econLevel) * TRADE_RATE_MULT
+	vEcoStore: Size * 5 * pow(LEVEL_GAIN_CURVE, Level)
+	vTrade: Size * 10 * pow(LEVEL_GAIN_CURVE, Level) * TRADE_RATE_MULT
 	vWorkers: Size * 600000
-	vShipBay: Size * 40 * pow(LEVEL_GAIN_CURVE, cargoLevel)
+	vShipBay: Size * 40 * pow(LEVEL_GAIN_CURVE, Level)
 
 	Provides: Trade with
 		Rate[vTrade]
@@ -537,11 +536,11 @@ System: SpacePort
 		Amount[vShipBay]
 
 	Provides: MakeBioFuel with
-		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, econLevel)],
-		FoodCostPer[0.2*decay(econLevel,5)]
+		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
+		FoodCostPer[0.5]
 
 	Provides: StorageFuel with
-		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, cargoLevel)]
+		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, Level)]
 
 	Provides: StorageMetl with
 		Amount[vEcoStore * 0.5]
@@ -562,14 +561,14 @@ System: ShipYard
 	Name: #SS_SHIPYARD_NAME
 	Description: #SS_SHIPYARD_DESC
 
-	Available: Techs.ShipConstruction.Level
-	Level: floor(Techs.ShipConstruction.Level)
+	Available: true
+	Level: max(floor(Techs.ShipConstruction.Level),0)
 	Size: Scale
 	Durability: 370 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure, ShipBay, BuildsShips
-	Tied To: ShipConstruction 1
+	Tied To: ShipConstruction 0
 
 	Costs: Metals[270 * Size * pow(COST_INC_CRV, Level)], Electronics[140 * Size * pow(COST_INC_CRV, Level)], AdvParts[90 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
@@ -620,19 +619,19 @@ System: ShipPartsYard
 	Name: #SS_SHIPPARTSYARD_NAME
 	Description: #SS_SHIPPARTSYARD_DESC
 
-	Available: Techs.ShipConstruction.Level
-	Level: floor(Techs.ShipConstruction.Level)
+	Available: (floor(Techs.ShipConstruction.Level)>1) && (floor(Techs.Cargo.Level)>1)
+	Level: floor(weight(Techs.ShipConstruction.Level, 0.5, Techs.Cargo.Level, 0.5))
 	Size: Scale
 	Durability: 360 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure, ShipBay, BuildsShips
-	Tied To: ShipConstruction 2
+	Tied To: ShipConstruction 2, Cargo 2
 
 	Costs: Metals[260 * Size * pow(COST_INC_CRV, Level)], Electronics[120 * Size * pow(COST_INC_CRV, Level)], AdvParts[120 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
 
-	vEcoStore: Size * 250 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level), 45))
+	vEcoStore: Size * 500 * (2 - decay(Level,5))
 	vWorkers: Size * 1200000
 	vLaborPool: Size * 18 * pow(1+((LEVEL_GAIN_CURVE-1)*1.25), Level)
 	vLabor: Size * 2 * pow(1+((LEVEL_GAIN_CURVE-1)/2), Level)
@@ -641,111 +640,101 @@ System: ShipPartsYard
 		Rate[vLabor], Store[vLaborPool]
 
 	Provides: StorageAdvp with
-		Amount[vEcoStore * 0.2]
+		Amount[vEcoStore * 0.25]
 
 	Provides: StorageElec with
-		Amount[vEcoStore * 0.3]
+		Amount[vEcoStore * 0.30]
 
 	Provides: StorageMetl with
-		Amount[vEcoStore * 0.5]
-
-	Provides: MakeBioFuel with
-		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
-		FoodCostPer[0.2*decay(Level,5)]
-
-	Provides: StorageFuel with
-		Amount[Size*100 * pow(LEVEL_GAIN_CURVE, Level)]
-
-	Provides: MakeAmmo with
-		Rate[Size * 0.2 * pow(LEVEL_GAIN_CURVE, Level)],
-		MetalCostPer[0.2*decay(Level,5)]
-
-	Provides: StorageAmmo with
-		Amount[Size * 100 * pow(LEVEL_GAIN_CURVE, Level)]
+		Amount[vEcoStore * 0.45]
 
 	Requires:
 		To Run:
 			Workers[vWorkers]
 
-	Hints: Workers[vWorkers * -1], ShipBay[vShipBay], LaborPool[vLaborPool], LaborGen[vLabor]
+	Hints: Workers[vWorkers * -1], LaborPool[vLaborPool], LaborGen[vLabor]
 
 
 System: FuelDepot
 	Name: #SS_FUELDEPOT_NAME
 	Description: #SS_FUELDEPOT_DESC
 
-	Available: Techs.Chemistry.Level > 0
-	Level: Techs.Chemistry.Level
+	Available: true
+	Level: max(floor(Techs.Chemistry.Level),floor(Techs.Propulsion.Level))
 	Size: Scale
 	Durability: 430 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Chemistry 1
+	Tied To: Chemistry 0, Propulsion 0
 
 	Costs: Metals[380 * Size * pow(COST_INC_CRV, Level)], Electronics[60 * Size * pow(COST_INC_CRV, Level)], AdvParts[60 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
 
 	vWorkers: Size * 600000
+	vFuelStore: Size * 750 * pow(LEVEL_GAIN_CURVE, Level)
+	vFuelGen: Size * 20 * pow(LEVEL_GAIN_CURVE, Level)
 
 	Provides: MakeBioFuel with
-		Rate[Size * 20 * pow(LEVEL_GAIN_CURVE, Level)],
-		FoodCostPer[0.2*decay(Level,5)]
+		Rate[vFuelGen],
+		FoodCostPer[0.5]
 
 	Provides: StorageFuel with
-		Amount[Size * 750 * pow(LEVEL_GAIN_CURVE, Level)]
+		Amount[vFuelStore]
 
 	Requires:
 		To Run:
 			Workers[vWorkers]
 
-	Hints: Workers[vWorkers * -1]
+	Hints: FuelGen[vFuelGen], FuelStore[vFuelStore], FoodCost[vFuelGen * -0.5], Workers[vWorkers * -1]
 
 
 System: AmmoDepot
 	Name: #SS_AMMODEPOT_NAME
 	Description: #SS_AMMODEPOT_DESC
 
-	Available: Techs.Cargo.Level > 0
-	Level: ceil(Techs.Cargo.Level * 0.5)
+	Available: true
+	Level: max(floor(Techs.Missiles.Level),floor(Techs.ProjWeapon.Level))
 	Size: Scale
 	Durability: 430 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Cargo 1
+	Tied To: Missiles 0, ProjWeapon 0
 
 	Costs: Metals[380 * Size * pow(COST_INC_CRV, Level)], Electronics[60 * Size * pow(COST_INC_CRV, Level)], AdvParts[60 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 5 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
 
 	vWorkers: Size * 600000
+	vAmmoStore: Size * 750 * pow(LEVEL_GAIN_CURVE, Level)
+	vAmmoGen: Size * 20 * pow(LEVEL_GAIN_CURVE, Level)
 
 	Provides: MakeAmmo with
-		Rate[Size * 20 * pow(LEVEL_GAIN_CURVE, Level)],
-		MetalCostPer[0.2*decay(Level,5)]
+		Rate[vAmmoGen],
+		MetalCostPer[0.5]
 
 	Provides: StorageAmmo with
-		Amount[Size * 750 * pow(LEVEL_GAIN_CURVE, Level)]
+		Amount[vAmmoStore]
 
 	Requires:
 		To Run:
 			Workers[vWorkers]
 
-	Hints: Workers[vWorkers * -1]
+	Hints: AmmoGen[vAmmoGen], AmmoStore[vAmmoStore], MetlCost[vAmmoGen / -2], FuelCost[vAmmoGen / -2], Workers[vWorkers * -1]
 
 
 System: CargoBlock
 	Name: #SS_CARGOBLOCK_NAME
 	Description: #SS_CARGOBLOCK_DESC
 
-	Available: Techs.Cargo.Level > 0
-	Level: Techs.Cargo.Level
+	Available: true
+	Level: max(floor(Techs.Cargo.Level),0)
 	Size: Scale
 	Durability: 205 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 250 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Cargo 1
+	Tied To: Cargo 0
 
 	Costs: Metals[190 * Size * pow(COST_INC_CRV, Level)], Electronics[30 * Size * pow(COST_INC_CRV, Level)], AdvParts[30 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * Size * 2.5 * pow(COST_INC_CRV, Level)]
 	Complexity: 1
@@ -769,26 +758,26 @@ System: CargoBlock
 		To Run:
 			Workers[vWorkers]
 
-	Hints: Workers[vWorkers * -1], Cargo[vCargoStore/4], AdvStore[vCargoStore/4], ElecStore[vCargoStore/4], MtlStore[vCargoStore/4]
+	Hints: Workers[vWorkers * -1], Cargo[vCargoStore/4], AdvpStore[vCargoStore/4], ElecStore[vCargoStore/4], MetlStore[vCargoStore/4]
 
 
 System: PlanetEngine
 	Name: #SS_PLANETTHRUSTER_NAME
 	Description: #SS_PLANETTHRUSTER_DESC
 
-	Available: (Techs.Engines.Level > 15) && (Techs.Gravitics.Level > 5) && (Techs.MegaConstruction.Level > 5)
-	Level: floor(weight(Techs.Engines.Level - 15, 1, Techs.Gravitics.Level - 5, 0.2, Techs.MegaConstruction.Level - 5, 0.2))
+	Available: (floor(Techs.Gravitics.Level) > 15) && (floor(Techs.WarpPhysics.Level) > 11) && (floor(Techs.MegaConstruction.Level) > 0)
+	Level: min(floor(Techs.MegaConstruction),floor(weight(Techs.Gravitics.Level,0.5,Techs.WarpPhysics.Level,0.5)))
 	Size: Scale
 	Durability: 1775 * Size * pow(LEVEL_GAIN_CURVE, Level)
 	Mass: 2500 * Size * pow(COST_INC_CRV, Level)
 
 	Tags: Structure
-	Tied To: Engines 16, Gravitics 6, MegaConstruction 6
+	Tied To: Gravitics 16, WarpPhysics 12, MegaConstruction 1
 
 	Costs: Metals[1225 * Size * pow(COST_INC_CRV, Level)], Electronics[750 * Size * pow(COST_INC_CRV, Level)], AdvParts[525 * Size * pow(COST_INC_CRV, Level)], Labr[BLDG_LABR_MULT * 50 * Size * pow(COST_INC_CRV, Level)]
 	Complexity: 1
 
-	vThrust: Size * 0.004 * 1000000000000000 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
+	vThrust: Size * 4 * 1000000000000 * (2 - decay(pow(LEVEL_GAIN_CURVE,Level),35)) * GAME_THRUST_MULT
 	vWorkers: Size * 1200000
 
 	Provides: Propulsion with
