@@ -786,8 +786,3 @@ void AddLuxsRequired(Event@ evt, float amount) {
 void SubLuxsRequired(Event@ evt, float amount) {
 	evt.obj.getState(strLuxs).required -= amount;
 }
-
-
-
-
-
