@@ -133,12 +133,78 @@ Name:	StorageLuxsFilled
 	OnDestruct:  SubMax(Amount, "Luxs")
 
 
-
 Name:	DeepOreMining
 	Value: Rate
 
-	OnActive:	AddMax(Rate, "OresGen")
+	OnActive:   AddMax(Rate, "OresGen")
 	OnDeactive: SubMax(Rate, "OresGen")
+
+Name:	MetlSmelting
+	Value: Rate
+
+	OnActive:   AddMax(Rate, "MetlGen")
+	OnDeactive: SubMax(Rate, "MetlGen")
+
+
+Name:	AdvpRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddAdvpRequired(amount)
+	OnDeactive: BasicEffects::SubAdvpRequired(amount)
+
+Name:	ElecRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddElecRequired(amount)
+	OnDeactive: BasicEffects::SubElecRequired(amount)
+
+Name:	MetlRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddMetlRequired(amount)
+	OnDeactive: BasicEffects::SubMetlRequired(amount)
+
+Name:	OresRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddOresRequired(amount)
+	OnDeactive: BasicEffects::SubOresRequired(amount)
+
+Name:	ScrpRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddScrpRequired(amount)
+	OnDeactive: BasicEffects::SubScrpRequired(amount)
+
+Name:	FoodRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddFoodRequired(amount)
+	OnDeactive: BasicEffects::SubFoodRequired(amount)
+
+Name:	FuelRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddFuelRequired(amount)
+	OnDeactive: BasicEffects::SubFuelRequired(amount)
+
+Name:	AmmoRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddAmmoRequired(amount)
+	OnDeactive: BasicEffects::SubAmmoRequired(amount)
+
+Name:	GudsRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddGudsRequired(amount)
+	OnDeactive: BasicEffects::SubGudsRequired(amount)
+
+Name:	LuxsRequired
+	Value:  amount
+
+	OnActive:   BasicEffects::AddLuxsRequired(amount)
+	OnDeactive: BasicEffects::SubLuxsRequired(amount)
 
 
 
@@ -149,12 +215,6 @@ Name:	CapitalSupport
 	Value: Food
 
 	Tick:	StructureEffects::PlanetCapitalTick
-
-Name:	MineMetals
-	Value: Rate
-
-	OnActive:	AddMaxTracked(Rate, "MineM", 0, "MetalsProd")
-	OnDeactive: SubMaxTracked(Rate, "MineM", "MetalsProd")
 
 Name:	MakeMetals
 	Value: Rate
