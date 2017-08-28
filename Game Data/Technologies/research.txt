@@ -5,17 +5,19 @@ Technology: Science
 	Description: #RS_SCIENCE_DESC
 	Icon: res_tech_2
 	Position: 0,0
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: 20000 * pow(RES_COST_CURVE, NextLevel) * RES_COST_MULT
-	
-	Link: EnergyPhysics[1 * LINK_COST * RES_COST_MULT]
-	Link: ParticlePhysics[1 * LINK_COST * RES_COST_MULT]
-	Link: Chemistry[1 * LINK_COST * RES_COST_MULT]
-	Link: Biology[1 * LINK_COST * RES_COST_MULT]
-	Link: Materials[1 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:    EnergyPhysics [1 * LINK_COST * RES_COST_MULT]
+	Link:  ParticlePhysics [1 * LINK_COST * RES_COST_MULT]
+	Link:        Chemistry [1 * LINK_COST * RES_COST_MULT]
+	Link:          Biology [1 * LINK_COST * RES_COST_MULT]
+	Link:        Materials [1 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [1 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [1 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
 
@@ -25,436 +27,466 @@ Technology: EnergyPhysics
 	Description: #RS_ENERGYPHYSICS_DESC
 	Icon: res_tech_6
 	Position: 0,1
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Chemistry[2 * LINK_COST * RES_COST_MULT]
-	Link: Sensors[2 * LINK_COST * RES_COST_MULT]
-	Link: Shields[2 * LINK_COST * RES_COST_MULT]
-	Link: BeamWeapons[2 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:      BeamWeapons [2 * LINK_COST * RES_COST_MULT]
+	Link:        Chemistry [2 * LINK_COST * RES_COST_MULT]
+	Link:          Sensors [2 * LINK_COST * RES_COST_MULT]
+	Link:          Shields [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
-	
+
 
 Technology: ParticlePhysics
 	Name: #RS_PARTICLEPHYSICS_NAME
 	Description: #RS_PARTICLEPHYSICS_DESC
 	Icon: res_tech_7
 	Position: 1,-1
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Materials[2 * LINK_COST * RES_COST_MULT]
-	Link: ProjWeapons[2 * LINK_COST * RES_COST_MULT]
-	Link: Missiles[2 * LINK_COST * RES_COST_MULT]
-	Link: Engines[2 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:        Materials [2 * LINK_COST * RES_COST_MULT]
+	Link:      ProjWeapons [2 * LINK_COST * RES_COST_MULT]
+	Link:         Missiles [2 * LINK_COST * RES_COST_MULT]
+	Link:          Engines [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Materials
 	Name: #RS_MATERIALS_NAME
 	Description: #RS_MATERIALS_DESC
 	Icon: res_tech_3
 	Position: 0,-1
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Engines[2 * LINK_COST * RES_COST_MULT]
-	Link: ShipSystems[2 * LINK_COST * RES_COST_MULT]
-	Link: Computers[2 * LINK_COST * RES_COST_MULT]
-	Link: Biology[2 * LINK_COST * RES_COST_MULT]
-	Link: ParticlePhysics[2 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:          Engines [2 * LINK_COST * RES_COST_MULT]
+	Link:      ShipSystems [2 * LINK_COST * RES_COST_MULT]
+	Link:        Computers [2 * LINK_COST * RES_COST_MULT]
+	Link:          Biology [2 * LINK_COST * RES_COST_MULT]
+	Link:  ParticlePhysics [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Gravitics
 	Name: #RS_GRAVITICS_NAME
 	Description: #RS_GRAVITICS_DESC
 	Icon: res_tech_3
 	Position: 1,-3
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (10000 * pow(RES_COST_CURVE, NextLevel)) * RES_COST_MULT
-	
-	Link: WarpPhysics[8 * LINK_COST * RES_COST_MULT]
-	Link: ShipConstruction[8 * LINK_COST * RES_COST_MULT]
-	Link: Engines[8 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:      WarpPhysics [8 * LINK_COST * RES_COST_MULT]
+	Link: ShipConstruction [8 * LINK_COST * RES_COST_MULT]
+	Link:          Engines [8 * LINK_COST * RES_COST_MULT
+	Link:          DeadEnd [8 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: WarpPhysics
 	Name: #RS_WARPPHYSICS_NAME
 	Description: #RS_WARPPHYSICS_DESC
 	Icon: res_tech_22
 	Position: 1,-4
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (25000 + (20000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Cosmology[8 * LINK_COST * RES_COST_MULT]
-	Link: MegaConstruction[8 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[8 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:        Gravitics [8 * LINK_COST * RES_COST_MULT]
+	Link: MegaConstruction [8 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [8 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 6%
 	OnLevel: 6-15 link_pay_rand 2%
+
 
 Technology: Metallurgy
 	Name: #RS_METALLURGY_NAME
 	Description: #RS_METALLURGY_DESC
 	Icon: res_tech_8
 	Position: -2,1
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (2500 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Chemistry[4 * LINK_COST * RES_COST_MULT]
-	Link: Nanotech[4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:        Chemistry [4 * LINK_COST * RES_COST_MULT]
+	Link:         Nanotech [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Chemistry
 	Name: #RS_CHEMISTRY_NAME
 	Description: #RS_CHEMISTRY_DESC
 	Icon: res_tech_1
 	Position: -1,0
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: 15000 * pow(RES_COST_CURVE, NextLevel) * RES_COST_MULT
-	
-	Link: EnergyPhysics[2 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[2 * LINK_COST * RES_COST_MULT]
-	Link: Metallurgy[2 * LINK_COST * RES_COST_MULT]
-	Link: Biology[2 * LINK_COST * RES_COST_MULT]
-	Link: Nanotech[2 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:    EnergyPhysics [2 * LINK_COST * RES_COST_MULT]
+	Link:       Metallurgy [2 * LINK_COST * RES_COST_MULT]
+	Link:         Nanotech [2 * LINK_COST * RES_COST_MULT]
+	Link:          Biology [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-6 link_pay_rand 33.4%
 	OnLevel: 7-15 link_pay_rand 20%
+
 
 Technology: Economics
 	Name: #RS_ECONOMICS_NAME
 	Description: #RS_ECONOMICS_DESC
 	Icon: res_tech_2
 	Position: 2,1
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Cargo[4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:            Cargo [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Sociology
 	Name: #RS_SOCIOLOGY_NAME
 	Description: #RS_SOCIOLOGY_DESC
 	Icon: res_tech_23
 	Position: -2,-1
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Command[4 * LINK_COST * RES_COST_MULT]
-	Link: Cybernetics[4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[4 * LINK_COST * RES_COST_MULT]
-	Link: Nanotech[4 * LINK_COST * RES_COST_MULT]
-	Link: Computers[5 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:        Computers [4 * LINK_COST * RES_COST_MULT]
+	Link:         Nanotech [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Biology
 	Name: #RS_BIOLOGY_NAME
 	Description: #RS_BIOLOGY_DESC
 	Icon: res_tech_17
 	Position: -1,-1
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (15000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Sociology[2 * LINK_COST * RES_COST_MULT]
-	Link: Chemistry[2 * LINK_COST * RES_COST_MULT]
-	Link: Computers[2 * LINK_COST * RES_COST_MULT]
-	Link: Nanotech[2 * LINK_COST * RES_COST_MULT]
-	Link: Materials[2 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:        Sociology [2 * LINK_COST * RES_COST_MULT]
+	Link:        Chemistry [2 * LINK_COST * RES_COST_MULT]
+	Link:        Computers [2 * LINK_COST * RES_COST_MULT]
+	Link:         Nanotech [2 * LINK_COST * RES_COST_MULT]
+	Link:        Materials [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [2 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-4 link_pay_rand 33.4%
 	OnLevel: 5-10 link_pay_rand 20%
+
 
 Technology: BeamWeapons
 	Name: #RS_BEAMWEAPONS_NAME
 	Description: #RS_BEAMWEAPONS_DESC
 	Icon: res_tech_24
 	Position: -1,1
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Shields[4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: Shields [4 * LINK_COST * RES_COST_MULT]
+	Link: DeadEnd [4 * LINK_COST * RES_COST_MULT]
+	Link: DeadEnd [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Shields
 	Name: #RS_SHIELDS_NAME
 	Description: #RS_SHIELDS_DESC
 	Icon: res_tech_15
 	Position: 0,2
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (25000 + (15000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: BeamWeapons[4 * LINK_COST * RES_COST_MULT]
-	Link: Stealth[4 * LINK_COST * RES_COST_MULT]
-	Link: Sensors[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: BeamWeapons [4 * LINK_COST * RES_COST_MULT]
+	Link:     Stealth [4 * LINK_COST * RES_COST_MULT]
+	Link:     Sensors [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Stealth
 	Name: #RS_STEALTH_NAME
 	Description: #RS_STEALTH_DESC
 	Icon: res_tech_9
 	Position: 1,2
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (25000 + (25000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Shields[8 * LINK_COST * RES_COST_MULT]
-	Link: Sensors[8 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: Shields [8 * LINK_COST * RES_COST_MULT]
+	Link: Sensors [8 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: ProjWeapons
 	Name: #RS_PROJECTILEWEAPONS_NAME
 	Description: #RS_PROJECTILEWEAPONS_DESC
 	Icon: res_tech_13
 	Position: 2,0
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Armor[4 * LINK_COST * RES_COST_MULT]
-	Link: Missiles[4 * LINK_COST * RES_COST_MULT]
-	Link: ParticlePhysics[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:           Armor [4 * LINK_COST * RES_COST_MULT]
+	Link:        Missiles [4 * LINK_COST * RES_COST_MULT]
+	Link: ParticlePhysics [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Missiles
 	Name: #RS_MISSILES_NAME
 	Description: #RS_MISSILES_DESC
 	Icon: res_tech_20
 	Position: 2,-1
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
+
 	Link: Engines[4 * LINK_COST * RES_COST_MULT]
 	Link: Armor[4 * LINK_COST * RES_COST_MULT]
 	Link: ProjWeapons[4 * LINK_COST * RES_COST_MULT]
 	Link: ParticlePhysics[4 * LINK_COST * RES_COST_MULT]
-	
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Engines
 	Name: #RS_ENGINES_NAME
 	Description: #RS_ENGINES_DESC
 	Icon: res_tech_11
 	Position: 1,-2
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
+
 	Link: Materials[4 * LINK_COST * RES_COST_MULT]
 	Link: ParticlePhysics[4 * LINK_COST * RES_COST_MULT]
 	Link: ShipSystems[4 * LINK_COST * RES_COST_MULT]
 	Link: Gravitics[4 * LINK_COST * RES_COST_MULT]
 	Link: Missiles[4 * LINK_COST * RES_COST_MULT]
-	
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: ShipConstruction
 	Name: #RS_SHIPCONSTRUCTION_NAME
 	Description: #RS_SHIPCONSTRUCTION_DESC
 	Icon: res_tech_15
 	Position: 0,-3
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
+
 	Link: Gravitics[8 * LINK_COST * RES_COST_MULT]
 	Link: ShipSystems[8 * LINK_COST * RES_COST_MULT]
 	Link: WarpPhysics[8 * LINK_COST * RES_COST_MULT]
 	Link: MegaConstruction[8 * LINK_COST * RES_COST_MULT]
-	
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: MegaConstruction
 	Name: #RS_MEGACONSTRUCTION_NAME
 	Description: #RS_MEGACONSTRUCTION_DESC
 	Icon: res_tech_21
 	Position: 0,-4
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (25000 + (25000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: ShipConstruction[16 * LINK_COST * RES_COST_MULT]
-	Link: WarpPhysics[16 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: ShipConstruction [16 * LINK_COST * RES_COST_MULT]
+	Link:      WarpPhysics [16 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: ShipSystems
 	Name: #RS_SHIPSYSTEMS_NAME
 	Description: #RS_SHIPSYSTEMS_DESC
 	Icon: res_tech_10
 	Position: 0,-2
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: ShipConstruction[4 * LINK_COST * RES_COST_MULT]
-	Link: Gravitics[4 * LINK_COST * RES_COST_MULT]
-	Link: Engines[4 * LINK_COST * RES_COST_MULT]
-	Link: Computers[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: ShipConstruction [4 * LINK_COST * RES_COST_MULT]
+	Link:        Gravitics [4 * LINK_COST * RES_COST_MULT]
+	Link:          Engines [4 * LINK_COST * RES_COST_MULT]
+	Link:        Computers [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 //Technology: SystemStrength
 //	Name: #RS_SYSTEMSTRENGTH_NAME
 //	Description: #RS_SYSTEMSTRENGTH_DESC
 //	Icon: res_tech_10
 //	Position: 1,-1
-//	
+//
 //	StartLevel: 1
 //	MaxLevel: pow(99,99)
 //	Cost: (10000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-//	
+//
 //	Link: ShipSystems[4 * LINK_COST * RES_COST_MULT]
 //	Link: Armor[3 * LINK_COST * RES_COST_MULT]
 //	Link: ShipConstruction[4 * LINK_COST * RES_COST_MULT]
 //	Link: Kinematics[2 * LINK_COST * RES_COST_MULT]
-//	
+//
 //	OnLevel: 2-5 link_pay_rand 33.4%
 //	OnLevel: 6-15 link_pay_rand 20%
-	
+
 
 Technology: Cargo
 	Name: #RS_CARGO_NAME
 	Description: #RS_CARGO_DESC
 	Icon: res_tech_19
 	Position: 3,0
-	
+
 	StartLevel: max(1, RES_START_LEVEL)
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
+
 	Link: Armor[8 * LINK_COST * RES_COST_MULT]
+
 
 Technology: Computers
 	Name: #RS_COMPUTERS_NAME
 	Description: #RS_COMPUTERS_DESC
 	Icon: res_tech_12
 	Position: -1,-2
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: Command[4 * LINK_COST * RES_COST_MULT]
-	Link: Biology[4 * LINK_COST * RES_COST_MULT]
-	Link: Sociology[4 * LINK_COST * RES_COST_MULT]
-	Link: Materials[4 * LINK_COST * RES_COST_MULT]
-	Link: ShipSystems[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link:     Command [4 * LINK_COST * RES_COST_MULT]
+	Link:     Biology [4 * LINK_COST * RES_COST_MULT]
+	Link:   Sociology [4 * LINK_COST * RES_COST_MULT]
+	Link:   Materials [4 * LINK_COST * RES_COST_MULT]
+	Link: ShipSystems [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Sensors
 	Name: #RS_SENSORS_NAME
 	Description: #RS_SENSORS_DESC
 	Icon: res_tech_14
 	Position: 1,1
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (15000 + (12500 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: EnergyPhsyics[4 * LINK_COST * RES_COST_MULT]
-	Link: Stealth[4 * LINK_COST * RES_COST_MULT]
-	Link: Shields[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: EnergyPhsyics [4 * LINK_COST * RES_COST_MULT]
+	Link:       Stealth [4 * LINK_COST * RES_COST_MULT]
+	Link:       Shields [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
+
 
 Technology: Armor
 	Name: #RS_ARMOR_NAME
 	Description: #RS_ARMOR_DESC
 	Icon: res_tech_5
 	Position: 3,-1
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (7500 + (11000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
-	
-	Link: ProjWeapons[8 * LINK_COST * RES_COST_MULT]
-	Link: Missiles[8 * LINK_COST * RES_COST_MULT]
-	Link: Cargo[8 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: ProjWeapons [8 * LINK_COST * RES_COST_MULT]
+	Link:    Missiles [8 * LINK_COST * RES_COST_MULT]
+	Link:       Cargo [8 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 8-15 link_pay_rand 20%
+
 
 Technology: Nanotech
 	Name: #RS_NANOTECH_NAME
 	Description: #RS_NANOTECH_DESC
 	Icon: res_tech_25
 	Position: -2,0
-	
+
 	StartLevel: if(RES_SHOW_ALL_TECHS, RES_START_LEVEL, 0)
 	MaxLevel: pow(99,99)
 	Cost: (15000 * pow(RES_COST_CURVE, NextLevel)) * RES_COST_MULT
-	
-	Link: Cybernetics[8 * LINK_COST * RES_COST_MULT]
-	Link: Chemistry[4 * LINK_COST * RES_COST_MULT]
-	Link: Biology[4 * LINK_COST * RES_COST_MULT]
-	Link: Sociology[4 * LINK_COST * RES_COST_MULT]
-	Link: Metallurgy[4 * LINK_COST * RES_COST_MULT]
-	
+
+	Link: Cybernetics [8 * LINK_COST * RES_COST_MULT]
+	Link:   Chemistry [4 * LINK_COST * RES_COST_MULT]
+	Link:     Biology [4 * LINK_COST * RES_COST_MULT]
+	Link:   Sociology [4 * LINK_COST * RES_COST_MULT]
+	Link:  Metallurgy [4 * LINK_COST * RES_COST_MULT]
+
 	OnLevel: 2-4 link_pay_rand 33.4%
 	OnLevel: 5-12 link_pay_rand 20%
+
