@@ -228,9 +228,9 @@ Technology: BeamWeapons
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
 
-	Link: Shields [4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd [4 * LINK_COST * RES_COST_MULT]
-	Link: DeadEnd [4 * LINK_COST * RES_COST_MULT]
+	Link:    EnergyPhysics [4 * LINK_COST * RES_COST_MULT]
+	Link:          Shields [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
 
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
@@ -246,9 +246,12 @@ Technology: Shields
 	MaxLevel: pow(99,99)
 	Cost: (25000 + (15000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
 
-	Link: BeamWeapons [4 * LINK_COST * RES_COST_MULT]
-	Link:     Stealth [4 * LINK_COST * RES_COST_MULT]
-	Link:     Sensors [4 * LINK_COST * RES_COST_MULT]
+	Link:    EnergyPhysics [4 * LINK_COST * RES_COST_MULT]
+	Link:      BeamWeapons [4 * LINK_COST * RES_COST_MULT]
+	Link:          Stealth [4 * LINK_COST * RES_COST_MULT]
+	Link:          Sensors [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
 
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
@@ -264,8 +267,9 @@ Technology: Stealth
 	MaxLevel: pow(99,99)
 	Cost: (25000 + (25000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
 
-	Link: Shields [8 * LINK_COST * RES_COST_MULT]
-	Link: Sensors [8 * LINK_COST * RES_COST_MULT]
+	Link:          Shields [8 * LINK_COST * RES_COST_MULT]
+	Link:          Sensors [8 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [8 * LINK_COST * RES_COST_MULT]
 
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
@@ -281,9 +285,11 @@ Technology: ProjWeapons
 	MaxLevel: pow(99,99)
 	Cost: (5000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
 
-	Link:           Armor [4 * LINK_COST * RES_COST_MULT]
-	Link:        Missiles [4 * LINK_COST * RES_COST_MULT]
-	Link: ParticlePhysics [4 * LINK_COST * RES_COST_MULT]
+	Link:  ParticlePhysics [4 * LINK_COST * RES_COST_MULT]
+	Link:         Missiles [4 * LINK_COST * RES_COST_MULT]
+	Link:            Armor [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
 
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
@@ -299,10 +305,12 @@ Technology: Missiles
 	MaxLevel: pow(99,99)
 	Cost: (10000 + (10000 * pow(RES_COST_CURVE, NextLevel))) * RES_COST_MULT
 
-	Link: Engines[4 * LINK_COST * RES_COST_MULT]
-	Link: Armor[4 * LINK_COST * RES_COST_MULT]
-	Link: ProjWeapons[4 * LINK_COST * RES_COST_MULT]
-	Link: ParticlePhysics[4 * LINK_COST * RES_COST_MULT]
+	Link:  ParticlePhysics [4 * LINK_COST * RES_COST_MULT]
+	Link:      ProjWeapons [4 * LINK_COST * RES_COST_MULT]
+	Link:          Engines [4 * LINK_COST * RES_COST_MULT]
+	Link:            Armor [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
+	Link:          DeadEnd [4 * LINK_COST * RES_COST_MULT]
 
 	OnLevel: 2-5 link_pay_rand 33.4%
 	OnLevel: 6-15 link_pay_rand 20%
