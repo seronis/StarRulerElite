@@ -70,7 +70,7 @@ import float makeAdvParts(Object@ obj, float Rate) from "Economy";
 //Metal/Electronics/AdvParts Frenzy
 // +100% Chosen resource generation rate. -90% Other resource generation rate
 
-const float baseWorkRate = 0.5f, workPopulationLevel = float(60.0 * million), workMoodImpact = 2.f, laborRate = 10.f;
+const float baseWorkRate = 0.5f, workPopulationLevel = float(60.0 * million), workMoodImpact = 2.f;
 
 const float moodDecayRate = float(1.0 - 0.1);
 
@@ -156,19 +156,113 @@ float modifyEcoRate(float rate, ecoMode type, ecoMode rateMode, ecoMode typeMode
 	}
 }
 
-//Performs economic generation for planets
+bool useNewPLTick = false;
+
+void togglePLTick() {
+	useNewPLTick = !useNewPLTick;
+}
+
 void tick(Planet@ pl, float time) {
+	if(useNewPLTick) {
+		tick_new(pl,time);
+	} else {
+		tick_old(pl,time);
+	}
+}
+
+//Performs economic generation for planets
+//NOTE: while testing we want to AVOID taking into account traits/acts
+//		as those are most likely going to get extensive rewrite.
+// _pl:
+//      planet that the tick event is being called upon
+// _time:
+//      number of seconds passed since last tick. 1 sec == 1 game year
+void tick_new(Planet@ _pl, float _time) {
+	Object@ obj = _pl;
+	Empire@ emp = obj.getOwner();
+	float popCur = _pl.getPopulation();
+	float popMax = _pl.getMaxPopulation();
+
+	// {** validity checks
+	if(emp is null || emp.isValid() == false) {
+		return; //skip unowned planets
+	}
+	if(popCur <= 0.1f || popMax <= 0.1f) {
+		return; //skip dead planets
+	} // **}
+
+	State@ resFood = null;
+	float eatsGoal = 0.f; //pct of 'food eaten' / 'food needed'
+
+	// {** calculate and perform food consumption
+	{
+		// avg human eats 500kg of food per year. 1 'Food' = 1000000 tonne
+		float eatsRate = 0.0000005f; //TODO: this should probably be a global
+
+		//TODO: all adjustments to eatsRate and desired food type go here
+		resFood = obj.getState(strFood);
+
+		// calc consumption. (NOTE: no traits/acts tweaks past here)
+		float eatsHave = resFood.getAvailable();
+		//NOTE: elderly/youths eat half as much as normal (0.9f adjustment)
+		//      this concept is used below when calculating starvation
+		float eatsNeed = popCur * eatsRate * 0.9f * _time;
+		float eatsUsed = min(eatsHave,eatsNeed);
+
+		// perform consumption
+		resFood.consume(eatsUsed,obj);
+		eatsGoal = eatsUsed/eatsNeed;
+	} // **}
+
+	// {** calculate and execute births/deaths
+	{
+		// yearly avg repo rates of humans in last century
+		float baseBirthRate = 0.024;
+		float baseDeathRate = 0.006;
+
+		//TODO: adjust for traits/acts/etc
+		if( obj.isUnderAttack() ) {
+			baseBirthRate *= 0.75f; //TODO: take into account strength ratios
+		}
+		
+		//adjust births/deaths for food consumption / starvation levels
+		if( eatsGoal < 1.0f )
+		{
+			//NOTE: births should be affected anytime food is scarce
+			baseBirthRate *= eatsGoal;
+
+			//NOTE: starvation deaths only increase passed 'half rations' rate
+			if( eatsGoal < 0.5f ) {
+				float baseSurvRate = 1 - baseDeathRate;
+				baseSurvRate = pow(baseSurvRate,(1/pow(eatsGoal*2,2)) );
+				baseDeathRate = 1 - baseSurvRate;
+			}
+		}
+
+		//most population born based on current pop level and space available
+		//NOTE: should be no tweaking beyond this point
+		float repoRate = baseBirthRate - baseDeathRate;
+		float popAdj = (popCur * popMax) / (popCur + ((popMax - popCur) * pow(float(c_e), -repoRate * _time))) - popCur;
+		_pl.modPopulation(popAdj);
+	} // **}
+
+	State@ mood = obj.getState(strMood);
+	
+}
+
+//Performs economic generation for planets
+void tick_old(Planet@ pl, float time) {
 	Object@ obj = pl;
 	Empire@ emp = obj.getOwner();
 	if(emp is null || emp.isValid() == false)
 		return;
-	
+
 	State@ mood = obj.getState(strMood);
-	
+
 	float population = pl.getPopulation();
 	if(population <= 0.1f)
 		return;
-	
+
 	float lackOfWorkers = 1.f;
 	{
 		State@ workers = pl.toObject().getState(strWorkers);
@@ -187,9 +281,10 @@ void tick(Planet@ pl, float time) {
 			consumptionRate *= 2.f;
 		if (emp.hasTraitTag(strFastReproduction))
 			reproduction *= 2.f;
-		if(obj.isUnderAttack())
+		if (obj.isUnderAttack())
 			reproduction *= 0.5f;
 
+			// y = (1000*50000) / (1000+(49000 * 2.718 ^ (-0.02 * x)))
 		float growth = (pop * maxPop) / (pop + ((maxPop - pop) * pow(float(c_e), -reproduction * time))) - pop;
 		pl.modPopulation(growth);
 
@@ -206,7 +301,7 @@ void tick(Planet@ pl, float time) {
 			foodSupplyPct = populationConsume(pl, strMetl, consumption, time);
 		}
 	}
-	
+
 	bool hasCivilActs = !emp.hasTraitTag(strDisableCivilActs);
 	popMode mode = PM_Normal;
 	if (hasCivilActs)
@@ -214,7 +309,7 @@ void tick(Planet@ pl, float time) {
 			mode = PM_Work_Slow;
 		else if(emp.getSetting(actForcedLabor) == 1)
 			mode = PM_Work_Hard;
-	
+
 	ethic workEthic = EC_Normal;
 	if (hasCivilActs)
 		switch(uint(emp.getSetting(strEthics))) {
@@ -223,7 +318,7 @@ void tick(Planet@ pl, float time) {
 			case 2:
 				workEthic = EC_Economy; break;
 		}
-	
+
 	ecoMode ecoRate = EM_Normal, ecoType = EM_Metals;
 	uint ecoSetting = 0;
 
@@ -238,16 +333,16 @@ void tick(Planet@ pl, float time) {
 				ecoType = EM_AdvParts; break;
 		}
 	}
-	
+
 	if(ecoSetting >= 4)
 		ecoRate = EM_Frenzy;
 	else if(ecoSetting > 0)
 		ecoRate = EM_Focus;
-	
+
 	float moodDecayFactor = time;
 	float moodDecayToward = 0;
 	bool hasMood = !emp.hasTraitTag(strIndifferent);
-	
+
 	float workRate = time * baseWorkRate * lackOfWorkers * (0.5f + (population / workPopulationLevel));
 	switch(mode) {
 		case PM_Work_Slow:
@@ -261,14 +356,14 @@ void tick(Planet@ pl, float time) {
 			moodDecayToward = -0.5f;
 			break;
 	}
-	
+
 	//Decay mood
 	if (hasMood)
 		mood.val = approachVal(mood.val, moodDecayToward, pow(moodDecayRate,moodDecayFactor));
 	else
 		mood.val = 0;
-	
-	float tickLabor = workRate * laborRate;
+
+	float tickLabor = workRate * 10.f;
 	float tickEco = workRate;
 	if(workEthic == EC_Labor) {
 		tickLabor *= 1.5f;
@@ -298,35 +393,35 @@ void tick(Planet@ pl, float time) {
 
 	System@ parent = obj.getParent();
 	bool blockaded = parent !is null && parent.isBlockadedFor(emp);
-	
+
 	State@ advRate = obj.getState(strAdvpGen);
 	if(@advRate != null && advRate.max > 0)
 		advRate.val = makeAdvParts(obj, modifyEcoRate(advRate.max * tickEco, EM_AdvParts, ecoRate, ecoType)) / time;
-		
+
 	State@ elcRate = obj.getState(strElecGen);
 	if(@elcRate != null && elcRate.max > 0)
 		elcRate.val = makeElectronics(obj, modifyEcoRate(elcRate.max * tickEco, EM_Elects, ecoRate, ecoType)) / time;
-	
+
 	State@ mtlRate = obj.getState(strMetlGen);
 	if(@mtlRate != null && mtlRate.max > 0)
 		mtlRate.val = processOre(obj, modifyEcoRate(mtlRate.max * tickEco, EM_Metals, ecoRate, ecoType)) / time;
-		
+
 	State@ fuelRate = obj.getState(strFuelGen);
 		/*
 	if(@fuelRate != null && fuelRate.max > 0)
 		fuelRate.val = makeFuel(obj, fuelRate.max) / time;
 		*/
-		
+
 	State@ ammoRate = obj.getState(strAmmoGen);
 		/*
 	if(@ammoRate != null && ammoRate.max > 0)
 		ammoRate.val = makeAmmo(obj, ammoRate.max * tickEco) / time;
 		*/
-		
+
 	float consumeFactor = time;
 	if(hasCivilActs && emp.getSetting(actTaxBreak) == 1)
 		consumeFactor *= 1.5f;
-	
+
 	if(hasMood) {
 		//Consume goods and luxuries
 		//Lacking goods only hurts happiness
@@ -351,7 +446,7 @@ void tick(Planet@ pl, float time) {
 
 		if(gotGoods < needGoods)
 			mood.val = approachVal(mood.val, -1.f, pow(noGoodsDecay, consumeFactor * (needGoods-gotGoods)/needGoods) );
-	
+
 		//Having luxuries only increases happiness
 		float needLux = population * luxPerPerson * consumeFactor;
 		if (emp.hasTraitTag(strLowLuxuries))
@@ -380,7 +475,7 @@ void tick(Planet@ pl, float time) {
 
 		if(gotLux > 0)
 			mood.val = approachVal(mood.val, 1.f, pow(luxGrowth, consumeFactor * (1.f - (needLux-gotLux)/needLux) ) );
-		
+
 		if(pl.toObject().isUnderAttack())
 			mood.val = approachVal(mood.val, -1.f, pow(noGoodsDecay, time));
 		if(foodSupplyPct < 1.f)
@@ -420,7 +515,7 @@ void tick(Planet@ pl, float time) {
 
 			float cargoUsed, cargoSpace, cargoSpaceLeft;
 			obj.getCargoVals(cargoUsed, cargoSpace); cargoSpaceLeft = cargoSpace - cargoUsed;
-		
+
 			// Figure out trade mode
 			float tval = 0, tmax = 0, treq = 0, tcargo = 0;
 			TradeMode advMode = TM_All, elcMode = TM_All, mtlMode = TM_All, fudMode = TM_All;
@@ -430,28 +525,28 @@ void tick(Planet@ pl, float time) {
 				mtlMode = TradeMode(int(treq));
 				fudMode = TradeMode(int(tcargo));
 			}
-			
+
 			//emp.getStatStats(strFood, v,i,e,d);	
 			State@ sp_Food = obj.getState(strFood);
 			float foodWeight = getResourceWeight(sp_Food, cargoSpaceLeft, tradeTarget); //float(e/max(i,1.0));
-			
+
 			State@ sp_Metals = obj.getState(strMetl);
 			float mtlWeight = getResourceWeight(sp_Metals, cargoSpaceLeft, tradeTarget);
-			
+
 			State@ sp_Elecs = obj.getState(strElec);
 			float elecWeight = getResourceWeight(sp_Elecs, cargoSpaceLeft, tradeTarget);
-			
+
 			State@ sp_Advs = obj.getState(strAdvp);
 			float advWeight = getResourceWeight(sp_Advs, cargoSpaceLeft, tradeTarget);
-			
+
 			State@ sp_Fuel = obj.getState(strFuel);
 			float fuelWeight = getResourceWeight(sp_Fuel, sp_Fuel.getTotalFreeSpace(obj), tradeTarget);
-			
+
 			State@ sp_Ammo = obj.getState(strAmmo);
 			float ammoWeight = getResourceWeight(sp_Ammo, sp_Ammo.getTotalFreeSpace(obj), tradeTarget);
-			
+
 			float totalWeight = abs(foodWeight) + abs(mtlWeight) + abs(elecWeight) + abs(advWeight) + abs(fuelWeight) + abs(ammoWeight);
-			
+
 			if(totalWeight > 0) {
 				advRate.inCargo  = tradeResource(emp, obj, sp_Advs,   strAdvp, tickTrade *  advWeight/totalWeight, tradeEff, advMode);
 				elcRate.inCargo  = tradeResource(emp, obj, sp_Elecs,  strElec, tickTrade * elecWeight/totalWeight, tradeEff, elcMode);
@@ -470,7 +565,7 @@ void tick(Planet@ pl, float time) {
 				fuelRate.inCargo = 0;
 				ammoRate.inCargo = 0;
 			}
-			
+
 			float traded = 0.f;
 
 			if (tickTrade > 0) {
