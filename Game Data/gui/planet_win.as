@@ -55,7 +55,7 @@ string@[] resNames =   { "#advparts",     "#electronics", "#metals",      "#ore"
                          "#food",         "#fuel",        "#ammo",        "#goods",       "#luxuries",   };
 uint[] resColors =     {  0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff,
                           0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff,     0xffffffff     };
-						  
+
 /* }}} */
 /* {{{ Planet Window Handle */
 class PlanetWindowHandle {
@@ -322,12 +322,12 @@ class PlanetWindow : ScriptedGuiHandler {
 
 		@resources = ResourceGrid(topPanel, pos2di(7, 103), 6);
 		resources.iconSize = dim2di(17, 17);
-		resources.add(gui_sprite("planet_topbar_resources", 0), localize("#PLTT_Food"), 0, 0);
-		resources.add(gui_sprite("planet_topbar_resources", 1), localize("#PLTT_Deep"), 0);
-		resources.add(gui_sprite("planet_topbar_resources", 2), localize("#PLTT_Damage"), 0);
-		resources.add(gui_sprite("planet_topbar_resources", 3), localize("#PLTT_Labor"), 0, 0);
+		resources.add(gui_sprite("planet_topbar_resources", 0), localize("#PLTT_Food"),    0, 0);
+		resources.add(gui_sprite("planet_topbar_resources", 1), localize("#PLTT_Deep"),    0   );
+		resources.add(gui_sprite("planet_topbar_resources", 2), localize("#PLTT_Damage"),  0   );
+		resources.add(gui_sprite("planet_topbar_resources", 3), localize("#PLTT_Labor"),   0, 0);
 		resources.add(gui_sprite("planet_topbar_resources", 4), localize("#PLTT_Workers"), 0, 0);
-		resources.add(gui_sprite("planet_topbar_resources", 5), localize("#PLTT_Mood"), 0, 1);
+		resources.add(gui_sprite("planet_topbar_resources", 5), localize("#PLTT_Mood"),    0, 1);
 
 		// Tabs
 		@queueTab   = TabButton(recti(), localize("#PL_MANAGE_QUEUE"), topPanel);
@@ -473,11 +473,11 @@ class PlanetWindow : ScriptedGuiHandler {
 		allowExport.setToolTip(localize("#PLTT_AllowExport"));
 
 		// Create economy headers
-		@txt = GuiStaticText(recti(pos2di(130, 92), dim2di(120, 20)), localize("#PL_Storage"), false, false, false, econPanel);
+		@txt = GuiStaticText(recti(pos2di(130, 92), dim2di(120, 20)), localize("#PL_Storage"),     false, false, false, econPanel);
 		txt.setToolTip(localize("#PLTT_Storage"));
 		txt.orphan(true);
 
-		@txt = GuiStaticText(recti(pos2di(230, 92), dim2di(105, 20)), localize("#PL_Production"), false, false, false, econPanel);
+		@txt = GuiStaticText(recti(pos2di(230, 92), dim2di(105, 20)), localize("#PL_Production"),  false, false, false, econPanel);
 		txt.setToolTip(localize("#PLTT_Production"));
 		txt.orphan(true);
 		txt.setTextAlignment(EA_Right, EA_Top);
@@ -487,40 +487,41 @@ class PlanetWindow : ScriptedGuiHandler {
 		txt.orphan(true);
 		txt.setTextAlignment(EA_Right, EA_Top);
 
-		@txt = GuiStaticText(recti(pos2di(460, 92), dim2di(105, 20)), localize("#PL_Trade"), false, false, false, econPanel);
+		@txt = GuiStaticText(recti(pos2di(460, 92), dim2di(105, 20)), localize("#PL_Trade"),       false, false, false, econPanel);
 		txt.setToolTip(localize("#PLTT_Trade"));
 		txt.orphan(true);
 		txt.setTextAlignment(EA_Right, EA_Top);
 
-		@txt = GuiStaticText(recti(pos2di(575, 92), dim2di(105, 20)), localize("#PL_NetChange"), false, false, false, econPanel);
+		@txt = GuiStaticText(recti(pos2di(575, 92), dim2di(105, 20)), localize("#PL_NetChange"),   false, false, false, econPanel);
 		txt.setToolTip(localize("#PLTT_NetChange"));
 		txt.orphan(true);
 		txt.setTextAlignment(EA_Right, EA_Top);
 
 		// Create economy data fields
 		for (uint i = 0; i < 10; ++i) {
+			// 0. resource name
 			GuiStaticText@ text = GuiStaticText(recti(pos2di(12, 128+(20*i)), dim2di(60, 20)), null, false, false, false, econPanel);
 			text.setText(localize(resNames[i]));
 			text.setColor(Color(resColors[i]));
 			@economyValues[(i*7)] = text;
 
-		//	if (i < 4 || i > 5) {
-				@text = GuiStaticText(recti(pos2di(130, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
-				text.setTextAlignment(EA_Right, EA_Top);
-				@economyValues[(i*7)+1] = text;
+			// 1. storage values, current
+			@text = GuiStaticText(recti(pos2di(130, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
+			text.setTextAlignment(EA_Right, EA_Top);
+			@economyValues[(i*7)+1] = text;
 
-				@text = GuiStaticText(recti(pos2di(175, 128+(20*i)), dim2di(10, 20)), "/", false, false, false, econPanel);
-				text.orphan(true);
+			@text = GuiStaticText(recti(pos2di(175, 128+(20*i)), dim2di(10, 20)), "/", false, false, false, econPanel);
+			text.orphan(true);
 
-				@text = GuiStaticText(recti(pos2di(180, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
-				text.setTextAlignment(EA_Right, EA_Top);
-				@economyValues[(i*7)+2] = text;
-		//	}
+			// 2. storage values, max
+			@text = GuiStaticText(recti(pos2di(180, 128+(20*i)), dim2di(40, 20)), null, false, false, false, econPanel);
+			text.setTextAlignment(EA_Right, EA_Top);
+			@economyValues[(i*7)+2] = text;
 
+			// 3-6. Production, Consumption, Trade, and Change values
 			for (uint h = 0; h < 4; ++h) {
 				@text = GuiStaticText(recti(pos2di(230+(115*h), 128+(20*i)), dim2di(105, 20)), null, false, false, false, econPanel);
 				text.setTextAlignment(EA_Right, EA_Top);
-
 				@economyValues[(i*7)+h+3] = text;
 			}
 		}
@@ -1414,7 +1415,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		for(uint i = 0; i < strCnt; ++i) {
 			const subSystem@ sys = list.getStructure(i);
 			string@ sysName = sys.type.getName();
-			if(!sys.type.hasTag(strUnique))
+		//	if(!sys.type.hasTag(strUnique))
 				sysName += " " + f_to_s(sys.level, 0);
 			switch(list.getStructureState(i).getState()) {
 				case SS_Disabled:
@@ -1455,6 +1456,7 @@ class PlanetWindow : ScriptedGuiHandler {
 		}
 	}
 	/* }}} */
+
 	/* {{{ Economy values */
 	float advAvg;
 	float elcAvg;
@@ -1688,30 +1690,34 @@ class PlanetWindow : ScriptedGuiHandler {
 			if (obj.getStateVals( strAdvp, val, max, temp, cargo))		updateStorage(0, val+cargo, max);
 			if (obj.getStateVals( strElec, val, max, temp, cargo))		updateStorage(1, val+cargo, max);
 			if (obj.getStateVals( strMetl, val, max, temp, cargo))		updateStorage(2, val+cargo, max);
-			if (obj.getStateVals( strFood, val, max, temp, cargo))		updateStorage(3, val+cargo, max);
-
+			if (obj.getStateVals( strOres, val, max, temp, cargo))		updateStorage(3, val+cargo, max);
+			if (obj.getStateVals( strScrp, val, max, temp, cargo))		updateStorage(4, val+cargo, max);
+			if (obj.getStateVals( strFood, val, max, temp, cargo))		updateStorage(5, val+cargo, max);
 			if (obj.getStateVals( strFuel, val, max, temp, cargo))		updateStorage(6, val+cargo, max);
 			if (obj.getStateVals( strAmmo, val, max, temp, cargo))		updateStorage(7, val+cargo, max);
+			if (obj.getStateVals( strGuds, val, max, temp, cargo))		updateStorage(8, val+cargo, max);
+			if (obj.getStateVals( strLuxs, val, max, temp, cargo))		updateStorage(9, val+cargo, max);
 
 			updateRate(0, advAvg+advGen, 0,         -advExpAvg);
 			updateRate(1, elcAvg+elcGen, -elcCons,  -elcExpAvg);
 			updateRate(2, mtlAvg+mtlGen, -mtlCons,  -mtlExpAvg);
-			updateRate(3, foodGen,       -foodCons, -fudExpAvg);
-
-			if (hasMood) {
-				updateRate(4, gudsGen, -gudsCons, gudExpAvg);
-				updateRate(5, luxsGen, -luxsCons, luxExpAvg);
-			}
-			else {
-				updateRate(4, 0, 0, 0);
-				updateRate(5, 0, 0, 0);
-			}
 			
+			updateRate(5, foodGen,       -foodCons, -fudExpAvg);
 			updateRate(6, fulAvg+fulGen, 0,         -fulExpAvg);
 			updateRate(7, amoAvg+amoGen, 0,         -amoExpAvg);
+
+			if (hasMood) {
+				updateRate(8, gudsGen, -gudsCons, gudExpAvg);
+				updateRate(9, luxsGen, -luxsCons, luxExpAvg);
+			}
+			else {
+				updateRate(8, 0, 0, 0);
+				updateRate(9, 0, 0, 0);
+			}
 		}
 	}
 	/* }}} */
+
 	/* {{{ Constructible hover information */
 	void hoverStructure() {
 		hb_panel.setVisible(true);
